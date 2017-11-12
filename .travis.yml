@@ -1,0 +1,26 @@
+language: python
+sudo: false
+cache: pip
+
+python:
+  - "3.4"
+  - "2.7"
+
+branches:
+  only:
+    - master
+
+before_install:
+  - pip install -U pip wheel setuptools
+  - pip install --no-cache-dir -U -r requirements-test.txt
+  - ./runflake8
+  - ./runisort
+
+install:
+  - python setup.py -q develop
+
+script:
+  - coverage run --source=django_loci runtests.py
+
+after_success:
+  coveralls
