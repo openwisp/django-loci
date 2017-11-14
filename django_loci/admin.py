@@ -4,7 +4,7 @@ from django import forms
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericStackedInline
-from django.core.eceptions import ValidationError
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
