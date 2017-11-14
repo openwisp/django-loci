@@ -36,7 +36,6 @@ class FloorPlan(TimeStampedEditableModel):
                                     _('floor'))
 
 
-@python_2_unicode_compatible
 class ObjectLocation(TimeStampedEditableModel):
     LOCATION_TYPES = (
         ('outdoor', _('Outdoor')),
