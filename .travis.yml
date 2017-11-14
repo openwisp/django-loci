@@ -5,6 +5,7 @@ cache: pip
 addons:
   apt:
     packages:
+      - sqlite3
       - gdal-bin
       - libproj-dev
       - libgeos-dev
