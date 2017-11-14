@@ -2,6 +2,14 @@ language: python
 sudo: false
 cache: pip
 
+addons:
+  apt:
+    packages:
+      - gdal-bin
+      - libproj-dev
+      - libgeos-dev
+      - libspatialite-dev
+
 python:
   - "3.4"
   - "2.7"
