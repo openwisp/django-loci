@@ -160,7 +160,7 @@ class ObjectLocationForm(forms.ModelForm):
             raise ValidationError(_('Invalid selection'))
         try:
             return FloorPlan.objects.get(pk=pk)
-        except FloorPlan.DoesNotExist as e:
+        except FloorPlan.DoesNotExist:
             pass
         # TODO maybe here we can call the model validation logic
 
