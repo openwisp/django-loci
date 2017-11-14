@@ -1,51 +1,38 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from django.contrib.auth import get_user_model
-
-from ..models import Location, FloorPlan, ObjectLocation
-
-User = get_user_model()
+from . import TestLociMixin
+from ..models import FloorPlan, Location, ObjectLocation
+from .testdeviceapp.models import Device
 
 
-class TestModels(TestCase):
+class TestModels(TestLociMixin, TestCase):
     """
     tests for django_loci.models
     """
-    def _create_object(self):
-        return User.objects.create(username='tester',
-                                   password='tester',
-                                   email='test@test.com')
-
-    def _create_location(self, **kwargs):
-        options = dict(name='test-location',
-                       address='Via del Corso, Roma',
-                       geometry='SRID=4326;POINT (12.019043 42.277309)')
-        options.update(kwargs)
-        l = Location(**options)
-        l.full_clean()
-        l.save()
-        return l
+    object_model = Device
+    location_model = Location
+    floorplan_model = FloorPlan
+    object_location_model = ObjectLocation
 
     def test_location_str(self):
-        l = Location(name='test-location')
-        self.assertEqual(str(l), l.name)
+        loc = self.location_model(name='test-location')
+        self.assertEqual(str(loc), loc.name)
 
     def test_floorplan_str(self):
-        l = self._create_location()
-        fl = FloorPlan(location=l, floor=2)
+        loc = self._create_location()
+        fl = self.floorplan_model(location=loc, floor=2)
         self.assertEqual(str(fl), 'test-location 2nd floor')
 
     def test_object_location_clean_location(self):
         l1 = self._create_location()
         l2 = self._create_location()
-        fl2 = FloorPlan(location=l2, floor=1, image='dummy.jpg')
-        fl2.save()
-        user = self._create_object()
-        ol = ObjectLocation(content_object=user,
-                            type='indoor',
-                            location=l1,
-                            floorplan=fl2)
+        fl2 = self._create_floorplan(location=l2)
+        obj = self._create_object()
+        ol = self.object_location_model(content_object=obj,
+                                        type='indoor',
+                                        location=l1,
+                                        floorplan=fl2)
         try:
             ol.full_clean()
         except ValidationError as e:
@@ -54,3 +41,14 @@ class TestModels(TestCase):
                              'Invalid floorplan (belongs to a different location)')
         else:
             self.fail('ValidationError not raised')
+
+    def test_delete(self):
+        loc = self._create_location()
+        obj = self._create_object()
+        ol = self.object_location_model(content_object=obj,
+                                        type='mobile',
+                                        location=loc)
+        ol.full_clean()
+        ol.save()
+        ol.delete()
+        self.assertEqual(self.location_model.objects.filter(id=loc.id).count(), 0)
