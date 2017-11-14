@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'channels',
 
     # test app
-    'building',
+    'django_loci.tests.testdeviceapp',
 ]
 
 STATICFILES_FINDERS = [
