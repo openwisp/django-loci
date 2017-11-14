@@ -7,7 +7,7 @@ from ..models import Location
 
 @receiver(post_save, sender=Location, dispatch_uid='ws_update_mobile_location')
 def update_mobile_location(sender, instance, **kwargs):
-    if instance.geometry: # TODO: and instance.type == 'mobile'
+    if instance.geometry:
         group_name = 'geo.mobile-location.{0}'.format(str(instance.pk))
         message = {'text': instance.geometry.geojson}
         Group(group_name).send(message, immediately=True)

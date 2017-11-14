@@ -2,7 +2,6 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.core.urlresolvers import reverse_lazy
 
 from openwisp_utils.admin_theme.admin import admin, openwisp_admin
 

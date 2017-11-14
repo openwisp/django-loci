@@ -1,7 +1,5 @@
 from django import forms
-from django.utils.html import mark_safe
 from django.templatetags.static import static
-
 from leaflet.forms.widgets import LeafletWidget as BaseLeafletWidget
 
 _floorplan_css = {'all': (static('django-loci/css/floorplan-widget.css'),)}

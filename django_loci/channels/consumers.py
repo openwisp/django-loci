@@ -1,6 +1,6 @@
 from channels import Group
-from channels.security.websockets import allowed_hosts_only
 from channels.auth import channel_session_user_from_http
+from channels.security.websockets import allowed_hosts_only
 from django.core.exceptions import ValidationError
 
 from ..models import Location
@@ -13,6 +13,7 @@ def get_object_or_false(model, **kwargs):
         return
 
 
+@allowed_hosts_only
 @channel_session_user_from_http
 def ws_add(message, pk):
     location = get_object_or_false(Location, pk=pk)

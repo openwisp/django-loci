@@ -44,7 +44,7 @@ class ObjectLocation(TimeStampedEditableModel):
         ('mobile', _('Mobile')),
     )
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    object_id = models.CharField(max_length=36, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     type = models.CharField(choices=LOCATION_TYPES, max_length=8)
     location = models.ForeignKey('django_loci.Location', models.PROTECT,
@@ -53,6 +53,9 @@ class ObjectLocation(TimeStampedEditableModel):
                                   blank=True, null=True)
     indoor = models.CharField(_('indoor position'), max_length=64,
                               blank=True, null=True)
+
+    class Meta:
+        unique_together = ('content_type', 'object_id')
 
     def _clean_location(self):
         if self.type == 'indoor' and self.location != self.floorplan.location:
@@ -66,6 +69,6 @@ class ObjectLocation(TimeStampedEditableModel):
         if self.type == 'mobile':
             delete_location = True
             location = self.location
-        super(DeviceLocation, self).delete(*args, **kwargs)
+        super(ObjectLocation, self).delete(*args, **kwargs)
         if delete_location:
             location.delete()

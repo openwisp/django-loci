@@ -4,7 +4,7 @@ from django import forms
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericStackedInline
-from django.core.exceptions import ValidationError
+from django.core.eceptions import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -13,8 +13,8 @@ from leaflet.admin import LeafletGeoAdmin
 from openwisp_utils.admin import TimeReadonlyAdminMixin
 
 from .fields import GeometryField
-from .models import ObjectLocation, FloorPlan, Location
-from .widgets import ImageWidget, FloorPlanWidget
+from .models import FloorPlan, Location, ObjectLocation
+from .widgets import FloorPlanWidget, ImageWidget
 
 
 class LocationForm(forms.ModelForm):
@@ -34,13 +34,14 @@ class LocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
     form = LocationForm
 
     def get_urls(self):
+        app_label = self.model._meta.app_label
         return [
             url(r'^(?P<pk>[^/]+)/json/$',
                 self.admin_site.admin_view(self.json_view),
-                name='geo_location_json'),
+                name='{0}_location_json'.format(app_label)),
             url(r'^(?P<pk>[^/]+)/floorplans/json/$',
                 self.admin_site.admin_view(self.floorplans_json_view),
-                name='geo_location_floorplans_json')
+                name='{0}_location_floorplans_json'.format(app_label))
         ] + super(LocationAdmin, self).get_urls()
 
     def json_view(self, request, pk):
@@ -109,7 +110,7 @@ class ObjectLocationForm(forms.ModelForm):
     floorplan_selection = forms.ChoiceField(required=False,
                                             choices=CHOICES)
     floorplan = UnvalidatedChoiceField(choices=((None, CHOICES[0][1]),),
-                                   required=False)
+                                       required=False)
     floor = forms.IntegerField(required=False)
     image = forms.ImageField(required=False,
                              widget=ImageWidget(thumbnail=False),
@@ -186,7 +187,7 @@ class ObjectLocationForm(forms.ModelForm):
                     err = ValidationError(msg, params=params)
                     self.add_error(field, err)
         elif type_ == 'mobile' and not instance.location:
-            data['name'] = instance.device.name
+            data['name'] = str(instance.content_object)
             data['address'] = ''
             data['geometry'] = ''
             data['location_selection'] = 'new'
@@ -202,7 +203,6 @@ class ObjectLocationForm(forms.ModelForm):
 
     def _get_location_instance(self):
         data = self.cleaned_data
-        instance = self.instance
         location = data.get('location') or Location()
         location.name = data.get('name') or location.name
         location.address = data.get('address') or location.address
@@ -241,7 +241,9 @@ class ObjectLocationInline(TimeReadonlyAdminMixin, GenericStackedInline):
     verbose_name = _('geographic information')
     verbose_name_plural = verbose_name
     raw_id_fields = ('location',)
-    template = 'admin/django-loci/location_inline.html'
+    max_num = 1
+    extra = 1
+    template = 'admin/django_loci/location_inline.html'
     fieldsets = (
         (None, {'fields': ('type',)}),
         ('Geographic coordinates', {
