@@ -12,7 +12,7 @@ addons:
       - libspatialite-dev
 
 python:
-  - "3.4"
+  - "3.6"
 
 branches:
   only:
