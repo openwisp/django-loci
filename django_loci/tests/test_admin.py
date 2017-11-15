@@ -6,10 +6,11 @@ from django.urls import reverse
 
 from . import TestAdminMixin, TestLociMixin
 from ..models import FloorPlan, Location, ObjectLocation
+from .testdeviceapp.models import Device
 
 
 class TestAdmin(TestAdminMixin, TestLociMixin, TestCase):
-    object_model = get_user_model()
+    object_model = Device
     location_model = Location
     floorplan_model = FloorPlan
     object_location_model = ObjectLocation
