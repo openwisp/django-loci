@@ -56,12 +56,16 @@ class ObjectLocation(TimeStampedEditableModel):
     class Meta:
         unique_together = ('content_type', 'object_id')
 
-    def _clean_location(self):
-        if self.type == 'indoor' and self.location != self.floorplan.location:
+    def _clean_indoor_location(self):
+        # skip validation if the instance does not
+        # have a floorplan assigned to it yet
+        if self.type != 'indoor' or not self.floorplan:
+            return
+        if self.location != self.floorplan.location:
             raise ValidationError(_('Invalid floorplan (belongs to a different location)'))
 
     def clean(self):
-        self._clean_location()
+        self._clean_indoor_location()
 
     def delete(self, *args, **kwargs):
         delete_location = False

@@ -165,7 +165,6 @@ class ObjectLocationForm(forms.ModelForm):
         # TODO maybe here we can call the model validation logic
 
     def clean(self):
-        instance = self.instance
         data = self.cleaned_data
         type_ = data['type']
         msg = _('this field is required for locations of type %(type)s')
@@ -186,20 +185,21 @@ class ObjectLocationForm(forms.ModelForm):
                     params = {'type': type_}
                     err = ValidationError(msg, params=params)
                     self.add_error(field, err)
-        elif type_ == 'mobile' and not instance.location:
-            data['name'] = str(instance.content_object)
+        elif type_ == 'mobile' and not data.get('location'):
+            # TODO: MOVE THIS TO EITHER DURING SAVE OR A MODEL METHOD
+            # data['name'] = str(instance.content_object)
             data['address'] = ''
             data['geometry'] = ''
             data['location_selection'] = 'new'
-        elif type_ == 'mobile' and instance.location:
+        elif type_ == 'mobile' and data.get('location'):
             data['location_selection'] = 'existing'
-        # clean location
-        instance.location = self._get_location_instance()
-        instance.location.full_clean()
-        # clean floorplan
-        if data['type'] == 'indoor':
-            instance.floorplan = self._get_floorplan_instance()
-            instance.floorplan.full_clean()
+        # # clean location
+        # location = self._get_location_instance()
+        # location.full_clean()
+        # # clean floorplan
+        # if data['type'] == 'indoor':
+        #     floorplan = self._get_floorplan_instance()
+        #     floorplan.full_clean()
 
     def _get_location_instance(self):
         data = self.cleaned_data

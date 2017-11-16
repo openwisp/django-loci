@@ -12,7 +12,7 @@ class TestLociMixin(object):
 
     def _create_location(self, **kwargs):
         options = dict(name='test-location',
-                       address='Via del Corso, Roma',
+                       address='Via del Corso, Roma, Italia',
                        geometry='SRID=4326;POINT (12.512124 41.898903)')
         options.update(kwargs)
         location = self.location_model(**options)

@@ -1,5 +1,10 @@
+import glob
+import os
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import GEOSGeometry
+from django.db.models.fields.files import ImageFieldFile
 from django.test import TestCase
 from django.urls import reverse
 
@@ -26,6 +31,11 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         '{0}-MIN_NUM_FORMS'.format(_p): '0',
         '{0}-MAX_NUM_FORMS'.format(_p): '1',
     }
+
+    @classmethod
+    def tearDownClass(cls):
+        for fl in glob.glob(os.path.join(settings.BASE_DIR, 'media/floorplan_*')):
+            os.remove(fl)
 
     def test_json_urls(self):
         self._login_as_admin()
@@ -148,7 +158,9 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-id'.format(p): str(ol.id),
             '{0}-INITIAL_FORMS'.format(p): '1',
         })
-        r = self.client.post(reverse('admin:testdeviceapp_device_change', args=[ol.content_object.pk]), params, follow=True)
+        r = self.client.post(reverse('admin:testdeviceapp_device_change',
+                                     args=[ol.content_object.pk]),
+                             params, follow=True)
         self.assertNotContains(r, 'errors')
         loc = self.location_model.objects.get(name=changed_name)
         self.assertEqual(new_loc.id, loc.id)
@@ -156,4 +168,37 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(loc.geometry.coords, GEOSGeometry(params['{0}-0-geometry'.format(p)]).coords)
         self.assertEqual(loc.objectlocation_set.count(), 1)
         self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
-        self.assertEqual(Location.objects.count(), 2)
+        self.assertEqual(self.location_model.objects.count(), 2)
+
+    def test_add_indoor_new_location_new_floorplan(self):
+        self._login_as_admin()
+        p = self._p
+        params = self._params
+        floorplan_file = open(os.path.join(settings.BASE_DIR, 'media/floorplan.jpg'), 'rb')
+        params.update({
+            'name': 'test-add-indoor-new-location-new-floorplan',
+            '{0}-0-type'.format(p): 'indoor',
+            '{0}-0-location_selection'.format(p): 'new',
+            '{0}-0-location'.format(p): '',
+            '{0}-0-floorplan_selection'.format(p): 'new',
+            '{0}-0-floorplan'.format(p): '',
+            '{0}-0-floor'.format(p): '1',
+            '{0}-0-image'.format(p): floorplan_file,
+            '{0}-0-indoor'.format(p): '-100,100',
+            '{0}-0-id'.format(p): '',
+        })
+        r = self.client.post(reverse('admin:testdeviceapp_device_add'), params, follow=True)
+        floorplan_file.close()
+        self.assertNotContains(r, 'errors')
+        loc = self.location_model.objects.get(name=params['{0}-0-name'.format(p)])
+        self.assertEqual(loc.address, params['{0}-0-address'.format(p)])
+        self.assertEqual(loc.geometry.coords, GEOSGeometry(params['{0}-0-geometry'.format(p)]).coords)
+        self.assertEqual(loc.objectlocation_set.count(), 1)
+        self.assertEqual(self.location_model.objects.count(), 1)
+        self.assertEqual(self.floorplan_model.objects.count(), 1)
+        ol = loc.objectlocation_set.first()
+        self.assertEqual(ol.content_object.name, params['name'])
+        self.assertEqual(ol.type, 'indoor')
+        self.assertEqual(ol.floorplan.floor, 1)
+        self.assertIsInstance(ol.floorplan.image, ImageFieldFile)
+        self.assertEqual(ol.indoor, '-100,100')
