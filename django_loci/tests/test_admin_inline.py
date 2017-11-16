@@ -87,18 +87,15 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
     def test_change_outdoor(self):
         self._login_as_admin()
         p = self._p
-        # -- TODO! this should become a method
         obj = self._create_object(name='test-change-outdoor')
         pre_loc = self._create_location()
-        ol = self.object_location_model(type='outdoor',
-                                        location=pre_loc,
-                                        content_object=obj)
-        ol.full_clean()
-        ol.save()
-        # --
+        ol = self._create_object_location(type='outdoor',
+                                          location=pre_loc,
+                                          content_object=obj)
+        # -- ensure change form doesn't raise any exception
         r = self.client.get(reverse('admin:testdeviceapp_device_change', args=[obj.pk]))
         self.assertContains(r, obj.name)
-        # -- change
+        # -- post changes
         params = self._params
         params.update({
             'name': 'test-outdoor-change',

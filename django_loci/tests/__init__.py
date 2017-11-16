@@ -31,6 +31,18 @@ class TestLociMixin(object):
         fl.save()
         return fl
 
+    def _create_object_location(self, **kwargs):
+        options = dict(type='outdoor')
+        options.update(**kwargs)
+        if 'content_object' not in options:
+            options['content_object'] = self._create_object()
+        if 'location' not in options:
+            options['location'] = self._create_location()
+        ol = self.object_location_model(**options)
+        ol.full_clean()
+        ol.save()
+        return ol
+
 
 class TestAdminMixin(object):
     def _create_admin(self):
