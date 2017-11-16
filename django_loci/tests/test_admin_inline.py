@@ -118,3 +118,38 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(loc.objectlocation_set.count(), 1)
         self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
         self.assertEqual(Location.objects.count(), 1)
+
+    def test_change_outdoor_to_different_location(self):
+        self._login_as_admin()
+        p = self._p
+        ol = self._create_object_location(type='outdoor')
+        new_loc = self._create_location(name='different-location',
+                                        address='Piazza Venezia, Roma, Italia',
+                                        geometry='SRID=4326;POINT (12.512324 41.898703)')
+        # -- post changes
+        params = self._params
+        changed_name = '{0} changed'.format(new_loc.name)
+        params.update({
+            'name': 'test-outdoor-change-different',
+            '{0}-0-type'.format(p): 'outdoor',
+            '{0}-0-location_selection'.format(p): 'existing',
+            '{0}-0-location'.format(p): str(new_loc.id),
+            '{0}-0-name'.format(p): changed_name,
+            '{0}-0-address'.format(p): new_loc.address,
+            '{0}-0-geometry'.format(p): new_loc.geometry.geojson,
+            '{0}-0-floorplan_selection'.format(p): '',
+            '{0}-0-floorplan'.format(p): '',
+            '{0}-0-floor'.format(p): '',
+            '{0}-0-image'.format(p): '',
+            '{0}-0-indoor'.format(p): '',
+            '{0}-0-id'.format(p): str(ol.id),
+            '{0}-INITIAL_FORMS'.format(p): '1',
+        })
+        self.client.post(reverse('admin:testdeviceapp_device_change', args=[ol.content_object.pk]), params)
+        loc = self.location_model.objects.get(name=changed_name)
+        self.assertEqual(new_loc.id, loc.id)
+        self.assertEqual(loc.address, params['{0}-0-address'.format(p)])
+        self.assertEqual(loc.geometry.coords, GEOSGeometry(params['{0}-0-geometry'.format(p)]).coords)
+        self.assertEqual(loc.objectlocation_set.count(), 1)
+        self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
+        self.assertEqual(Location.objects.count(), 2)
