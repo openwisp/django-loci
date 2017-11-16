@@ -78,7 +78,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             'name': 'test-outdoor-add-existing',
             '{0}-0-type'.format(p): 'outdoor',
             '{0}-0-location_selection'.format(p): 'existing',
-            '{0}-0-location'.format(p): str(pre_loc.id),
+            '{0}-0-location'.format(p): pre_loc.id,
             '{0}-0-floorplan_selection'.format(p): '',
             '{0}-0-floorplan'.format(p): '',
             '{0}-0-floor'.format(p): '',
@@ -110,16 +110,16 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         # -- post changes
         params = self._params.copy()
         params.update({
-            'name': 'test-outdoor-change',
+            'name': obj.name,
             '{0}-0-type'.format(p): 'outdoor',
             '{0}-0-location_selection'.format(p): 'existing',
-            '{0}-0-location'.format(p): str(pre_loc.id),
+            '{0}-0-location'.format(p): pre_loc.id,
             '{0}-0-floorplan_selection'.format(p): '',
             '{0}-0-floorplan'.format(p): '',
             '{0}-0-floor'.format(p): '',
             '{0}-0-image'.format(p): '',
             '{0}-0-indoor'.format(p): '',
-            '{0}-0-id'.format(p): str(ol.id),
+            '{0}-0-id'.format(p): ol.id,
             '{0}-INITIAL_FORMS'.format(p): '1',
         })
         r = self.client.post(reverse('admin:testdeviceapp_device_change', args=[obj.pk]), params, follow=True)
@@ -146,7 +146,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             'name': 'test-outdoor-change-different',
             '{0}-0-type'.format(p): 'outdoor',
             '{0}-0-location_selection'.format(p): 'existing',
-            '{0}-0-location'.format(p): str(new_loc.id),
+            '{0}-0-location'.format(p): new_loc.id,
             '{0}-0-name'.format(p): changed_name,
             '{0}-0-address'.format(p): new_loc.address,
             '{0}-0-geometry'.format(p): new_loc.geometry.geojson,
@@ -155,7 +155,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-floor'.format(p): '',
             '{0}-0-image'.format(p): '',
             '{0}-0-indoor'.format(p): '',
-            '{0}-0-id'.format(p): str(ol.id),
+            '{0}-0-id'.format(p): ol.id,
             '{0}-INITIAL_FORMS'.format(p): '1',
         })
         r = self.client.post(reverse('admin:testdeviceapp_device_change',
