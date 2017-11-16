@@ -51,7 +51,8 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-indoor'.format(p): '',
             '{0}-0-id'.format(p): '',
         })
-        self.client.post(reverse('admin:testdeviceapp_device_add'), params)
+        r = self.client.post(reverse('admin:testdeviceapp_device_add'), params, follow=True)
+        self.assertNotContains(r, 'errors')
         loc = self.location_model.objects.get(name=params['{0}-0-name'.format(p)])
         self.assertEqual(loc.address, params['{0}-0-address'.format(p)])
         self.assertEqual(loc.geometry.coords, GEOSGeometry(params['{0}-0-geometry'.format(p)]).coords)
@@ -75,14 +76,15 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-indoor'.format(p): '',
             '{0}-0-id'.format(p): '',
         })
-        self.client.post(reverse('admin:testdeviceapp_device_add'), params)
+        r = self.client.post(reverse('admin:testdeviceapp_device_add'), params, follow=True)
+        self.assertNotContains(r, 'errors')
         loc = self.location_model.objects.get(name=params['{0}-0-name'.format(p)])
         self.assertEqual(pre_loc.id, loc.id)
         self.assertEqual(loc.address, params['{0}-0-address'.format(p)])
         self.assertEqual(loc.geometry.coords, GEOSGeometry(params['{0}-0-geometry'.format(p)]).coords)
         self.assertEqual(loc.objectlocation_set.count(), 1)
         self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
-        self.assertEqual(Location.objects.count(), 1)
+        self.assertEqual(self.location_model.objects.count(), 1)
 
     def test_change_outdoor(self):
         self._login_as_admin()
@@ -110,14 +112,15 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-id'.format(p): str(ol.id),
             '{0}-INITIAL_FORMS'.format(p): '1',
         })
-        self.client.post(reverse('admin:testdeviceapp_device_change', args=[obj.pk]), params)
+        r = self.client.post(reverse('admin:testdeviceapp_device_change', args=[obj.pk]), params, follow=True)
+        self.assertNotContains(r, 'errors')
         loc = self.location_model.objects.get(name=params['{0}-0-name'.format(p)])
         self.assertEqual(pre_loc.id, loc.id)
         self.assertEqual(loc.address, params['{0}-0-address'.format(p)])
         self.assertEqual(loc.geometry.coords, GEOSGeometry(params['{0}-0-geometry'.format(p)]).coords)
         self.assertEqual(loc.objectlocation_set.count(), 1)
         self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
-        self.assertEqual(Location.objects.count(), 1)
+        self.assertEqual(self.location_model.objects.count(), 1)
 
     def test_change_outdoor_to_different_location(self):
         self._login_as_admin()
@@ -145,7 +148,8 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-id'.format(p): str(ol.id),
             '{0}-INITIAL_FORMS'.format(p): '1',
         })
-        self.client.post(reverse('admin:testdeviceapp_device_change', args=[ol.content_object.pk]), params)
+        r = self.client.post(reverse('admin:testdeviceapp_device_change', args=[ol.content_object.pk]), params, follow=True)
+        self.assertNotContains(r, 'errors')
         loc = self.location_model.objects.get(name=changed_name)
         self.assertEqual(new_loc.id, loc.id)
         self.assertEqual(loc.address, params['{0}-0-address'.format(p)])
