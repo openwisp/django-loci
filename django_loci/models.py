@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
@@ -7,6 +9,8 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from openwisp_utils.base import TimeStampedEditableModel
+
+from .storage import OverwriteStorage
 
 
 @python_2_unicode_compatible
@@ -20,11 +24,18 @@ class Location(TimeStampedEditableModel):
         return self.name
 
 
+def _get_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    return '{0}.{1}'.format(instance.id, ext)
+
+
 @python_2_unicode_compatible
 class FloorPlan(TimeStampedEditableModel):
     location = models.ForeignKey('django_loci.Location')
     floor = models.SmallIntegerField(_('floor'))
     image = models.ImageField(_('image'),
+                              upload_to=_get_file_path,
+                              storage=OverwriteStorage(),
                               help_text=_('floor plan image'))
 
     class Meta:
@@ -34,6 +45,11 @@ class FloorPlan(TimeStampedEditableModel):
         return '{0} {1} {2}'.format(self.location.name,
                                     ordinal(self.floor),
                                     _('floor'))
+
+    def delete(self, *args, **kwargs):
+        path = self.image.file.name
+        super(FloorPlan, self).delete(*args, **kwargs)
+        os.remove(path)
 
 
 class ObjectLocation(TimeStampedEditableModel):

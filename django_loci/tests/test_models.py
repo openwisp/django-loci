@@ -1,3 +1,5 @@
+import os
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
@@ -52,3 +54,17 @@ class TestModels(TestLociMixin, TestCase):
         ol.save()
         ol.delete()
         self.assertEqual(self.location_model.objects.filter(id=loc.id).count(), 0)
+
+    def test_floorplan_image(self):
+        fl = self._create_floorplan()
+        path = fl.image.file.name
+        name = path.split('/')[-1]
+        self.assertEqual(name, '{0}.jpg'.format(fl.id))
+        # overwrite
+        fl.image = self._get_simpleuploadedfile()
+        fl.full_clean()
+        fl.save()
+        self.assertEqual(name, '{0}.jpg'.format(fl.id))
+        # delete
+        fl.delete()
+        self.assertFalse(os.path.isfile(path))

@@ -1,4 +1,3 @@
-import glob
 import os
 
 from django.conf import settings
@@ -31,11 +30,6 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         '{0}-MIN_NUM_FORMS'.format(_p): '0',
         '{0}-MAX_NUM_FORMS'.format(_p): '1',
     }
-
-    @classmethod
-    def tearDownClass(cls):
-        for fl in glob.glob(os.path.join(settings.BASE_DIR, 'media/floorplan_*')):
-            os.remove(fl)
 
     def test_json_urls(self):
         self._login_as_admin()

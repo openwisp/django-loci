@@ -1,10 +1,21 @@
 """
 Reusable test helpers
 """
+import glob
+import os
+
+from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class TestLociMixin(object):
     _object_kwargs = dict(name='test-object')
+    _floorplan_path = os.path.join(settings.MEDIA_ROOT, 'floorplan.jpg')
+
+    @classmethod
+    def tearDownClass(cls):
+        for fl in glob.glob(os.path.join(settings.BASE_DIR, 'media/floorplans/*')):
+            os.remove(fl)
 
     def _create_object(self, **kwargs):
         self._object_kwargs.update(kwargs)
@@ -20,10 +31,18 @@ class TestLociMixin(object):
         location.save()
         return location
 
+    def _get_simpleuploadedfile(self):
+        with open(self._floorplan_path, 'rb') as f:
+            image = f.read()
+        return SimpleUploadedFile(name='floorplan.jpg',
+                                  content=image,
+                                  content_type='image/jpeg')
+
     def _create_floorplan(self, **kwargs):
-        options = dict(floor=1,
-                       image='floorplan.jpg')
+        options = dict(floor=1)
         options.update(kwargs)
+        if 'image' not in options:
+            options['image'] = self._get_simpleuploadedfile()
         if 'location' not in options:
             options['location'] = self._create_location()
         fl = self.floorplan_model(**options)
