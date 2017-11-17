@@ -359,7 +359,6 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-floorplan_selection'.format(p): 'existing',
             '{0}-0-floorplan'.format(p): pre_fl.id,
             '{0}-0-floor'.format(p): pre_fl.floor,
-            '{0}-0-image'.format(p): '',
             '{0}-0-indoor'.format(p): '',
             '{0}-0-id'.format(p): ol.id,
             '{0}-INITIAL_FORMS'.format(p): '1',
@@ -386,3 +385,23 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertContains(r, 'errors field-name')
         self.assertContains(r, 'errors field-address')
         self.assertContains(r, 'errors field-geometry')
+
+    def test_add_mobile(self):
+        self._login_as_admin()
+        p = self._p
+        params = self._params.copy()
+        params.update({
+            'name': 'test-add-mobile',
+            '{0}-0-type'.format(p): 'mobile',
+            '{0}-0-location_selection'.format(p): 'new',
+            '{0}-0-name'.format(p): '',
+            '{0}-0-address'.format(p): '',
+            '{0}-0-geometry'.format(p): '',
+        })
+        self.assertEqual(self.location_model.objects.count(), 0)
+        r = self.client.post(reverse('admin:testdeviceapp_device_add'), params, follow=True)
+        self.assertNotContains(r, 'errors')
+        self.assertEqual(self.location_model.objects.count(), 1)
+        self.assertEqual(self.object_location_model.objects.filter(type='mobile').count(), 1)
+        loc = self.location_model.objects.first()
+        self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])

@@ -189,6 +189,7 @@ class ObjectLocationForm(forms.ModelForm):
         elif type_ == 'mobile' and not data.get('location'):
             # TODO: MOVE THIS TO EITHER DURING SAVE OR A MODEL METHOD
             # data['name'] = str(instance.content_object)
+            data['name'] = ''
             data['address'] = ''
             data['geometry'] = ''
             data['location_selection'] = 'new'
