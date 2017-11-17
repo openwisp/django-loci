@@ -170,7 +170,7 @@ class ObjectLocationForm(forms.ModelForm):
         msg = _('this field is required for locations of type %(type)s')
         if type_ in ['outdoor', 'indoor'] and not data['location']:
             for field in ['location_selection', 'name', 'address', 'geometry']:
-                if field in data and data[field] is None:
+                if field in data and data[field] in [None, '']:
                     params = {'type': type_}
                     err = ValidationError(msg, params=params)
                     self.add_error(field, err)
@@ -182,7 +182,7 @@ class ObjectLocationForm(forms.ModelForm):
                 fields.append('image')
             for field in fields:
                 # TODO: DRY
-                if field in data and data[field] is None:
+                if field in data and data[field] in [None, '']:
                     params = {'type': type_}
                     err = ValidationError(msg, params=params)
                     self.add_error(field, err)
