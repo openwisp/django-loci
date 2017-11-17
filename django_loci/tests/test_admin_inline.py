@@ -220,7 +220,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-geometry'.format(p): pre_loc.geometry.geojson,
             '{0}-0-floorplan_selection'.format(p): 'new',
             '{0}-0-floorplan'.format(p): '',
-            '{0}-0-floor'.format(p): '1',
+            '{0}-0-floor'.format(p): '0',
             '{0}-0-image'.format(p): floorplan_file,
             '{0}-0-indoor'.format(p): '-100,100',
             '{0}-0-id'.format(p): '',
@@ -237,7 +237,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         ol = loc.objectlocation_set.first()
         self.assertEqual(ol.content_object.name, params['name'])
         self.assertEqual(ol.type, 'indoor')
-        self.assertEqual(ol.floorplan.floor, 1)
+        self.assertEqual(ol.floorplan.floor, 0)
         self.assertIsInstance(ol.floorplan.image, ImageFieldFile)
         self.assertEqual(ol.indoor, '-100,100')
 

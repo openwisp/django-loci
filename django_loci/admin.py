@@ -170,7 +170,7 @@ class ObjectLocationForm(forms.ModelForm):
         msg = _('this field is required for locations of type %(type)s')
         if type_ in ['outdoor', 'indoor'] and not data['location']:
             for field in ['location_selection', 'name', 'address', 'geometry']:
-                if field in data and not data[field]:
+                if field in data and data[field] is None:
                     params = {'type': type_}
                     err = ValidationError(msg, params=params)
                     self.add_error(field, err)
@@ -181,7 +181,8 @@ class ObjectLocationForm(forms.ModelForm):
             elif data.get('floorplan_selection') == 'new':
                 fields.append('image')
             for field in fields:
-                if field in data and not data[field]:
+                # TODO: DRY
+                if field in data and data[field] is None:
                     params = {'type': type_}
                     err = ValidationError(msg, params=params)
                     self.add_error(field, err)
@@ -214,7 +215,8 @@ class ObjectLocationForm(forms.ModelForm):
         instance = self.instance
         floorplan = data.get('floorplan') or FloorPlan()
         floorplan.location = instance.location
-        floorplan.floor = data.get('floor') or floorplan.floor
+        floor = data.get('floor')
+        floorplan.floor = floor if floor is not None else floorplan.floor
         # the image path is updated only during creation
         # or if the image has been actually changed
         if data.get('image') and self.initial.get('image') != data.get('image'):
