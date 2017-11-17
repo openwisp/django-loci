@@ -248,7 +248,6 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         pre_fl = self._create_floorplan(location=pre_loc, floor=2)
         p = self._p
         params = self._params.copy()
-        floorplan_file = open(os.path.join(settings.BASE_DIR, 'media/floorplan.jpg'), 'rb')
         changed_name = '{0} changed'.format(pre_loc.name)
         params.update({
             'name': obj.name,
@@ -266,7 +265,6 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-id'.format(p): '',
         })
         r = self.client.post(reverse('admin:testdeviceapp_device_add'), params, follow=True)
-        floorplan_file.close()
         self.assertNotContains(r, 'errors')
         loc = self.location_model.objects.get(name=changed_name)
         self.assertEqual(loc.id, pre_loc.id)
@@ -282,6 +280,61 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(ol.floorplan.floor, 3)
         self.assertIsInstance(ol.floorplan.image, ImageFieldFile)
         self.assertEqual(ol.indoor, '-110,110')
+
+    def test_change_indoor(self):
+        self._login_as_admin()
+        p = self._p
+        obj = self._create_object(name='test-change-indoor')
+        pre_loc = self._create_location()
+        pre_fl = self._create_floorplan(location=pre_loc)
+        ol = self._create_object_location(type='indoor',
+                                          content_object=obj,
+                                          location=pre_loc,
+                                          floorplan=pre_fl,
+                                          indoor='-100,100')
+        # -- ensure change form doesn't raise any exception
+        r = self.client.get(reverse('admin:testdeviceapp_device_change', args=[obj.pk]))
+        self.assertContains(r, obj.name)
+        # -- post changes
+        params = self._params.copy()
+        floorplan_file = open(os.path.join(settings.BASE_DIR, 'media/floorplan.jpg'), 'rb')
+        changed_name = '{0} changed'.format(pre_loc.name)
+        params.update({
+            'name': obj.name,
+            '{0}-0-type'.format(p): 'indoor',
+            '{0}-0-location_selection'.format(p): 'existing',
+            '{0}-0-location'.format(p): pre_loc.id,
+            '{0}-0-name'.format(p): changed_name,
+            '{0}-0-address'.format(p): 'changed-address',
+            '{0}-0-location-geometry'.format(p): pre_loc.geometry,
+            '{0}-0-floorplan_selection'.format(p): 'existing',
+            '{0}-0-floorplan'.format(p): pre_fl.id,
+            '{0}-0-floor'.format(p): 3,  # floor
+            '{0}-0-image'.format(p): floorplan_file,
+            '{0}-0-indoor'.format(p): '-110,110',
+            '{0}-0-id'.format(p): ol.id,
+            '{0}-INITIAL_FORMS'.format(p): '1',
+        })
+        r = self.client.post(reverse('admin:testdeviceapp_device_change',
+                                     args=[obj.pk]),
+                             params, follow=True)
+        floorplan_file.close()
+        self.assertNotContains(r, 'errors')
+        loc = self.location_model.objects.get(name=changed_name)
+        self.assertEqual(loc.id, pre_loc.id)
+        self.assertEqual(loc.address, 'changed-address')
+        self.assertEqual(loc.geometry.coords, GEOSGeometry(params['{0}-0-geometry'.format(p)]).coords)
+        self.assertEqual(loc.objectlocation_set.count(), 1)
+        self.assertEqual(self.location_model.objects.count(), 1)
+        self.assertEqual(self.floorplan_model.objects.count(), 1)
+        ol = loc.objectlocation_set.first()
+        self.assertEqual(ol.content_object.name, params['name'])
+        self.assertEqual(ol.type, 'indoor')
+        self.assertEqual(ol.floorplan.id, pre_fl.id)
+        self.assertEqual(ol.floorplan.floor, 3)
+        self.assertIsInstance(ol.floorplan.image, ImageFieldFile)
+        self.assertEqual(ol.indoor, '-110,110')
+
     def test_change_indoor_missing_indoor_position(self):
         self._login_as_admin()
         p = self._p
