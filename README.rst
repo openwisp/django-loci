@@ -77,8 +77,6 @@ Add ``django_loci`` and its dependencies to `INSTALLED_APPS`` in the following o
         'django_loci',
         'django.contrib.admin',
         'leaflet',
-        'rest_framework',
-        'rest_framework_gis',
         'channels'
         # ...
     ]

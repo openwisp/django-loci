@@ -29,9 +29,6 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     # other dependencies
     'leaflet',
-    # rest framework
-    'rest_framework',
-    'rest_framework_gis',
     # channels
     'channels',
 
