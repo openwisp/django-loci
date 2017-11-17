@@ -386,6 +386,20 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertContains(r, 'errors field-address')
         self.assertContains(r, 'errors field-geometry')
 
+    def test_add_outdoor_invalid_geometry(self):
+        self._login_as_admin()
+        p = self._p
+        params = self._params.copy()
+        params.update({
+            'name': 'test-outdoor-invalid-geometry',
+            '{0}-0-type'.format(p): 'outdoor',
+            '{0}-0-location_selection'.format(p): 'new',
+            '{0}-0-location'.format(p): '',
+            '{0}-0-geometry'.format(p): 'INVALID',
+        })
+        r = self.client.post(reverse('admin:testdeviceapp_device_add'), params, follow=True)
+        self.assertContains(r, 'errors field-geometry')
+
     def test_add_mobile(self):
         self._login_as_admin()
         p = self._p
