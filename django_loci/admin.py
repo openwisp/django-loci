@@ -170,40 +170,27 @@ class ObjectLocationForm(forms.ModelForm):
         data = self.cleaned_data
         type_ = data['type']
         msg = _('this field is required for locations of type %(type)s')
+        fields = []
         if type_ in ['outdoor', 'indoor'] and not data['location']:
-            for field in ['location_selection', 'name', 'address', 'geometry']:
-                if field in data and data[field] in [None, '']:
-                    params = {'type': type_}
-                    err = ValidationError(msg, params=params)
-                    self.add_error(field, err)
+            fields += ['location_selection', 'name', 'address', 'geometry']
         if type_ == 'indoor':
-            fields = ['floorplan_selection', 'floor', 'indoor']
+            fields += ['floorplan_selection', 'floor', 'indoor']
             if data.get('floorplan_selection') == 'existing':
                 fields.append('floorplan')
             elif data.get('floorplan_selection') == 'new':
                 fields.append('image')
-            for field in fields:
-                # TODO: DRY
-                if field in data and data[field] in [None, '']:
-                    params = {'type': type_}
-                    err = ValidationError(msg, params=params)
-                    self.add_error(field, err)
         elif type_ == 'mobile' and not data.get('location'):
-            # TODO: MOVE THIS TO EITHER DURING SAVE OR A MODEL METHOD
-            # data['name'] = str(instance.content_object)
             data['name'] = ''
             data['address'] = ''
             data['geometry'] = ''
             data['location_selection'] = 'new'
         elif type_ == 'mobile' and data.get('location'):
             data['location_selection'] = 'existing'
-        # # clean location
-        # location = self._get_location_instance()
-        # location.full_clean()
-        # # clean floorplan
-        # if data['type'] == 'indoor':
-        #     floorplan = self._get_floorplan_instance()
-        #     floorplan.full_clean()
+        for field in fields:
+            if field in data and data[field] in [None, '']:
+                params = {'type': type_}
+                err = ValidationError(msg, params=params)
+                self.add_error(field, err)
 
     def _get_location_instance(self):
         data = self.cleaned_data
