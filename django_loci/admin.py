@@ -157,12 +157,14 @@ class ObjectLocationForm(forms.ModelForm):
             return None
         pk = self.cleaned_data['floorplan']
         if not pk:
-            raise ValidationError(_('Invalid selection'))
+            raise ValidationError(_('No floorplan selected'))
         try:
-            return FloorPlan.objects.get(pk=pk)
+            fl = FloorPlan.objects.get(pk=pk)
         except FloorPlan.DoesNotExist:
-            pass
-        # TODO maybe here we can call the model validation logic
+            raise ValidationError(_('Selected floorplan does not exist'))
+        if fl.location != self.cleaned_data['location']:
+            raise ValidationError(_('This floorplan is associated to a different location'))
+        return fl
 
     def clean(self):
         data = self.cleaned_data

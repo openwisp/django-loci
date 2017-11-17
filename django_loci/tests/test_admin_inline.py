@@ -439,7 +439,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
     def test_change_indoor_missing_floorplan_pk(self):
         self._login_as_admin()
         p = self._p
-        obj = self._create_object(name='test-change-indoor')
+        obj = self._create_object(name='test-floorplan-error')
         pre_loc = self._create_location()
         pre_fl = self._create_floorplan(location=pre_loc)
         ol = self._create_object_location(type='indoor',
@@ -468,3 +468,73 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
                                      args=[obj.pk]),
                              params, follow=True)
         self.assertContains(r, 'errors field-floorplan')
+        self.assertContains(r, 'No floorplan selected')
+
+    def test_change_indoor_floorplan_doesnotexist(self):
+        self._login_as_admin()
+        p = self._p
+        obj = self._create_object(name='test-floorplan-error')
+        pre_loc = self._create_location()
+        pre_fl = self._create_floorplan(location=pre_loc)
+        ol = self._create_object_location(type='indoor',
+                                          content_object=obj,
+                                          location=pre_loc,
+                                          floorplan=pre_fl,
+                                          indoor='-100,100')
+        # -- post changes
+        params = self._params.copy()
+        params.update({
+            'name': obj.name,
+            '{0}-0-type'.format(p): 'indoor',
+            '{0}-0-location_selection'.format(p): 'existing',
+            '{0}-0-location'.format(p): pre_loc.id,
+            '{0}-0-name'.format(p): pre_loc.name,
+            '{0}-0-address'.format(p): pre_loc.address,
+            '{0}-0-location-geometry'.format(p): pre_loc.geometry,
+            '{0}-0-floorplan_selection'.format(p): 'existing',
+            '{0}-0-floorplan'.format(p): self.floorplan_model().id,
+            '{0}-0-floor'.format(p): pre_fl.floor,
+            '{0}-0-indoor'.format(p): '-100,100',
+            '{0}-0-id'.format(p): ol.id,
+            '{0}-INITIAL_FORMS'.format(p): '1',
+        })
+        r = self.client.post(reverse('admin:testdeviceapp_device_change',
+                                     args=[obj.pk]),
+                             params, follow=True)
+        self.assertContains(r, 'errors field-floorplan')
+        self.assertContains(r, 'Selected floorplan does not exist')
+
+    def test_change_indoor_floorplan_different_location(self):
+        self._login_as_admin()
+        p = self._p
+        obj = self._create_object(name='test-floorplan-error')
+        pre_loc = self._create_location()
+        pre_fl = self._create_floorplan(location=pre_loc)
+        ol = self._create_object_location(type='indoor',
+                                          content_object=obj,
+                                          location=pre_loc,
+                                          floorplan=pre_fl,
+                                          indoor='-100,100')
+        fl = self._create_floorplan()
+        # -- post changes
+        params = self._params.copy()
+        params.update({
+            'name': obj.name,
+            '{0}-0-type'.format(p): 'indoor',
+            '{0}-0-location_selection'.format(p): 'existing',
+            '{0}-0-location'.format(p): pre_loc.id,
+            '{0}-0-name'.format(p): pre_loc.name,
+            '{0}-0-address'.format(p): pre_loc.address,
+            '{0}-0-location-geometry'.format(p): pre_loc.geometry,
+            '{0}-0-floorplan_selection'.format(p): 'existing',
+            '{0}-0-floorplan'.format(p): fl.id,
+            '{0}-0-floor'.format(p): pre_fl.floor,
+            '{0}-0-indoor'.format(p): '-100,100',
+            '{0}-0-id'.format(p): ol.id,
+            '{0}-INITIAL_FORMS'.format(p): '1',
+        })
+        r = self.client.post(reverse('admin:testdeviceapp_device_change',
+                                     args=[obj.pk]),
+                             params, follow=True)
+        self.assertContains(r, 'errors field-floorplan')
+        self.assertContains(r, 'This floorplan is associated to a different location')
