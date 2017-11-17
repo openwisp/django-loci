@@ -405,3 +405,33 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(self.object_location_model.objects.filter(type='mobile').count(), 1)
         loc = self.location_model.objects.first()
         self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
+
+    def test_change_mobile(self):
+        self._login_as_admin()
+        obj = self._create_object(name='test-change-mobile')
+        pre_loc = self._create_location()
+        ol = self._create_object_location(type='mobile',
+                                          content_object=obj,
+                                          location=pre_loc)
+        p = self._p
+        params = self._params.copy()
+        params.update({
+            'name': 'test-add-mobile',
+            '{0}-0-type'.format(p): 'mobile',
+            '{0}-0-location'.format(p): pre_loc.id,
+            '{0}-0-name'.format(p): '',
+            '{0}-0-address'.format(p): '',
+            '{0}-0-geometry'.format(p): '',
+            '{0}-0-location_selection'.format(p): 'new',
+            '{0}-0-id'.format(p): ol.id,
+            '{0}-INITIAL_FORMS'.format(p): '1',
+        })
+        self.assertEqual(self.location_model.objects.count(), 1)
+        r = self.client.post(reverse('admin:testdeviceapp_device_change',
+                                     args=[obj.pk]),
+                             params, follow=True)
+        self.assertNotContains(r, 'errors')
+        self.assertEqual(self.location_model.objects.count(), 1)
+        self.assertEqual(self.object_location_model.objects.filter(type='mobile').count(), 1)
+        loc = self.location_model.objects.first()
+        self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
