@@ -373,7 +373,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         p = self._p
         params = self._params.copy()
         params.update({
-            'name': 'test-outdoor-add-new',
+            'name': 'test-outdoor-invalid',
             '{0}-0-type'.format(p): 'outdoor',
             '{0}-0-location_selection'.format(p): 'new',
             '{0}-0-location'.format(p): '',
@@ -419,11 +419,12 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(self.object_location_model.objects.filter(type='mobile').count(), 1)
         loc = self.location_model.objects.first()
         self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
+        self.assertEqual(loc.name, params['name'])
 
     def test_change_mobile(self):
         self._login_as_admin()
         obj = self._create_object(name='test-change-mobile')
-        pre_loc = self._create_location()
+        pre_loc = self._create_location(name=obj.name)
         ol = self._create_object_location(type='mobile',
                                           content_object=obj,
                                           location=pre_loc)

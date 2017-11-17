@@ -231,6 +231,9 @@ class ObjectLocationForm(forms.ModelForm):
         data = self.cleaned_data
         # create or update location
         instance.location = self._get_location_instance()
+        # set name of mobile locations automatically
+        if instance.type == 'mobile' and not instance.location.name:
+            instance.location.name = str(self.instance.content_object)
         instance.location.save()
         # create or update floorplan
         if data['type'] == 'indoor':
