@@ -1,5 +1,5 @@
 from channels import Group
-from channels.auth import channel_session_user_from_http
+from channels.generic.websockets import WebsocketConsumer
 from django.core.exceptions import ValidationError
 
 from ..models import Location
@@ -12,21 +12,27 @@ def _get_object_or_none(model, **kwargs):
         return None
 
 
-@channel_session_user_from_http
-def ws_add(message, pk):
-    location = _get_object_or_none(Location, pk=pk)
-    if not location:
-        message.reply_channel.send({'close': True})
-        return
-    check = True
-    user = message.user
-    if user.is_authenticated() and user.is_staff and (user.is_superuser or check):
-        content = {'accept': True}
-    else:
-        content = {'close': True}
-    message.reply_channel.send(content)
-    Group('geo.mobile-location.{0}'.format(pk)).add(message.reply_channel)
+class LocationBroadcast(WebsocketConsumer):
+    """
+    Notifies that the coordinates of a location have changed
+    to authorized users (superusers or organization operators)
+    """
+    http_user = True
+    model = Location
 
+    def connect(self, message, pk):
+        location = _get_object_or_none(self.model, pk=pk)
+        if not location or not self.is_authorized(message.user, location):
+            message.reply_channel.send({'close': True})
+            return
+        message.reply_channel.send({'accept': True})
+        Group('geo.mobile-location.{0}'.format(pk)).add(message.reply_channel)
 
-def ws_disconnect(message, pk):
-    Group('geo.mobile-location.{0}'.format(pk)).discard(message.reply_channel)
+    def is_authorized(self, user, location):
+        return user.is_authenticated() and user.is_staff
+
+    def disconnect(self, message, pk):
+        """
+        Perform things on connection close
+        """
+        Group('geo.mobile-location.{0}'.format(pk)).discard(message.reply_channel)

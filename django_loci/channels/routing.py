@@ -1,8 +1,5 @@
-from channels.routing import route
-
-from .consumers import ws_add, ws_disconnect
+from .consumers import LocationBroadcast
 
 channel_routing = [
-    route('websocket.connect', ws_add, path=r'^/geo/mobile-location/(?P<pk>[^/]+)/$'),
-    route('websocket.disconnect', ws_disconnect, path=r'^/geo/mobile-location/(?P<pk>[^/]+)/$'),
+    LocationBroadcast.as_route(path=r'^/geo/mobile-location/(?P<pk>[^/]+)/$'),
 ]
