@@ -1,28 +1,26 @@
 from channels import Group
 from channels.auth import channel_session_user_from_http
-from channels.security.websockets import allowed_hosts_only
 from django.core.exceptions import ValidationError
 
 from ..models import Location
 
 
-def get_object_or_false(model, **kwargs):
+def _get_object_or_none(model, **kwargs):
     try:
         return model.objects.get(**kwargs)
     except (ValidationError, model.DoesNotExist):
-        return
+        return None
 
 
-@allowed_hosts_only
 @channel_session_user_from_http
 def ws_add(message, pk):
-    location = get_object_or_false(Location, pk=pk)
+    location = _get_object_or_none(Location, pk=pk)
     if not location:
         message.reply_channel.send({'close': True})
         return
-    org_id = (location.organization_id,)
+    check = True
     user = message.user
-    if user.is_authenticated() and (user.is_superuser or org_id in list(user.organizations_pk)):
+    if user.is_authenticated() and user.is_staff and (user.is_superuser or check):
         content = {'accept': True}
     else:
         content = {'close': True}
