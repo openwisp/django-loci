@@ -30,7 +30,7 @@ Dependencies
 ------------
 
 * Python 2.7 or Python >= 3.4
-* TODO
+* one of the databases supported by GeoDjango
 
 Install stable version from pypi
 --------------------------------
@@ -94,7 +94,7 @@ Install sqlite:
 
 .. code-block:: shell
 
-    sudo apt-get install sqlite3 libsqlite3-dev TODO: spatialite
+    sudo apt-get install sqlite3 libsqlite3-dev libsqlite3-mod-spatialite
 
 Install your forked repo:
 
