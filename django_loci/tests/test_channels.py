@@ -36,7 +36,7 @@ class TestChannels(TestAdminMixin, TestLociMixin, ChannelTestCase):
         if user:
             self.client.force_login(user)
         self.client.send_and_consume('websocket.connect', path=path)
-        return path
+        return {'ol': ol, 'path': path}
 
     def test_ws_add_unauthenticated(self):
         try:
@@ -47,9 +47,9 @@ class TestChannels(TestAdminMixin, TestLociMixin, ChannelTestCase):
             self.fail('AssertionError not raised')
 
     def test_connect_and_disconnect(self):
-        path = self._test_ws_add(user=self._create_admin())
+        res = self._test_ws_add(user=self._create_admin())
         self.assertEqual(self.client.receive(), None)
-        self.client.send_and_consume('websocket.disconnect', path=path)
+        self.client.send_and_consume('websocket.disconnect', path=res['path'])
 
     def test_ws_add_not_staff(self):
         user = self.user_model.objects.create_user(username='user',
@@ -71,3 +71,11 @@ class TestChannels(TestAdminMixin, TestLociMixin, ChannelTestCase):
             self.assertIn('Connection rejected', str(e))
         else:
             self.fail('AssertionError not raised')
+
+    def test_location_update(self):
+        res = self._test_ws_add(user=self._create_admin())
+        res['ol'].location.geometry = 'POINT (12.513124 41.897903)'
+        res['ol'].location.save()
+        result = self.client.receive()
+        self.assertIsInstance(result, dict)
+        self.assertDictEqual(result, {'type': 'Point', 'coordinates': [12.513124, 41.897903]})
