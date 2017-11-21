@@ -132,9 +132,8 @@ django.jQuery(function ($) {
         }
         if (value === 'existing' && optionsLength > 1) {
             $floorplanRow.show();
-        }
         // if no floorplan available, make it obvious
-        else if (value === 'existing' && optionsLength <= 1) {
+        } else if (value === 'existing' && optionsLength <= 1) {
             alert(gettext('This location has no floorplans available yet'));
             $floorplanSelection.val('');
         }
