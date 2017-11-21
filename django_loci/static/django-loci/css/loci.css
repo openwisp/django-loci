@@ -24,7 +24,7 @@
 .field-location strong{ margin-left: 3px }
 input[type=text]{ width: 320px }
 /* simulate required fields */
-.coords.geo label{
+.coords.loci label{
     font-weight: bold;
     color: #333;
 }

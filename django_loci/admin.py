@@ -242,7 +242,7 @@ class ObjectLocationInline(TimeReadonlyAdminMixin, GenericStackedInline):
     fieldsets = (
         (None, {'fields': ('type',)}),
         ('Geographic coordinates', {
-            'classes': ('geo', 'coords'),
+            'classes': ('loci', 'coords'),
             'fields': ('location_selection', 'location',
                        'name', 'address', 'geometry'),
         }),

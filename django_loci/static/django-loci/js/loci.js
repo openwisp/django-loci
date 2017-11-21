@@ -6,29 +6,29 @@ this JS is shared between:
 django.jQuery(function ($) {
     'use strict';
 
-    var $outdoor = $('.geo.coords'),
+    var $outdoor = $('.loci.coords'),
         $indoor = $('.indoor.coords'),
         $allSections = $('.coords'),
-        $geoRows = $('.geo.coords .form-row:not(.field-location_selection)'),
-        $geoEdit = $('.field-name, .field-address, .field-geometry', '.geo.coords'),
+        $geoRows = $('.loci.coords .form-row:not(.field-location_selection)'),
+        $geoEdit = $('.field-name, .field-address, .field-geometry', '.loci.coords'),
         $indoorRows = $('.indoor.coords .form-row:not(.field-indoor)'),
         geometryId = $('.field-geometry label').attr('for'),
         mapName = 'leafletmap' + geometryId + '-map',
         loadMapName = 'loadmap' + geometryId + '-map',
         $type = $('.inline-group .field-type select'),
-        $locationSelectionRow = $('.geo.coords .field-location_selection'),
+        $locationSelectionRow = $('.loci.coords .field-location_selection'),
         $locationSelection = $locationSelectionRow.find('select'),
-        $locationRow = $('.geo.coords .field-location'),
+        $locationRow = $('.loci.coords .field-location'),
         $location = $locationRow.find('select, input'),
         $locationLabel = $('.field-location .item-label'),
-        $name = $('.field-name input', '.geo.coords'),
-        $address = $('.field-address input', '.geo.coords'),
+        $name = $('.field-name input', '.loci.coords'),
+        $address = $('.field-address input', '.loci.coords'),
         $geometryTextarea = $('.field-geometry textarea'),
         baseLocationJsonUrl = $('#loci-location-json-url').attr('data-url'),
         baseLocationFloorplansJsonUrl = $('#loci-location-floorplans-json-url').attr('data-url'),
         $geometryRow = $geometryTextarea.parents('.form-row'),
         msg = gettext('Location data not received yet'),
-        $noLocationDiv = $('.no-location', '.geo.coords'),
+        $noLocationDiv = $('.no-location', '.loci.coords'),
         $floorplanSelectionRow = $('.indoor.coords .field-floorplan_selection'),
         $floorplanSelection = $floorplanSelectionRow.find('select'),
         $floorplanRow = $('.indoor .field-floorplan'),
@@ -294,7 +294,7 @@ django.jQuery(function ($) {
         if (!$geometryTextarea.val()) {
             $geometryRow.hide();
             $geometryRow.parent().append('<div class="no-location">' + msg + '</div>');
-            $noLocationDiv = $('.no-location', '.geo.coords');
+            $noLocationDiv = $('.no-location', '.loci.coords');
         }
         listenForLocationUpdates($location.val());
     } else if (!$type.length) {
