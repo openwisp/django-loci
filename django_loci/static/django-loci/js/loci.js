@@ -163,18 +163,21 @@ django.jQuery(function ($) {
     $locationSelection.change(locationSelectionChange);
     locationSelectionChange(null, true);
 
-    function locationChange() {
-        var url = getLocationJsonUrl($location.val());
-        $.getJSON(url, function (data) {
-            $locationLabel.text(data.name);
-            $name.val(data.name);
-            $address.val(data.address);
-            $geometryTextarea.val(JSON.stringify(data.geometry));
-            var map = getMap();
-            if (map) { map.remove(); }
-            $geoEdit.show();
-            window[loadMapName]();
-        });
+    function locationChange(e, initial) {
+        if (!initial) {
+            // update location fields
+            var url = getLocationJsonUrl($location.val());
+            $.getJSON(url, function (data) {
+                $locationLabel.text(data.name);
+                $name.val(data.name);
+                $address.val(data.address);
+                $geometryTextarea.val(JSON.stringify(data.geometry));
+                var map = getMap();
+                if (map) { map.remove(); }
+                $geoEdit.show();
+                window[loadMapName]();
+            });
+        }
         indoorForm();
         if ($type.val() === 'indoor') {
             var floorplansUrl = getLocationFloorplansJsonUrl($location.val());
@@ -199,7 +202,7 @@ django.jQuery(function ($) {
     }
 
     $location.change(locationChange);
-    locationChange();
+    locationChange(null, true);
 
     $floorplanSelection.change(floorplanSelectionChange);
     floorplanSelectionChange();
