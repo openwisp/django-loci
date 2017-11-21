@@ -13,7 +13,6 @@ class TestChannels(TestAdminMixin, TestLociMixin, ChannelTestCase):
     """
     object_model = Device
     location_model = Location
-    # floorplan_model = FloorPlan
     object_location_model = ObjectLocation
     user_model = get_user_model()
 
@@ -32,7 +31,7 @@ class TestChannels(TestAdminMixin, TestLociMixin, ChannelTestCase):
         if not pk:
             ol = self._create_object_location(type='mobile')
             pk = ol.location.pk
-        path = '/geo/mobile-location/{0}/'.format(pk)
+        path = '/loci/location/{0}/'.format(pk)
         if user:
             self.client.force_login(user)
         self.client.send_and_consume('websocket.connect', path=path)

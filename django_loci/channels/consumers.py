@@ -26,7 +26,7 @@ class LocationBroadcast(WebsocketConsumer):
             message.reply_channel.send({'close': True})
             return
         message.reply_channel.send({'accept': True})
-        Group('geo.mobile-location.{0}'.format(pk)).add(message.reply_channel)
+        Group('loci.mobile-location.{0}'.format(pk)).add(message.reply_channel)
 
     def is_authorized(self, user, location):
         return user.is_authenticated() and user.is_staff
@@ -35,4 +35,4 @@ class LocationBroadcast(WebsocketConsumer):
         """
         Perform things on connection close
         """
-        Group('geo.mobile-location.{0}'.format(pk)).discard(message.reply_channel)
+        Group('loci.mobile-location.{0}'.format(pk)).discard(message.reply_channel)

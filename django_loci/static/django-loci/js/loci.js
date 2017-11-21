@@ -268,7 +268,7 @@ django.jQuery(function ($) {
 
     // websocket for mobile coords
     function listenForLocationUpdates(pk) {
-        var ws = new WebSocket('ws://' + window.location.host + '/geo/mobile-location/' + pk + '/');
+        var ws = new WebSocket('ws://' + window.location.host + '/loci/location/' + pk + '/');
         ws.onmessage = function (e) {
             $geometryRow.show();
             $noLocationDiv.hide();
