@@ -238,7 +238,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
     def test_add_indoor_existing_location_existing_floorplan(self):
         self._login_as_admin()
         obj = self._create_object(name='test-add-indoor-existing-location-new-floorplan')
-        pre_loc = self._create_location()
+        pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc, floor=2)
         p = self._p
         params = self._params.copy()
@@ -279,7 +279,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self._login_as_admin()
         p = self._p
         obj = self._create_object(name='test-change-indoor')
-        pre_loc = self._create_location()
+        pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
         ol = self._create_object_location(type='indoor',
                                           content_object=obj,
@@ -333,7 +333,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self._login_as_admin()
         p = self._p
         obj = self._create_object(name='test-change-indoor')
-        pre_loc = self._create_location()
+        pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
         ol = self._create_object_location(type='indoor',
                                           content_object=obj,
@@ -449,7 +449,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self._login_as_admin()
         p = self._p
         obj = self._create_object(name='test-floorplan-error')
-        pre_loc = self._create_location()
+        pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
         ol = self._create_object_location(type='indoor',
                                           content_object=obj,
@@ -483,7 +483,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self._login_as_admin()
         p = self._p
         obj = self._create_object(name='test-floorplan-error')
-        pre_loc = self._create_location()
+        pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
         ol = self._create_object_location(type='indoor',
                                           content_object=obj,
@@ -517,7 +517,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self._login_as_admin()
         p = self._p
         obj = self._create_object(name='test-floorplan-error')
-        pre_loc = self._create_location()
+        pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
         ol = self._create_object_location(type='indoor',
                                           content_object=obj,

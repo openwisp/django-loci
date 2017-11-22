@@ -27,8 +27,8 @@ class TestModels(TestLociMixin, TestCase):
         self.assertEqual(str(fl), 'test-location 2nd floor')
 
     def test_object_location_clean_location(self):
-        l1 = self._create_location()
-        l2 = self._create_location()
+        l1 = self._create_location(type='indoor')
+        l2 = self._create_location(type='indoor')
         fl2 = self._create_floorplan(location=l2)
         obj = self._create_object()
         ol = self.object_location_model(content_object=obj,
@@ -68,3 +68,28 @@ class TestModels(TestLociMixin, TestCase):
         # delete
         fl.delete()
         self.assertFalse(os.path.isfile(path))
+
+    def test_floorplan_association_validation(self):
+        outdoor = self._create_location(type='outdoor')
+        try:
+            self._create_floorplan(location=outdoor)
+        except ValidationError as e:
+            err_str = str(e)
+            self.assertIn('floorplans can only be associated to', err_str)
+            self.assertIn('indoor', err_str)
+        else:
+            self.fail('ValidationError not raised')
+
+    def test_location_change_indoor_to_outdoor(self):
+        fl = self._create_floorplan()
+        location = fl.location
+        location.type = 'outdoor'
+        try:
+            location.full_clean()
+        except ValidationError as e:
+            self.assertIn('type', e.message_dict)
+            err_str = str(e.message_dict['type'])
+            self.assertIn('this location has floorplans', err_str)
+            self.assertIn('please delete them', err_str)
+        else:
+            self.fail('ValidationError not raised')

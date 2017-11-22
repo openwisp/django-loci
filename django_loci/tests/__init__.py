@@ -24,7 +24,8 @@ class TestLociMixin(object):
     def _create_location(self, **kwargs):
         options = dict(name='test-location',
                        address='Via del Corso, Roma, Italia',
-                       geometry='SRID=4326;POINT (12.512124 41.898903)')
+                       geometry='SRID=4326;POINT (12.512124 41.898903)',
+                       type='outdoor')
         options.update(kwargs)
         location = self.location_model(**options)
         location.full_clean()
@@ -44,7 +45,7 @@ class TestLociMixin(object):
         if 'image' not in options:
             options['image'] = self._get_simpleuploadedfile()
         if 'location' not in options:
-            options['location'] = self._create_location()
+            options['location'] = self._create_location(type='indoor')
         fl = self.floorplan_model(**options)
         fl.full_clean()
         fl.save()

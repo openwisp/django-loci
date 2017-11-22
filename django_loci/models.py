@@ -15,13 +15,37 @@ from .storage import OverwriteStorage
 
 @python_2_unicode_compatible
 class Location(TimeStampedEditableModel):
+    LOCATION_TYPES = (
+        ('outdoor', _('Outdoor environment (eg: street, square, garden)')),
+        ('indoor', _('Indoor environment (eg: building, subway, large '
+                     'transportation vehicles)')),
+    )
     name = models.CharField(_('name'), max_length=75)
+    type = models.CharField(choices=LOCATION_TYPES, max_length=8, db_index=True,
+                            help_text=_('indoor locations can have floorplans associated to them'))
+    is_mobile = models.BooleanField(_('is mobile?'), default=False, db_index=True)
     address = models.CharField(_('address'), db_index=True,
                                max_length=256, blank=True)
     geometry = models.GeometryField(_('geometry'), blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+    def _validate_outdoor_floorplans(self):
+        """
+        if a location type is changed from indoor to outdoor
+        but the location has still floorplan associated to it,
+        a ValidationError will be raised
+        """
+        if self.type == 'indoor' or self._state.adding:
+            return
+        if self.floorplan_set.count() > 0:
+            msg = 'this location has floorplans associated to it, ' \
+                  'please delete them before changing its type'
+            raise ValidationError({'type': msg})
+
+    def clean(self):
+        self._validate_outdoor_floorplans()
 
 
 def _get_file_path(instance, filename):
@@ -45,6 +69,15 @@ class FloorPlan(TimeStampedEditableModel):
         return '{0} {1} {2}'.format(self.location.name,
                                     ordinal(self.floor),
                                     _('floor'))
+
+    def _validate_location_type(self):
+        if self.location and self.location.type != 'indoor':
+            msg = 'floorplans can only be associated '\
+                  'to locations of type "indoor"'
+            raise ValidationError(msg)
+
+    def clean(self):
+        self._validate_location_type()
 
     def delete(self, *args, **kwargs):
         path = self.image.file.name
