@@ -1,6 +1,8 @@
 .coords, .coords .form-row{ display: none }
 .coords .field-location_selection,
 .coords .field-floorplan_selection{ display: block }
+/* hide redundant heading in objectlocationinline */
+.loci.coords > h2{ display: none }
 /* improve raw_id_field look */
 .coords .field-location input[type=text]{ display: none }
 .field-location .related-lookup{
@@ -11,11 +13,10 @@
 .field-location .item-label{
     display: inline-block;
     height: 16px;
-    vertical-align: middle;
     font-weight: bold;
     margin-left: 6px;
 }
-.coords .field-location a,
+#floorplan_form .field-location .item-label{ vertical-align: middle }
 .coords .field-location .item-label,
 .field-location strong{
     position: relative;

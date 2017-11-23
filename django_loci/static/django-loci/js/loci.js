@@ -9,14 +9,17 @@ django.jQuery(function ($) {
     var $outdoor = $('.loci.coords'),
         $indoor = $('.indoor.coords'),
         $allSections = $('.coords'),
-        $geoRows = $('.loci.coords .form-row:not(.field-location_selection)'),
-        $geoEdit = $('.field-name, .field-address, .field-geometry', '.loci.coords'),
+        $geoRows = $('.loci.coords .form-row'),
+        $geoEdit = $('.field-name, .field-type, .field-is_mobile, ' +
+                     '.field-address, .field-geometry', '.loci.coords'),
         $indoorRows = $('.indoor.coords .form-row:not(.field-indoor)'),
         geometryId = $('.field-geometry label').attr('for'),
         mapName = 'leafletmap' + geometryId + '-map',
         loadMapName = 'loadmap' + geometryId + '-map',
-        $type = $('.inline-group .field-type select'),
-        $locationSelectionRow = $('.loci.coords .field-location_selection'),
+        $typeRow = $('.inline-group .field-type'),
+        $type = $typeRow.find('select'),
+        $isMobile = $('.coords .field-is_mobile input'),
+        $locationSelectionRow = $('.field-location_selection'),
         $locationSelection = $locationSelectionRow.find('select'),
         $locationRow = $('.loci.coords .field-location'),
         $location = $locationRow.find('select, input'),
@@ -57,7 +60,7 @@ django.jQuery(function ($) {
     function resetOutdoorForm(keepLocationSelection) {
         $locationSelectionRow.show();
         if (!keepLocationSelection) {
-            $locationSelection.val('');
+            $type.val('');
         }
         $location.val('');
         $locationLabel.text('');
@@ -99,29 +102,48 @@ django.jQuery(function ($) {
         }
     }
 
-    function typeChange(e, initial) {
-        var value = $type.val();
+    function locationSelectionChange(e, initial) {
+        // var value = $locationSelection.val();
+        // $geoRows.hide();
+        // if (!initial) {
+        //     resetOutdoorForm(true);
+        //     resetIndoorForm();
+        // }
+        // if (value === 'new') {
+        //     $geoEdit.show();
+        //     indoorForm(value);
+        // } else if (value === 'existing') {
+        //     $locationRow.show();
+        // }
+        // invalidateMapSize();
+        var value = $locationSelection.val();
         $allSections.hide();
         if (!initial) { resetDeviceLocationForm(); }
-        if (value === 'outdoor' || value === 'indoor') {
+        if (value === 'new') {
             $outdoor.show();
+            $geoEdit.show();
+            indoorForm(value);
+            // $locationRow.hide();
+            invalidateMapSize();
+        } else if (value === 'existing') {
+            $outdoor.show();
+            $geoRows.hide();
+            $locationRow.show();
         }
     }
 
-    function locationSelectionChange(e, initial) {
-        var value = $locationSelection.val();
-        $geoRows.hide();
-        if (!initial) {
-            resetOutdoorForm(true);
-            resetIndoorForm();
+    function typeChange(e, initial) {
+        var value = $type.val();
+        // $allSections.hide();
+        // if (!initial) { resetDeviceLocationForm(); }
+        // $outdoor.show();
+        if (value === 'indoor') {
+            $indoor.show();
+            $indoorRows.show();
+            indoorForm($locationSelection.val());
+        } else {
+            $indoor.hide();
         }
-        if (value === 'new') {
-            $geoEdit.show();
-            indoorForm(value);
-        } else if (value === 'existing') {
-            $locationRow.show();
-        }
-        invalidateMapSize();
     }
 
     function floorplanSelectionChange() {
@@ -163,22 +185,9 @@ django.jQuery(function ($) {
     locationSelectionChange(null, true);
 
     function locationChange(e, initial) {
-        if (!initial) {
-            // update location fields
-            var url = getLocationJsonUrl($location.val());
-            $.getJSON(url, function (data) {
-                $locationLabel.text(data.name);
-                $name.val(data.name);
-                $address.val(data.address);
-                $geometryTextarea.val(JSON.stringify(data.geometry));
-                var map = getMap();
-                if (map) { map.remove(); }
-                $geoEdit.show();
-                window[loadMapName]();
-            });
-        }
-        indoorForm();
-        if ($type.val() === 'indoor') {
+        function loadIndoor() {
+            indoorForm();
+            if ($type.val() !== 'indoor') { return; }
             var floorplansUrl = getLocationFloorplansJsonUrl($location.val());
             $.getJSON(floorplansUrl, function (data) {
                 var $current = $floorplan.find('option:selected'),
@@ -197,6 +206,28 @@ django.jQuery(function ($) {
                     $floorplan.append(o);
                 });
             });
+        }
+        $typeRow.show();
+        if (!initial) {
+            // update location fields
+            var url = getLocationJsonUrl($location.val());
+            $.getJSON(url, function (data) {
+                $locationLabel.text(data.name);
+                $name.val(data.name);
+                $type.val(data.type);
+                if (data.is_mobile) {
+                    $isMobile.prop('checked', true);
+                }
+                $address.val(data.address);
+                $geometryTextarea.val(JSON.stringify(data.geometry));
+                var map = getMap();
+                if (map) { map.remove(); }
+                $geoEdit.show();
+                window[loadMapName]();
+                loadIndoor();
+            });
+        } else {
+            loadIndoor();
         }
     }
 

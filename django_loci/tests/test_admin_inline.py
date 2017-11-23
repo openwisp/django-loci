@@ -22,6 +22,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
     inline_field_prefix = 'objectlocation-content_type-object_id'
     _p = '{0}-{1}'.format(app_label, inline_field_prefix)
     _params = {
+        '{0}-0-is_mobile'.format(_p): False,
         '{0}-0-name'.format(_p): 'Centro Piazza Venezia',
         '{0}-0-address'.format(_p): 'Piazza Venezia, Roma, Italia',
         '{0}-0-geometry'.format(_p): '{"type": "Point", "coordinates": [12.512124, 41.898903]}',
@@ -95,8 +96,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         p = self._p
         obj = self._create_object(name='test-change-outdoor')
         pre_loc = self._create_location()
-        ol = self._create_object_location(type='outdoor',
-                                          location=pre_loc,
+        ol = self._create_object_location(location=pre_loc,
                                           content_object=obj)
         # -- ensure change form doesn't raise any exception
         r = self.client.get(reverse('admin:testdeviceapp_device_change', args=[obj.pk]))
@@ -129,7 +129,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
     def test_change_outdoor_to_different_location(self):
         self._login_as_admin()
         p = self._p
-        ol = self._create_object_location(type='outdoor')
+        ol = self._create_object_location()
         new_loc = self._create_location(name='different-location',
                                         address='Piazza Venezia, Roma, Italia',
                                         geometry='SRID=4326;POINT (12.512324 41.898703)')
@@ -192,7 +192,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(self.floorplan_model.objects.count(), 1)
         ol = loc.objectlocation_set.first()
         self.assertEqual(ol.content_object.name, params['name'])
-        self.assertEqual(ol.type, 'indoor')
+        self.assertEqual(ol.location.type, 'indoor')
         self.assertEqual(ol.floorplan.floor, 1)
         self.assertIsInstance(ol.floorplan.image, ImageFieldFile)
         self.assertEqual(ol.indoor, '-100,100')
@@ -230,7 +230,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(self.floorplan_model.objects.count(), 1)
         ol = loc.objectlocation_set.first()
         self.assertEqual(ol.content_object.name, params['name'])
-        self.assertEqual(ol.type, 'indoor')
+        self.assertEqual(ol.location.type, 'indoor')
         self.assertEqual(ol.floorplan.floor, 0)
         self.assertIsInstance(ol.floorplan.image, ImageFieldFile)
         self.assertEqual(ol.indoor, '-100,100')
@@ -269,7 +269,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(self.floorplan_model.objects.count(), 1)
         ol = loc.objectlocation_set.first()
         self.assertEqual(ol.content_object.name, params['name'])
-        self.assertEqual(ol.type, 'indoor')
+        self.assertEqual(ol.location.type, 'indoor')
         self.assertEqual(ol.floorplan.id, pre_fl.id)
         self.assertEqual(ol.floorplan.floor, 3)
         self.assertIsInstance(ol.floorplan.image, ImageFieldFile)
@@ -281,8 +281,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         obj = self._create_object(name='test-change-indoor')
         pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
-        ol = self._create_object_location(type='indoor',
-                                          content_object=obj,
+        ol = self._create_object_location(content_object=obj,
                                           location=pre_loc,
                                           floorplan=pre_fl,
                                           indoor='-100,100')
@@ -323,7 +322,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(self.floorplan_model.objects.count(), 1)
         ol = loc.objectlocation_set.first()
         self.assertEqual(ol.content_object.name, params['name'])
-        self.assertEqual(ol.type, 'indoor')
+        self.assertEqual(ol.location.type, 'indoor')
         self.assertEqual(ol.floorplan.id, pre_fl.id)
         self.assertEqual(ol.floorplan.floor, 3)
         self.assertIsInstance(ol.floorplan.image, ImageFieldFile)
@@ -335,8 +334,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         obj = self._create_object(name='test-change-indoor')
         pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
-        ol = self._create_object_location(type='indoor',
-                                          content_object=obj,
+        ol = self._create_object_location(content_object=obj,
                                           location=pre_loc,
                                           floorplan=pre_fl,
                                           indoor='-100,100')
@@ -400,7 +398,8 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         params = self._params.copy()
         params.update({
             'name': 'test-add-mobile',
-            '{0}-0-type'.format(p): 'mobile',
+            '{0}-0-type'.format(p): 'outdoor',
+            '{0}-0-is_mobile'.format(p): True,
             '{0}-0-location_selection'.format(p): 'new',
             '{0}-0-name'.format(p): '',
             '{0}-0-address'.format(p): '',
@@ -409,8 +408,8 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         self.assertEqual(self.location_model.objects.count(), 0)
         r = self.client.post(reverse('admin:testdeviceapp_device_add'), params, follow=True)
         self.assertNotContains(r, 'errors')
-        self.assertEqual(self.location_model.objects.count(), 1)
-        self.assertEqual(self.object_location_model.objects.filter(type='mobile').count(), 1)
+        self.assertEqual(self.location_model.objects.filter(is_mobile=True).count(), 1)
+        self.assertEqual(self.object_location_model.objects.count(), 1)
         loc = self.location_model.objects.first()
         self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
         self.assertEqual(loc.name, params['name'])
@@ -418,15 +417,15 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
     def test_change_mobile(self):
         self._login_as_admin()
         obj = self._create_object(name='test-change-mobile')
-        pre_loc = self._create_location(name=obj.name)
-        ol = self._create_object_location(type='mobile',
-                                          content_object=obj,
+        pre_loc = self._create_location(name=obj.name, is_mobile=True)
+        ol = self._create_object_location(content_object=obj,
                                           location=pre_loc)
         p = self._p
         params = self._params.copy()
         params.update({
-            'name': 'test-add-mobile',
-            '{0}-0-type'.format(p): 'mobile',
+            'name': 'test-change-mobile',
+            '{0}-0-type'.format(p): 'outdoor',
+            '{0}-0-is_mobile'.format(p): True,
             '{0}-0-location'.format(p): pre_loc.id,
             '{0}-0-name'.format(p): '',
             '{0}-0-address'.format(p): '',
@@ -440,8 +439,8 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
                                      args=[obj.pk]),
                              params, follow=True)
         self.assertNotContains(r, 'errors')
-        self.assertEqual(self.location_model.objects.count(), 1)
-        self.assertEqual(self.object_location_model.objects.filter(type='mobile').count(), 1)
+        self.assertEqual(self.object_location_model.objects.count(), 1)
+        self.assertEqual(self.location_model.objects.filter(is_mobile=True).count(), 1)
         loc = self.location_model.objects.first()
         self.assertEqual(loc.objectlocation_set.first().content_object.name, params['name'])
 
@@ -451,8 +450,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         obj = self._create_object(name='test-floorplan-error')
         pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
-        ol = self._create_object_location(type='indoor',
-                                          content_object=obj,
+        ol = self._create_object_location(content_object=obj,
                                           location=pre_loc,
                                           floorplan=pre_fl,
                                           indoor='-100,100')
@@ -464,6 +462,8 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-location_selection'.format(p): 'existing',
             '{0}-0-location'.format(p): pre_loc.id,
             '{0}-0-name'.format(p): pre_loc.name,
+            '{0}-0-type'.format(p): pre_loc.type,
+            '{0}-0-is_mobile'.format(p): pre_loc.is_mobile,
             '{0}-0-address'.format(p): pre_loc.address,
             '{0}-0-location-geometry'.format(p): pre_loc.geometry,
             '{0}-0-floorplan_selection'.format(p): 'existing',
@@ -485,8 +485,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         obj = self._create_object(name='test-floorplan-error')
         pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
-        ol = self._create_object_location(type='indoor',
-                                          content_object=obj,
+        ol = self._create_object_location(content_object=obj,
                                           location=pre_loc,
                                           floorplan=pre_fl,
                                           indoor='-100,100')
@@ -498,6 +497,8 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
             '{0}-0-location_selection'.format(p): 'existing',
             '{0}-0-location'.format(p): pre_loc.id,
             '{0}-0-name'.format(p): pre_loc.name,
+            '{0}-0-type'.format(p): pre_loc.type,
+            '{0}-0-is_mobile'.format(p): pre_loc.is_mobile,
             '{0}-0-address'.format(p): pre_loc.address,
             '{0}-0-location-geometry'.format(p): pre_loc.geometry,
             '{0}-0-floorplan_selection'.format(p): 'existing',
@@ -519,8 +520,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
         obj = self._create_object(name='test-floorplan-error')
         pre_loc = self._create_location(type='indoor')
         pre_fl = self._create_floorplan(location=pre_loc)
-        ol = self._create_object_location(type='indoor',
-                                          content_object=obj,
+        ol = self._create_object_location(content_object=obj,
                                           location=pre_loc,
                                           floorplan=pre_fl,
                                           indoor='-100,100')

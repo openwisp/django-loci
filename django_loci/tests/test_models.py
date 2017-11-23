@@ -34,7 +34,6 @@ class TestModels(TestLociMixin, TestCase):
         fl2 = self._create_floorplan(location=l2)
         obj = self._create_object()
         ol = self.object_location_model(content_object=obj,
-                                        type='indoor',
                                         location=l1,
                                         floorplan=fl2)
         try:
@@ -45,17 +44,6 @@ class TestModels(TestLociMixin, TestCase):
                              'Invalid floorplan (belongs to a different location)')
         else:
             self.fail('ValidationError not raised')
-
-    def test_delete(self):
-        loc = self._create_location()
-        obj = self._create_object()
-        ol = self.object_location_model(content_object=obj,
-                                        type='mobile',
-                                        location=loc)
-        ol.full_clean()
-        ol.save()
-        ol.delete()
-        self.assertEqual(self.location_model.objects.filter(id=loc.id).count(), 0)
 
     def test_floorplan_image(self):
         fl = self._create_floorplan()

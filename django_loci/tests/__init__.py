@@ -52,7 +52,7 @@ class TestLociMixin(object):
         return fl
 
     def _create_object_location(self, **kwargs):
-        options = dict(type='outdoor')
+        options = {}
         options.update(**kwargs)
         if 'content_object' not in options:
             options['content_object'] = self._create_object()

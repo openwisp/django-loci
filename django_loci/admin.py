@@ -55,9 +55,9 @@ class FloorPlanInline(TimeReadonlyAdminMixin, admin.StackedInline):
 
 
 class LocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
-    list_display = ('name', 'short_type', 'created', 'modified')
+    list_display = ('name', 'short_type', 'is_mobile', 'created', 'modified')
     search_fields = ('name', 'address')
-    list_filter = ('type', )
+    list_filter = ('type', 'is_mobile')
     save_on_top = True
     form = LocationForm
     inlines = [FloorPlanInline]
@@ -77,6 +77,8 @@ class LocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
         instance = get_object_or_404(self.model, pk=pk)
         return JsonResponse({
             'name': instance.name,
+            'type': instance.type,
+            'is_mobile': instance.is_mobile,
             'address': instance.address,
             'geometry': json.loads(instance.geometry.json)
         })
@@ -113,9 +115,13 @@ class ObjectLocationForm(forms.ModelForm):
     location_selection = forms.ChoiceField(choices=CHOICES, required=False)
     name = forms.CharField(label=_('Location name'),
                            max_length=75, required=False,
-                           help_text=_('Descriptive name of the location '
-                                       '(building name, company name, etc.)'))
+                           help_text=Location._meta.get_field('name').help_text)
     address = forms.CharField(max_length=128, required=False)
+    type = forms.ChoiceField(choices=Location.LOCATION_TYPES, required=True,
+                             help_text=Location._meta.get_field('type').help_text)
+    is_mobile = forms.BooleanField(label=Location._meta.get_field('is_mobile').verbose_name,
+                                   help_text=Location._meta.get_field('is_mobile').help_text,
+                                   required=False)
     geometry = GeometryField(required=False)
     floorplan_selection = forms.ChoiceField(required=False,
                                             choices=CHOICES)
@@ -147,6 +153,8 @@ class ObjectLocationForm(forms.ModelForm):
         if location:
             initial.update({
                 'location_selection': 'existing',
+                'type': location.type,
+                'is_mobile': location.is_mobile,
                 'name': location.name,
                 'address': location.address,
                 'geometry': location.geometry,
@@ -179,23 +187,24 @@ class ObjectLocationForm(forms.ModelForm):
     def clean(self):
         data = self.cleaned_data
         type_ = data['type']
+        is_mobile = data['is_mobile']
         msg = _('this field is required for locations of type %(type)s')
         fields = []
-        if type_ in ['outdoor', 'indoor'] and not data['location']:
+        if not is_mobile and type_ in ['outdoor', 'indoor']: # and not data['location']:
             fields += ['location_selection', 'name', 'address', 'geometry']
-        if type_ == 'indoor':
+        if not is_mobile and type_ == 'indoor':
             fields += ['floorplan_selection', 'floor', 'indoor']
             if data.get('floorplan_selection') == 'existing':
                 fields.append('floorplan')
             elif data.get('floorplan_selection') == 'new':
                 fields.append('image')
-        elif type_ == 'mobile' and not data.get('location'):
+        elif is_mobile and not data.get('location'):
             data['name'] = ''
             data['address'] = ''
             data['geometry'] = ''
             data['location_selection'] = 'new'
-        elif type_ == 'mobile' and data.get('location'):
-            data['location_selection'] = 'existing'
+        # elif is_mobile and data.get('location'):
+        #     data['location_selection'] = 'existing'
         for field in fields:
             if field in data and data[field] in [None, '']:
                 params = {'type': type_}
@@ -205,6 +214,8 @@ class ObjectLocationForm(forms.ModelForm):
     def _get_location_instance(self):
         data = self.cleaned_data
         location = data.get('location') or Location()
+        location.type = data.get('type') or location.type
+        location.is_mobile = data.get('is_mobile') or location.is_mobile
         location.name = data.get('name') or location.name
         location.address = data.get('address') or location.address
         location.geometry = data.get('geometry') or location.geometry
@@ -229,7 +240,7 @@ class ObjectLocationForm(forms.ModelForm):
         # create or update location
         instance.location = self._get_location_instance()
         # set name of mobile locations automatically
-        if instance.type == 'mobile' and not instance.location.name:
+        if data['is_mobile'] and not instance.location.name:
             instance.location.name = str(self.instance.content_object)
         instance.location.save()
         # create or update floorplan
@@ -250,10 +261,10 @@ class ObjectLocationInline(TimeReadonlyAdminMixin, GenericStackedInline):
     extra = 1
     template = 'admin/django_loci/location_inline.html'
     fieldsets = (
-        (None, {'fields': ('type',)}),
+        (None, {'fields': ('location_selection',)}),
         ('Geographic coordinates', {
             'classes': ('loci', 'coords'),
-            'fields': ('location_selection', 'location',
+            'fields': ('location', 'type', 'is_mobile',
                        'name', 'address', 'geometry'),
         }),
         ('Indoor coordinates', {

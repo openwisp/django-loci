@@ -35,6 +35,8 @@ class TestAdmin(TestAdminMixin, TestLociMixin, TestCase):
         r = self.client.get(reverse('admin:django_loci_location_json', args=[loc.pk]))
         expected = {'name': loc.name,
                     'address': loc.address,
+                    'type': loc.type,
+                    'is_mobile': loc.is_mobile,
                     'geometry': json.loads(loc.geometry.json)}
         self.assertDictEqual(r.json(), expected)
 

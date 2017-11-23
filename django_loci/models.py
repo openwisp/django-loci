@@ -20,10 +20,13 @@ class Location(TimeStampedEditableModel):
         ('indoor', _('Indoor environment (eg: building, subway, large '
                      'transportation vehicles)')),
     )
-    name = models.CharField(_('name'), max_length=75)
+    name = models.CharField(_('name'), max_length=75,
+                            help_text=_('A descriptive name of the location '
+                                        '(building name, company name, etc.)'))
     type = models.CharField(choices=LOCATION_TYPES, max_length=8, db_index=True,
                             help_text=_('indoor locations can have floorplans associated to them'))
-    is_mobile = models.BooleanField(_('is mobile?'), default=False, db_index=True)
+    is_mobile = models.BooleanField(_('is mobile?'), default=False, db_index=True,
+                                    help_text=_('is this location a moving object?'))
     address = models.CharField(_('address'), db_index=True,
                                max_length=256, blank=True)
     geometry = models.GeometryField(_('geometry'), blank=True, null=True)
@@ -100,7 +103,6 @@ class ObjectLocation(TimeStampedEditableModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.CharField(max_length=36, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
-    type = models.CharField(choices=LOCATION_TYPES, max_length=8)
     location = models.ForeignKey('django_loci.Location', models.PROTECT,
                                  blank=True, null=True)
     floorplan = models.ForeignKey('django_loci.Floorplan', models.PROTECT,
@@ -114,19 +116,10 @@ class ObjectLocation(TimeStampedEditableModel):
     def _clean_indoor_location(self):
         # skip validation if the instance does not
         # have a floorplan assigned to it yet
-        if self.type != 'indoor' or not self.floorplan:
+        if not self.location or self.location.type != 'indoor' or not self.floorplan:
             return
         if self.location != self.floorplan.location:
             raise ValidationError(_('Invalid floorplan (belongs to a different location)'))
 
     def clean(self):
         self._clean_indoor_location()
-
-    def delete(self, *args, **kwargs):
-        delete_location = False
-        if self.type == 'mobile':
-            delete_location = True
-            location = self.location
-        super(ObjectLocation, self).delete(*args, **kwargs)
-        if delete_location:
-            location.delete()

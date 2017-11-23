@@ -29,7 +29,8 @@ class TestChannels(TestAdminMixin, TestLociMixin, ChannelTestCase):
 
     def _test_ws_add(self, pk=None, user=None):
         if not pk:
-            ol = self._create_object_location(type='mobile')
+            location = self._create_location(is_mobile=True)
+            ol = self._create_object_location(location=location)
             pk = ol.location.pk
         path = '/loci/location/{0}/'.format(pk)
         if user:
