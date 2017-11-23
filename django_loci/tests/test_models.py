@@ -25,6 +25,8 @@ class TestModels(TestLociMixin, TestCase):
         loc = self._create_location()
         fl = self.floorplan_model(location=loc, floor=2)
         self.assertEqual(str(fl), 'test-location 2nd floor')
+        fl.floor = 0
+        self.assertEqual(str(fl), 'test-location ground floor')
 
     def test_object_location_clean_location(self):
         l1 = self._create_location(type='indoor')

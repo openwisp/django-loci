@@ -70,9 +70,11 @@ class FloorPlan(TimeStampedEditableModel):
         unique_together = ('location', 'floor')
 
     def __str__(self):
-        return '{0} {1} {2}'.format(self.location.name,
-                                    ordinal(self.floor),
-                                    _('floor'))
+        if self.floor is not 0:
+            suffix = _('{0} floor').format(ordinal(self.floor))
+        else:
+            suffix = _('ground floor')
+        return '{0} {1}'.format(self.location.name, suffix)
 
     def _validate_location_type(self):
         if self.location and self.location.type != 'indoor':
