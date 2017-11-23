@@ -55,8 +55,9 @@ class FloorPlanInline(TimeReadonlyAdminMixin, admin.StackedInline):
 
 
 class LocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
-    list_display = ('name', 'created', 'modified')
+    list_display = ('name', 'short_type', 'created', 'modified')
     search_fields = ('name', 'address')
+    list_filter = ('type', )
     save_on_top = True
     form = LocationForm
     inlines = [FloorPlanInline]

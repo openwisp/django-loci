@@ -47,6 +47,10 @@ class Location(TimeStampedEditableModel):
     def clean(self):
         self._validate_outdoor_floorplans()
 
+    @property
+    def short_type(self):
+        return _(self.type.capitalize())
+
 
 def _get_file_path(instance, filename):
     ext = filename.split('.')[-1]
