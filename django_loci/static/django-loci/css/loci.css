@@ -34,3 +34,4 @@ input[type=text]{ width: 320px }
     text-align: center;
     font-size: 14px;
 }
+#floorplan_set-group{ display: none }

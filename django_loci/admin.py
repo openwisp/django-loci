@@ -17,14 +17,41 @@ from .models import FloorPlan, Location, ObjectLocation
 from .widgets import FloorPlanWidget, ImageWidget
 
 
+class FloorPlanForm(forms.ModelForm):
+    class Meta:
+        model = FloorPlan
+        exclude = tuple()
+        widgets = {'image': ImageWidget()}
+
+    class Media:
+        css = {'all': ('django-loci/css/loci.css',)}
+
+
+class FloorPlanAdmin(TimeReadonlyAdminMixin, admin.ModelAdmin):
+    list_display = ['__str__', 'location', 'floor', 'created', 'modified']
+    list_select_related = ['location']
+    search_fields = ('location__name',)
+    raw_id_fields = ('location',)
+    save_on_top = True
+    form = FloorPlanForm
+
+
 class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
         exclude = tuple()
 
     class Media:
-        js = ('django-loci/js/loci.js',)
+        js = ('django-loci/js/loci.js',
+              'django-loci/js/floorplan-inlines.js',)
         css = {'all': ('django-loci/css/loci.css',)}
+
+
+class FloorPlanInline(TimeReadonlyAdminMixin, admin.StackedInline):
+    model = FloorPlan
+    form = FloorPlanForm
+    extra = 0
+    ordering = ('floor',)
 
 
 class LocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
@@ -32,6 +59,7 @@ class LocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
     search_fields = ('name', 'address')
     save_on_top = True
     form = LocationForm
+    inlines = [FloorPlanInline]
 
     def get_urls(self):
         app_label = self.model._meta.app_label
@@ -65,25 +93,6 @@ class LocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
                 'image_height': floorplan.image.height,
             })
         return JsonResponse({'choices': choices})
-
-
-class FloorPlanForm(forms.ModelForm):
-    class Meta:
-        model = FloorPlan
-        exclude = tuple()
-        widgets = {'image': ImageWidget()}
-
-    class Media:
-        css = {'all': ('django-loci/css/loci.css',)}
-
-
-class FloorPlanAdmin(TimeReadonlyAdminMixin, admin.ModelAdmin):
-    list_display = ['__str__', 'location', 'floor', 'created', 'modified']
-    list_select_related = ['location']
-    search_fields = ('location__name',)
-    raw_id_fields = ('location',)
-    save_on_top = True
-    form = FloorPlanForm
 
 
 class UnvalidatedChoiceField(forms.ChoiceField):
@@ -254,5 +263,5 @@ class ObjectLocationInline(TimeReadonlyAdminMixin, GenericStackedInline):
     )
 
 
-admin.site.register(Location, LocationAdmin)
 admin.site.register(FloorPlan, FloorPlanAdmin)
+admin.site.register(Location, LocationAdmin)
