@@ -93,9 +93,16 @@ class FloorPlan(TimeStampedEditableModel):
         self._validate_location_type()
 
     def delete(self, *args, **kwargs):
-        path = self.image.file.name
         super(FloorPlan, self).delete(*args, **kwargs)
-        os.remove(path)
+        self._remove_image()
+
+    def _remove_image(self):
+        path = self.image.file.name
+        if os.path.isfile(path):
+            os.remove(path)
+        else:
+            msg = 'floorplan image not found while deleting {0}: {1}'
+            logger.error(msg.format(self, path))
 
 
 class ObjectLocation(TimeStampedEditableModel):

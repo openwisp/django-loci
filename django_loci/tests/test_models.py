@@ -65,6 +65,12 @@ class TestModels(TestLociMixin, TestCase):
         fl.delete()
         self.assertFalse(os.path.isfile(fl.image.file.name))
 
+    def test_floorplan_delete_corner_case(self):
+        fl = self._create_floorplan()
+        os.remove(fl.image.file.name)
+        # there should be no failure
+        fl.delete()
+
     def test_floorplan_association_validation(self):
         outdoor = self._create_location(type='outdoor')
         try:
