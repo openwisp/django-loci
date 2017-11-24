@@ -106,26 +106,38 @@ class UnvalidatedChoiceField(forms.ChoiceField):
         super(forms.ChoiceField, self).validate(value)
 
 
+LOCATION_CHOICES = (
+    ('', _('--- Please select an option ---')),
+    Location.LOCATION_TYPES[0],
+    Location.LOCATION_TYPES[1]
+)
+
+
 class ObjectLocationForm(forms.ModelForm):
-    CHOICES = (
-        ('', _('Please select an option')),
+    FORM_CHOICES = (
+        ('', _('--- Please select an option ---')),
         ('new', _('New')),
         ('existing', _('Existing'))
     )
-    location_selection = forms.ChoiceField(choices=CHOICES, required=False)
+    LOCATION_TYPES = (
+        FORM_CHOICES[0],
+        Location.LOCATION_TYPES[0],
+        Location.LOCATION_TYPES[1]
+    )
+    location_selection = forms.ChoiceField(choices=FORM_CHOICES, required=False)
     name = forms.CharField(label=_('Location name'),
                            max_length=75, required=False,
                            help_text=Location._meta.get_field('name').help_text)
     address = forms.CharField(max_length=128, required=False)
-    type = forms.ChoiceField(choices=Location.LOCATION_TYPES, required=True,
+    type = forms.ChoiceField(choices=LOCATION_TYPES, required=True,
                              help_text=Location._meta.get_field('type').help_text)
     is_mobile = forms.BooleanField(label=Location._meta.get_field('is_mobile').verbose_name,
                                    help_text=Location._meta.get_field('is_mobile').help_text,
                                    required=False)
     geometry = GeometryField(required=False)
     floorplan_selection = forms.ChoiceField(required=False,
-                                            choices=CHOICES)
-    floorplan = UnvalidatedChoiceField(choices=((None, CHOICES[0][1]),),
+                                            choices=FORM_CHOICES)
+    floorplan = UnvalidatedChoiceField(choices=((None, FORM_CHOICES[0][1]),),
                                        required=False)
     floor = forms.IntegerField(required=False)
     image = forms.ImageField(required=False,
@@ -190,7 +202,7 @@ class ObjectLocationForm(forms.ModelForm):
         is_mobile = data['is_mobile']
         msg = _('this field is required for locations of type %(type)s')
         fields = []
-        if not is_mobile and type_ in ['outdoor', 'indoor']: # and not data['location']:
+        if not is_mobile and type_ in ['outdoor', 'indoor']:
             fields += ['location_selection', 'name', 'address', 'geometry']
         if not is_mobile and type_ == 'indoor':
             fields += ['floorplan_selection', 'floor', 'indoor']
@@ -203,8 +215,6 @@ class ObjectLocationForm(forms.ModelForm):
             data['address'] = ''
             data['geometry'] = ''
             data['location_selection'] = 'new'
-        # elif is_mobile and data.get('location'):
-        #     data['location_selection'] = 'existing'
         for field in fields:
             if field in data and data[field] in [None, '']:
                 params = {'type': type_}

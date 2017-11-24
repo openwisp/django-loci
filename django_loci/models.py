@@ -16,9 +16,8 @@ from .storage import OverwriteStorage
 @python_2_unicode_compatible
 class Location(TimeStampedEditableModel):
     LOCATION_TYPES = (
-        ('outdoor', _('Outdoor environment (eg: street, square, garden)')),
-        ('indoor', _('Indoor environment (eg: building, subway, large '
-                     'transportation vehicles)')),
+        ('outdoor', _('Outdoor environment (eg: street, square, garden, land)')),
+        ('indoor', _('Indoor environment (eg: building, roofs, subway, large vehicles)')),
     )
     name = models.CharField(_('name'), max_length=75,
                             help_text=_('A descriptive name of the location '
