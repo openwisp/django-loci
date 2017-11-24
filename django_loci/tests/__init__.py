@@ -58,6 +58,8 @@ class TestLociMixin(object):
             options['content_object'] = self._create_object()
         if 'location' not in options:
             options['location'] = self._create_location()
+        elif options['location'].type == 'indoor':
+            options['indoor'] = '-140.38620,40.369227'
         ol = self.object_location_model(**options)
         ol.full_clean()
         ol.save()

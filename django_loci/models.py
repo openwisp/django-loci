@@ -125,6 +125,10 @@ class ObjectLocation(TimeStampedEditableModel):
         unique_together = ('content_type', 'object_id')
 
     def _clean_indoor_location(self):
+        """
+        ensures related floorplan is not
+        associated to a different location
+        """
         # skip validation if the instance does not
         # have a floorplan assigned to it yet
         if not self.location or self.location.type != 'indoor' or not self.floorplan:
@@ -132,5 +136,39 @@ class ObjectLocation(TimeStampedEditableModel):
         if self.location != self.floorplan.location:
             raise ValidationError(_('Invalid floorplan (belongs to a different location)'))
 
+    def _raise_invalid_indoor(self):
+        raise ValidationError({'indoor': _('invalid value')})
+
+    def _clean_indoor_position(self):
+        """
+        ensures invalid indoor position values
+        cannot be inserted into the database
+        """
+        # stop here if location not defined yet
+        # (other validation errors will be triggered)
+        if not self.location:
+            return
+        # do not allow non empty values for outdoor locations
+        if self.location.type != 'indoor' and self.indoor not in [None, '']:
+            self._raise_invalid_indoor()
+        # allow empty values for outdoor locations
+        elif self.location.type != 'indoor' and self.indoor in [None, '']:
+            return
+        # split indoor position
+        position = []
+        if self.indoor:
+            position = self.indoor.split(',')
+        # must have at least e elements
+        if len(position) != 2:
+            self._raise_invalid_indoor()
+        # each member must be convertible to float
+        else:
+            for part in position:
+                try:
+                    float(part)
+                except ValueError:
+                    self._raise_invalid_indoor()
+
     def clean(self):
         self._clean_indoor_location()
+        self._clean_indoor_position()

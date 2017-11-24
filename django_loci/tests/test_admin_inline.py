@@ -200,7 +200,7 @@ class TestAdminInline(TestAdminMixin, TestLociMixin, TestCase):
     def test_add_indoor_existing_location_new_floorplan(self):
         self._login_as_admin()
         obj = self._create_object(name='test-add-indoor-existing-location-new-floorplan')
-        pre_loc = self._create_location()
+        pre_loc = self._create_location(type='indoor')
         p = self._p
         params = self._params.copy()
         floorplan_file = open(os.path.join(settings.BASE_DIR, 'media/floorplan.jpg'), 'rb')

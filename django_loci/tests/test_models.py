@@ -95,3 +95,47 @@ class TestModels(TestLociMixin, TestCase):
             self.assertIn('please delete them', err_str)
         else:
             self.fail('ValidationError not raised')
+
+    def _test_indoor_position_validation_error(self, ol):
+        try:
+            ol.full_clean()
+        except ValidationError as e:
+            self.assertIn('indoor', e.message_dict)
+            self.assertIn('invalid value', e.message_dict['indoor'])
+        else:
+            self.fail('ValidationError not raised')
+
+    def test_invalid_indoor_position(self):
+        loc = self._create_location(type='indoor')
+        ol = self._create_object_location(location=loc)
+        ol.indoor = 'TOTALLYWRONG'
+        self._test_indoor_position_validation_error(ol)
+        ol.indoor = 'WRONG,WRONG'
+        self._test_indoor_position_validation_error(ol)
+        ol.indoor = '10,WRONG'
+        self._test_indoor_position_validation_error(ol)
+        ol.indoor = 'WRONG,10'
+        self._test_indoor_position_validation_error(ol)
+        ol.indoor = '10,10.10,100'
+        self._test_indoor_position_validation_error(ol)
+        ol.indoor = 'TOTALLY.WRONG'
+        self._test_indoor_position_validation_error(ol)
+        ol.indoor = ''
+        self._test_indoor_position_validation_error(ol)
+        ol.indoor = None
+        self._test_indoor_position_validation_error(ol)
+        ol.indoor = '100.2300,-45.23454'
+        ol.full_clean()
+        # outdoor allows empty but not invalid values
+        loc.type = 'outdoor'
+        loc.full_clean()
+        loc.save()
+        ol.indoor = None
+        ol.full_clean()
+        ol.indoor = ''
+        ol.full_clean()
+        ol.indoor = 'TOTALLY.WRONG'
+        self._test_indoor_position_validation_error(ol)
+        # outdoor does not allow valid indoor positions
+        ol.indoor = '100.2300,-45.23454'
+        self._test_indoor_position_validation_error(ol)
