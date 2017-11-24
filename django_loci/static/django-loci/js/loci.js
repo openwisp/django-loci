@@ -66,6 +66,7 @@ django.jQuery(function ($) {
         }
         $location.val('');
         $locationLabel.text('');
+        $isMobile.prop('checked', false);
         $name.val('');
         $address.val('');
         $geometryTextarea.val('');
@@ -213,9 +214,7 @@ django.jQuery(function ($) {
                 $locationLabel.text(data.name);
                 $name.val(data.name);
                 $type.val(data.type);
-                if (data.is_mobile) {
-                    $isMobile.prop('checked', true);
-                }
+                $isMobile.prop('checked', data.is_mobile);
                 $address.val(data.address);
                 $geometryTextarea.val(JSON.stringify(data.geometry));
                 var map = getMap();
@@ -231,6 +230,23 @@ django.jQuery(function ($) {
 
     $location.change(locationChange);
     locationChange(null, true);
+
+    $isMobile.change(function () {
+        var rows = [
+            $name.parents('.form-row'),
+            $address.parents('.form-row'),
+            $geometryRow
+        ];
+        if ($isMobile.prop('checked')) {
+            $(rows).each(function (i, el) {
+                $(el).hide();
+            });
+        } else {
+            $(rows).each(function (i, el) {
+                $(el).show();
+            });
+        }
+    });
 
     $floorplanSelection.change(floorplanSelectionChange);
     floorplanSelectionChange();
@@ -320,7 +336,8 @@ django.jQuery(function ($) {
         $geoEdit.show();
     }
     // show mobile map (hide not relevant fields)
-    if ($type.val() === 'mobile') {
+    if ($isMobile.prop('checked')) {
+        listenForLocationUpdates($location.val());
         $outdoor.show();
         $locationSelection.parents('.form-row').hide();
         $locationRow.hide();
@@ -332,7 +349,7 @@ django.jQuery(function ($) {
             $geometryRow.parent().append('<div class="no-location">' + msg + '</div>');
             $noLocationDiv = $('.no-location', '.loci.coords');
         }
-        listenForLocationUpdates($location.val());
+    // this is triggered in the location form page
     } else if (!$type.length) {
         var pk = window.location.pathname.split('/').slice('-3', '-2')[0];
         listenForLocationUpdates(pk);
