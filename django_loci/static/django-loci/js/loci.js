@@ -13,6 +13,8 @@ django.jQuery(function ($) {
         $geoEdit = $('.field-name, .field-type, .field-is_mobile, ' +
                      '.field-address, .field-geometry', '.loci.coords'),
         $indoorRows = $('.indoor.coords .form-row:not(.field-indoor)'),
+        $indoorEdit = $('.indoor.coords .form-row:not(.field-floorplan_selection)'),
+        $indoorPositionRow = $('.indoor.coords .field-indoor'),
         geometryId = $('.field-geometry label').attr('for'),
         mapName = 'leafletmap' + geometryId + '-map',
         loadMapName = 'loadmap' + geometryId + '-map',
@@ -80,7 +82,8 @@ django.jQuery(function ($) {
         }
         $indoorRows.hide();
         $floorplanSelectionRow.show();
-        $floorplan.val('');
+        // reset values
+        $indoorEdit.find('input,select').val('');
     }
 
     function resetDeviceLocationForm() {
@@ -90,8 +93,12 @@ django.jQuery(function ($) {
 
     function indoorForm(selection) {
         if ($type.val() !== 'indoor') { return; }
+        $indoorPositionRow.hide();
         $indoor.show();
-        if (selection === 'new') {
+        if (!selection) {
+            $indoorRows.hide();
+            $floorplanSelectionRow.show();
+        } else if (selection === 'new') {
             $indoorRows.show();
             $floorplan.val('');
             $floorplanRow.hide();
@@ -103,28 +110,14 @@ django.jQuery(function ($) {
     }
 
     function locationSelectionChange(e, initial) {
-        // var value = $locationSelection.val();
-        // $geoRows.hide();
-        // if (!initial) {
-        //     resetOutdoorForm(true);
-        //     resetIndoorForm();
-        // }
-        // if (value === 'new') {
-        //     $geoEdit.show();
-        //     indoorForm(value);
-        // } else if (value === 'existing') {
-        //     $locationRow.show();
-        // }
-        // invalidateMapSize();
         var value = $locationSelection.val();
         $allSections.hide();
         if (!initial) { resetDeviceLocationForm(); }
         if (value === 'new') {
             $outdoor.show();
-            $geoEdit.show();
+            $geoRows.hide();
+            $typeRow.show();
             indoorForm(value);
-            // $locationRow.hide();
-            invalidateMapSize();
         } else if (value === 'existing') {
             $outdoor.show();
             $geoRows.hide();
@@ -134,9 +127,15 @@ django.jQuery(function ($) {
 
     function typeChange(e, initial) {
         var value = $type.val();
-        // $allSections.hide();
-        // if (!initial) { resetDeviceLocationForm(); }
-        // $outdoor.show();
+        if (value) {
+            $outdoor.show();
+            $geoEdit.show();
+            invalidateMapSize();
+        } else {
+            $geoEdit.hide();
+            $indoor.hide();
+            $typeRow.show();
+        }
         if (value === 'indoor') {
             $indoor.show();
             $indoorRows.show();
@@ -149,9 +148,8 @@ django.jQuery(function ($) {
     function floorplanSelectionChange() {
         var value = $floorplanSelection.val(),
             optionsLength = $floorplan.find('option').length;
-        if (value === 'new') {
-            indoorForm(value);
-        }
+        resetIndoorForm(true);
+        indoorForm(value);
         if (value === 'existing' && optionsLength > 1) {
             $floorplanRow.show();
         // if no floorplan available, make it obvious
@@ -238,7 +236,14 @@ django.jQuery(function ($) {
     floorplanSelectionChange();
 
     $floorplan.change(function () {
-        if (!$floorplan.val()) { return; }
+        // reset floorplan data if no floorplan is chosen
+        if (!$floorplan.val()) {
+            resetIndoorForm(true);
+            $indoorRows.show();
+            $indoorEdit.hide();
+            $floorplanRow.show();
+            return;
+        }
         var option = $floorplan.find('option:selected'),
             widgetName = $floorplanMap.parents('.field-indoor')
                                       .find('.floorplan-widget')
