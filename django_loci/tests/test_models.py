@@ -47,17 +47,23 @@ class TestModels(TestLociMixin, TestCase):
 
     def test_floorplan_image(self):
         fl = self._create_floorplan()
-        path = fl.image.file.name
-        name = path.split('/')[-1]
+        path = fl.image.file.name.split('/')
+        name = path[-1]
+        dir_ = path[-2]
         self.assertEqual(name, '{0}.jpg'.format(fl.id))
+        self.assertEqual(dir_, 'floorplans')
         # overwrite
         fl.image = self._get_simpleuploadedfile()
         fl.full_clean()
         fl.save()
+        path = fl.image.file.name.split('/')
+        name = path[-1]
+        dir_ = path[-2]
         self.assertEqual(name, '{0}.jpg'.format(fl.id))
+        self.assertEqual(dir_, 'floorplans')
         # delete
         fl.delete()
-        self.assertFalse(os.path.isfile(path))
+        self.assertFalse(os.path.isfile(fl.image.file.name))
 
     def test_floorplan_association_validation(self):
         outdoor = self._create_location(type='outdoor')

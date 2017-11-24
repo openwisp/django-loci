@@ -87,6 +87,20 @@ Now run migrations:
 
     ./manage.py migrate
 
+Settings
+--------
+
+``LOCI_FLOORPLAN_UPLOAD_DIR``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++--------------+----------------+
+| **type**:    | ``str``        |
++--------------+----------------+
+| **default**: | ``floorplan``  |
++--------------+----------------+
+
+The directory under ``settings.MEDIA_ROOT`` in which floorplan images will be uploaded.
+
 Installing for development
 --------------------------
 

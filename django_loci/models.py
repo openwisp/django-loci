@@ -1,3 +1,4 @@
+import logging
 import os
 
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -10,7 +11,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from openwisp_utils.base import TimeStampedEditableModel
 
+from . import settings as app_settings
 from .storage import OverwriteStorage
+
+logger = logging.getLogger(__name__)
 
 
 @python_2_unicode_compatible
@@ -56,7 +60,8 @@ class Location(TimeStampedEditableModel):
 
 def _get_file_path(instance, filename):
     ext = filename.split('.')[-1]
-    return '{0}.{1}'.format(instance.id, ext)
+    dir_ = app_settings.FLOORPLAN_UPLOAD_DIR
+    return '{0}/{1}.{2}'.format(dir_, instance.id, ext)
 
 
 @python_2_unicode_compatible
