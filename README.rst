@@ -176,6 +176,61 @@ This example provides an example of how to extend the base models of
             # your own validation logic here...
             pass
 
+Extending the admin
+~~~~~~~~~~~~~~~~~~~
+
+Following the previous `Organization` example, you can avoid duplicating the admin
+code by importing the base admin classes and registering your models with them.
+
+.. code-block:: python
+
+    # admin.py of your app
+    from django.contrib import admin
+
+    from django_loci.base.admin import (AbstractFloorPlanAdmin, AbstractFloorPlanForm,
+                                        AbstractFloorPlanInline, AbstractLocationAdmin,
+                                        AbstractLocationForm, AbstractObjectLocationForm,
+                                        AbstractObjectLocationInline)
+    from django_loci.models import FloorPlan, Location, ObjectLocation
+
+
+    class FloorPlanForm(AbstractFloorPlanForm):
+        class Meta(AbstractFloorPlanForm.Meta):
+            model = FloorPlan
+
+
+    class FloorPlanAdmin(AbstractFloorPlanAdmin):
+        form = FloorPlanForm
+
+
+    class LocationForm(AbstractLocationForm):
+        class Meta(AbstractLocationForm.Meta):
+            model = Location
+
+
+    class FloorPlanInline(AbstractFloorPlanInline):
+        form = FloorPlanForm
+        model = FloorPlan
+
+
+    class LocationAdmin(AbstractLocationAdmin):
+        form = LocationForm
+        inlines = [FloorPlanInline]
+
+
+    class ObjectLocationForm(AbstractObjectLocationForm):
+        class Meta(AbstractObjectLocationForm.Meta):
+            model = ObjectLocation
+
+
+    class ObjectLocationInline(AbstractObjectLocationInline):
+        model = ObjectLocation
+        form = ObjectLocationForm
+
+
+    admin.site.register(FloorPlan, FloorPlanAdmin)
+    admin.site.register(Location, LocationAdmin)
+
 Installing for development
 --------------------------
 
