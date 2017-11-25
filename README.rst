@@ -108,6 +108,74 @@ To understand the details of this statement, take a look at the code of
 `django_loci.storage.OverwriteStorage
 <https://github.com/openwisp/django-loci/blob/master/django_loci/storage.py>`_.
 
+Extending django-loci
+---------------------
+
+*django-loci* provides a set of models and admin classes which can be imported,
+extended and reused by third party apps.
+
+To extend *django-loci*, **you MUST NOT** add it to ``settings.INSTALLED_APPS``,
+but you must create your own app (which goes into ``settings.INSTALLED_APPS``),
+import the base classes of django-loci and add your customizations.
+
+Extending models
+~~~~~~~~~~~~~~~~
+
+This example provides an example of how to extend the base models of
+*django-loci* by adding a relation to another django model named `Organization`.
+
+.. code-block:: python
+
+    # models.py of your app
+    from django.db import models
+    from django_loci.base.models import (AbstractFloorPlan,
+                                         AbstractLocation,
+                                         AbstractObjectLocation)
+
+    # the model ``organizations.Organization`` is omitted for brevity
+    # if you are curious to see a real implementation, check out django-organizations
+
+
+    class OrganizationMixin(models.Model):
+        organization = models.ForeignKey('organizations.Organization')
+
+        class Meta:
+            abstract = True
+
+
+    class Location(OrganizationMixin, AbstractLocation):
+        class Meta(AbstractLocation.Meta):
+            abstract = False
+
+        def clean(self):
+            # your own validation logic here...
+            pass
+
+
+    class FloorPlan(OrganizationMixin, AbstractFloorPlan):
+        location = models.ForeignKey(Location)
+
+        class Meta(AbstractFloorPlan.Meta):
+            abstract = False
+
+        def clean(self):
+            # your own validation logic here...
+            pass
+
+
+    class ObjectLocation(OrganizationMixin, AbstractObjectLocation):
+        location = models.ForeignKey(Location, models.PROTECT,
+                                     blank=True, null=True)
+        floorplan = models.ForeignKey(FloorPlan, models.PROTECT,
+                                      blank=True, null=True)
+
+        class Meta(AbstractObjectLocation.Meta):
+            abstract = False
+
+        def clean(self):
+            # your own validation logic here...
+            pass
+
 Installing for development
 --------------------------
 
