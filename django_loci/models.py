@@ -12,7 +12,6 @@ from django.utils.translation import ugettext_lazy as _
 from openwisp_utils.base import TimeStampedEditableModel
 
 from . import settings as app_settings
-from .storage import OverwriteStorage
 
 logger = logging.getLogger(__name__)
 
@@ -58,19 +57,13 @@ class Location(TimeStampedEditableModel):
         return _(self.type.capitalize())
 
 
-def _get_file_path(instance, filename):
-    ext = filename.split('.')[-1]
-    dir_ = app_settings.FLOORPLAN_UPLOAD_DIR
-    return '{0}/{1}.{2}'.format(dir_, instance.id, ext)
-
-
 @python_2_unicode_compatible
 class FloorPlan(TimeStampedEditableModel):
     location = models.ForeignKey('django_loci.Location')
     floor = models.SmallIntegerField(_('floor'))
     image = models.ImageField(_('image'),
-                              upload_to=_get_file_path,
-                              storage=OverwriteStorage(),
+                              upload_to=app_settings.FLOORPLAN_STORAGE.upload_to,
+                              storage=app_settings.FLOORPLAN_STORAGE(),
                               help_text=_('floor plan image'))
 
     class Meta:

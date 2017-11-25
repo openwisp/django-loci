@@ -90,16 +90,23 @@ Now run migrations:
 Settings
 --------
 
-``LOCI_FLOORPLAN_UPLOAD_DIR``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``LOCI_FLOORPLAN_STORAGE``
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-+--------------+----------------+
-| **type**:    | ``str``        |
-+--------------+----------------+
-| **default**: | ``floorplan``  |
-+--------------+----------------+
++--------------+-------------------------------------------+
+| **type**:    | ``str``                                   |
++--------------+-------------------------------------------+
+| **default**: | ``django_loci.storage.OverwriteStorage``  |
++--------------+-------------------------------------------+
 
-The directory under ``settings.MEDIA_ROOT`` in which floorplan images will be uploaded.
+The django file storage class used for uploading floorplan images.
+
+The filestorage can be changed to a different one as long as it has an
+``upload_to`` class method which will be passed to ``FloorPlan.image.upload_to``.
+
+To understand the details of this statement, take a look at the code of
+`django_loci.storage.OverwriteStorage
+<https://github.com/openwisp/django-loci/blob/master/django_loci/storage.py>`_.
 
 Installing for development
 --------------------------
