@@ -231,6 +231,23 @@ code by importing the base admin classes and registering your models with them.
     admin.site.register(FloorPlan, FloorPlanAdmin)
     admin.site.register(Location, LocationAdmin)
 
+Extending AppConfig
+~~~~~~~~~~~~~~~~~~~
+
+You may want to reuse the ``AppConfig`` class of *django-loci* too:
+
+.. code-block:: python
+
+    from django_loci.apps import LociConfig
+
+
+    class MyAppConfig(LociConfig):
+        name = 'myapp'
+
+        def load_receivers(self):
+            # load receivers that listen for signals from your models
+            from .channels import receivers
+
 Installing for development
 --------------------------
 

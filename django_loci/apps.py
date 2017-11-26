@@ -9,4 +9,7 @@ class LociConfig(AppConfig):
     def ready(self):
         import leaflet
         leaflet.app_settings['NO_GLOBALS'] = False
+        self.load_receivers()
+
+    def load_receivers(self):
         from .channels import receivers  # noqa
