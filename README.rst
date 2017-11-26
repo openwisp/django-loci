@@ -16,7 +16,7 @@ django-loci
 
 ------------
 
-TODO
+Reusable django-app for storing GIS and indoor coordinates of objects.
 
 ------------
 
