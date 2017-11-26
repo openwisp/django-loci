@@ -232,6 +232,20 @@ code by importing the base admin classes and registering your models with them.
     admin.site.register(FloorPlan, FloorPlanAdmin)
     admin.site.register(Location, LocationAdmin)
 
+Extending Channel Consumer
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Extend the channel consumer of django-loci in this way:
+
+.. code-block:: python
+
+    from django_loci.channels.base import BaseLocationBroadcast
+    from ..models import Location  # your own location model
+
+
+    class LocationBroadcast(BaseLocationBroadcast):
+        model = Location
+
 Extending AppConfig
 ~~~~~~~~~~~~~~~~~~~
 

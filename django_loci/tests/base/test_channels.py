@@ -1,7 +1,7 @@
 from channels.test import WSClient
 
 from .. import TestAdminMixin, TestLociMixin
-from ...channels.consumers import _get_object_or_none
+from ...channels.base import _get_object_or_none
 
 
 class BaseTestChannels(TestAdminMixin, TestLociMixin):
