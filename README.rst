@@ -232,8 +232,8 @@ code by importing the base admin classes and registering your models with them.
     admin.site.register(FloorPlan, FloorPlanAdmin)
     admin.site.register(Location, LocationAdmin)
 
-Extending Channel Consumer
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Extending channel consumers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Extend the channel consumer of django-loci in this way:
 
