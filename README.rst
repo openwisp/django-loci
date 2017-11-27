@@ -68,7 +68,7 @@ If you want to contribute, install your cloned fork:
 Setup (integrate in an existing django project)
 -----------------------------------------------
 
-Add ``django_loci`` and its dependencies to `INSTALLED_APPS`` in the following order:
+Add ``django_loci`` and its dependencies to ``INSTALLED_APPS`` in the following order:
 
 .. code-block:: python
 
