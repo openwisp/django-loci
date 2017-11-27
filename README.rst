@@ -82,6 +82,17 @@ Add ``django_loci`` and its dependencies to ``INSTALLED_APPS`` in the following 
         # ...
     ]
 
+Configure ``CHANNEL_LAYERS`` according to your needs, a sample configuration can be:
+
+.. code-block:: python
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "asgiref.inmemory.ChannelLayer",
+            "ROUTING": "django_loci.channels.routing.channel_routing",
+        },
+    }
+
 Now run migrations:
 
 .. code-block:: shell
