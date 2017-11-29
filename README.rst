@@ -194,11 +194,38 @@ Extending the admin
 Following the previous `Organization` example, you can avoid duplicating the admin
 code by importing the base admin classes and registering your models with them.
 
-But first you have to setup an additional static file finder and a template loader, these are
-needed in order to load the admin templates and static files of *django-loci* even if it's not
+But first you have to change a few settings in your ``settings.py``, these are needed in
+order to load the admin templates and static files of *django-loci* even if it's not
 listed in ``settings.INSTALLED_APPS``.
 
-Add ``openwisp_utils.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS`` in your ``settings.py``
+Add ``django.forms`` to ``INSTALLED_APPS``, now it should look like the following:
+
+.. code-block:: python
+
+    INSTALLED_APPS = [
+        # ...
+        'django.contrib.gis',
+        'django_loci',
+        'django.contrib.admin',
+        #      ↓
+        'django.forms', # <-- add this
+        #      ↑
+        'leaflet',
+        'channels'
+        # ...
+    ]
+
+Now add ``EXTENDED_APPS`` after ``INSTALLED_APPS``:
+
+.. code-block:: python
+
+    INSTALLED_APPS = [
+        # ...
+    ]
+
+    EXTENDED_APPS = ('django_loci',)
+
+Add ``openwisp_utils.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS``:
 
 .. code-block:: python
 
@@ -208,7 +235,7 @@ Add ``openwisp_utils.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS`` i
         'openwisp_utils.staticfiles.DependencyFinder',
     ]
 
-Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES`` in your ``settings.py``
+Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES``:
 
 .. code-block:: python
 
@@ -233,15 +260,13 @@ Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES`` in your ``setti
         }
     ]
 
-Now add ``EXTENDED_APPS`` after ``INSTALLED_APPS`` (in ``settings.py``):
+Last step, add ``FORM_RENDERER``:
 
 .. code-block:: python
 
-    INSTALLED_APPS = [
-        # ...
-    ]
+    FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
-    EXTENDED_APPS = ('django_loci',)
+Then you can go ahead and create your ``admin.py`` file following the example below:
 
 .. code-block:: python
 
