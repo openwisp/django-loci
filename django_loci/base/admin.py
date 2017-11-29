@@ -259,7 +259,12 @@ class AbstractObjectLocationForm(forms.ModelForm):
         return super(AbstractObjectLocationForm, self).save(commit=True)
 
 
-class AbstractObjectLocationInline(TimeReadonlyAdminMixin, GenericStackedInline):
+class ObjectLocationMixin(TimeReadonlyAdminMixin):
+    """
+    Base ObjectLocationInline logic, can be imported and
+    mixed in with different inline classes (stacked, tabular).
+    If you need the generic inline look below.
+    """
     verbose_name = _('geographic information')
     verbose_name_plural = verbose_name
     raw_id_fields = ('location',)
@@ -279,3 +284,10 @@ class AbstractObjectLocationInline(TimeReadonlyAdminMixin, GenericStackedInline)
                        'floor', 'image', 'indoor',),
         })
     )
+
+
+class AbstractObjectLocationInline(ObjectLocationMixin, GenericStackedInline):
+    """
+    Generic Inline + ObjectLocationMixin
+    """
+    pass
