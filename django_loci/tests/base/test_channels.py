@@ -1,4 +1,5 @@
 from channels.test import WSClient
+from django.contrib.auth.models import Permission
 
 from .. import TestAdminMixin, TestLociMixin
 from ...channels.base import _get_object_or_none
@@ -50,6 +51,22 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
             self.assertIn('Connection rejected', str(e))
         else:
             self.fail('AssertionError not raised')
+
+    def test_ws_add_staff_but_no_change_permission(self):
+        user = self.user_model.objects.create_user(username='user',
+                                                   password='password',
+                                                   email='test@test.org',
+                                                   is_staff=True)
+        try:
+            self._test_ws_add(user=user)
+        except AssertionError as e:
+            self.assertIn('Connection rejected', str(e))
+        else:
+            self.fail('AssertionError not raised')
+        # add permission to change location and repeat
+        perm = Permission.objects.filter(name='Can change location').first()
+        user.user_permissions.add(perm)
+        self._test_ws_add(user=user)
 
     def test_ws_add_404(self):
         pk = self.location_model().pk

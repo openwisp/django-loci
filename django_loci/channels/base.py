@@ -28,8 +28,13 @@ class BaseLocationBroadcast(WebsocketConsumer):
         Group('loci.mobile-location.{0}'.format(pk)).add(message.reply_channel)
 
     def is_authorized(self, user, location):
-        # TODO: add is_superuser or has_permission
-        return user.is_authenticated() and user.is_staff
+        perm = '{0}.change_location'.format(self.model._meta.app_label)
+        return user.is_authenticated() and (
+            user.is_superuser or (
+                user.is_staff and
+                user.has_perm(perm)
+            )
+        )
 
     def disconnect(self, message, pk):
         """
