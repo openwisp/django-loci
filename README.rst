@@ -341,12 +341,13 @@ You may want to reuse the ``AppConfig`` class of *django-loci* too:
     from django_loci.apps import LociConfig
 
 
-    class MyAppConfig(LociConfig):
+    class MyConfig(LociConfig):
         name = 'myapp'
+        verbose_name = _('My custom app')
 
-        def load_receivers(self):
-            # load receivers that listen for signals from your models
-            from .channels import receivers
+        def __setmodels__(self):
+            from .models import Location
+            self.location_model = Location
 
 Installing for development
 --------------------------
