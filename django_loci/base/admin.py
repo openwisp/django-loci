@@ -57,7 +57,10 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
     save_on_top = True
 
     def get_urls(self):
-        app_label = self.model._meta.app_label
+        # hardcoding django_loci as the prefix for the
+        # view names makes it much easier to extend
+        # without having to change templates
+        app_label = 'django_loci'
         return [
             url(r'^(?P<pk>[^/]+)/json/$',
                 self.admin_site.admin_view(self.json_view),
