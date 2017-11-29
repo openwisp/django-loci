@@ -194,6 +194,44 @@ Extending the admin
 Following the previous `Organization` example, you can avoid duplicating the admin
 code by importing the base admin classes and registering your models with them.
 
+But first you have to setup an additional static file finder and a template loader, these are
+needed in order to load the admin templates and static files of *django-loci* even if it's not
+listed in ``settings.INSTALLED_APPS``.
+
+Add ``openwisp_utils.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS`` in your ``settings.py``
+
+.. code-block:: python
+
+    STATICFILES_FINDERS = [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        'openwisp_utils.staticfiles.DependencyFinder',
+    ]
+
+Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES`` in your ``settings.py``
+
+.. code-block:: python
+
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'OPTIONS': {
+                'loaders': [
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    # add the following line
+                    'openwisp_utils.loaders.DependencyLoader'
+                ],
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        }
+    ]
 
 Now add ``EXTENDED_APPS`` after ``INSTALLED_APPS`` (in ``settings.py``):
 
