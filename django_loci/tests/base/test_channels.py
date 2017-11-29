@@ -17,7 +17,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         result = _get_object_or_none(self.location_model, pk=plausible_pk)
         self.assertEqual(result, None)
 
-    def _test_ws_add(self, pk=None, user=None):
+    def _test_consume(self, pk=None, user=None):
         if not pk:
             location = self._create_location(is_mobile=True)
             ol = self._create_object_location(location=location)
@@ -28,37 +28,37 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         self.client.send_and_consume('websocket.connect', path=path)
         return {'ol': ol, 'path': path}
 
-    def test_ws_add_unauthenticated(self):
+    def test_consumer_unauthenticated(self):
         try:
-            self._test_ws_add()
+            self._test_consume()
         except AssertionError as e:
             self.assertIn('Connection rejected', str(e))
         else:
             self.fail('AssertionError not raised')
 
     def test_connect_and_disconnect(self):
-        res = self._test_ws_add(user=self._create_admin())
+        res = self._test_consume(user=self._create_admin())
         self.assertEqual(self.client.receive(), None)
         self.client.send_and_consume('websocket.disconnect', path=res['path'])
 
-    def test_ws_add_not_staff(self):
+    def test_consumer_not_staff(self):
         user = self.user_model.objects.create_user(username='user',
                                                    password='password',
                                                    email='test@test.org')
         try:
-            self._test_ws_add(user=user)
+            self._test_consume(user=user)
         except AssertionError as e:
             self.assertIn('Connection rejected', str(e))
         else:
             self.fail('AssertionError not raised')
 
-    def test_ws_add_staff_but_no_change_permission(self):
+    def test_consumer_staff_but_no_change_permission(self):
         user = self.user_model.objects.create_user(username='user',
                                                    password='password',
                                                    email='test@test.org',
                                                    is_staff=True)
         try:
-            self._test_ws_add(user=user)
+            self._test_consume(user=user)
         except AssertionError as e:
             self.assertIn('Connection rejected', str(e))
         else:
@@ -66,20 +66,20 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         # add permission to change location and repeat
         perm = Permission.objects.filter(name='Can change location').first()
         user.user_permissions.add(perm)
-        self._test_ws_add(user=user)
+        self._test_consume(user=user)
 
-    def test_ws_add_404(self):
+    def test_consumer_404(self):
         pk = self.location_model().pk
         admin = self._create_admin()
         try:
-            self._test_ws_add(pk=pk, user=admin)
+            self._test_consume(pk=pk, user=admin)
         except AssertionError as e:
             self.assertIn('Connection rejected', str(e))
         else:
             self.fail('AssertionError not raised')
 
     def test_location_update(self):
-        res = self._test_ws_add(user=self._create_admin())
+        res = self._test_consume(user=self._create_admin())
         res['ol'].location.geometry = 'POINT (12.513124 41.897903)'
         res['ol'].location.save()
         result = self.client.receive()
