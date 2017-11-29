@@ -28,6 +28,7 @@ class BaseLocationBroadcast(WebsocketConsumer):
         Group('loci.mobile-location.{0}'.format(pk)).add(message.reply_channel)
 
     def is_authorized(self, user, location):
+        # TODO: add is_superuser or has_permission
         return user.is_authenticated() and user.is_staff
 
     def disconnect(self, message, pk):
@@ -35,10 +36,3 @@ class BaseLocationBroadcast(WebsocketConsumer):
         Perform things on connection close
         """
         Group('loci.mobile-location.{0}'.format(pk)).discard(message.reply_channel)
-
-
-def update_mobile_location(sender, instance, **kwargs):
-    if not kwargs.get('created') and instance.geometry:
-        group_name = 'loci.mobile-location.{0}'.format(str(instance.pk))
-        message = {'text': instance.geometry.geojson}
-        Group(group_name).send(message, immediately=True)
