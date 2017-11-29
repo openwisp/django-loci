@@ -1,5 +1,5 @@
-from .base import BaseLocationBroadcast
 from ..models import Location
+from .base import BaseLocationBroadcast
 
 
 class LocationBroadcast(BaseLocationBroadcast):
