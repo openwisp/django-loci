@@ -36,3 +36,10 @@ class BaseLocationBroadcast(WebsocketConsumer):
         Perform things on connection close
         """
         Group('loci.mobile-location.{0}'.format(pk)).discard(message.reply_channel)
+
+
+def update_mobile_location(sender, instance, **kwargs):
+    if not kwargs.get('created') and instance.geometry:
+        group_name = 'loci.mobile-location.{0}'.format(str(instance.pk))
+        message = {'text': instance.geometry.geojson}
+        Group(group_name).send(message, immediately=True)

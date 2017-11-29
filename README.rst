@@ -194,6 +194,17 @@ Extending the admin
 Following the previous `Organization` example, you can avoid duplicating the admin
 code by importing the base admin classes and registering your models with them.
 
+
+Now add ``EXTENDED_APPS`` after ``INSTALLED_APPS`` (in ``settings.py``):
+
+.. code-block:: python
+
+    INSTALLED_APPS = [
+        # ...
+    ]
+
+    EXTENDED_APPS = ('django_loci',)
+
 .. code-block:: python
 
     # admin.py of your app
