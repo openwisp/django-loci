@@ -20,13 +20,13 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
     def _test_consume(self, pk=None, user=None):
         if not pk:
             location = self._create_location(is_mobile=True)
-            ol = self._create_object_location(location=location)
-            pk = ol.location.pk
+            self._create_object_location(location=location)
+            pk = location.pk
         path = '/loci/location/{0}/'.format(pk)
         if user:
             self.client.force_login(user)
         self.client.send_and_consume('websocket.connect', path=path)
-        return {'ol': ol, 'path': path}
+        return {'pk': pk, 'path': path}
 
     def test_consumer_unauthenticated(self):
         try:
@@ -57,8 +57,11 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
                                                    password='password',
                                                    email='test@test.org',
                                                    is_staff=True)
+        location = self._create_location(is_mobile=True)
+        ol = self._create_object_location(location=location)
+        pk = ol.location.pk
         try:
-            self._test_consume(user=user)
+            self._test_consume(pk=pk, user=user)
         except AssertionError as e:
             self.assertIn('Connection rejected', str(e))
         else:
@@ -66,7 +69,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         # add permission to change location and repeat
         perm = Permission.objects.filter(name='Can change location').first()
         user.user_permissions.add(perm)
-        self._test_consume(user=user)
+        self._test_consume(pk=pk, user=user)
 
     def test_consumer_404(self):
         pk = self.location_model().pk
@@ -80,8 +83,9 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
 
     def test_location_update(self):
         res = self._test_consume(user=self._create_admin())
-        res['ol'].location.geometry = 'POINT (12.513124 41.897903)'
-        res['ol'].location.save()
+        loc = self.location_model.objects.get(pk=res['pk'])
+        loc.geometry = 'POINT (12.513124 41.897903)'
+        loc.save()
         result = self.client.receive()
         self.assertIsInstance(result, dict)
         self.assertDictEqual(result, {'type': 'Point', 'coordinates': [12.513124, 41.897903]})
