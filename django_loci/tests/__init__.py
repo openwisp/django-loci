@@ -67,6 +67,14 @@ class TestLociMixin(object):
 
 
 class TestAdminMixin(object):
+    @property
+    def url_prefix(self):
+        return 'admin:{0}'.format(self.location_model._meta.app_label)
+
+    @property
+    def object_url_prefix(self):
+        return 'admin:{0}'.format(self.object_model._meta.app_label)
+
     def _create_admin(self):
         return self.user_model.objects.create_superuser(username='admin',
                                                         password='admin',

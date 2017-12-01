@@ -9,14 +9,16 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
     def test_location_list(self):
         self._login_as_admin()
         self._create_location(name='test-admin-location-1')
-        r = self.client.get(reverse('admin:django_loci_location_changelist'))
+        url = reverse('{0}_location_changelist'.format(self.url_prefix))
+        r = self.client.get(url)
         self.assertContains(r, 'test-admin-location-1')
 
     def test_floorplan_list(self):
         self._login_as_admin()
         self._create_floorplan()
         self._create_location()
-        r = self.client.get(reverse('admin:django_loci_floorplan_changelist'))
+        url = reverse('{0}_floorplan_changelist'.format(self.url_prefix))
+        r = self.client.get(url)
         self.assertContains(r, '1st floor')
 
     def test_location_json_view(self):
