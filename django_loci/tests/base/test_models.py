@@ -56,7 +56,7 @@ class BaseTestModels(TestLociMixin):
 
     def test_floorplan_delete_corner_case(self):
         fl = self._create_floorplan()
-        os.remove(fl.image.file.name)
+        os.remove(fl.image.path)
         # there should be no failure
         fl.delete()
 

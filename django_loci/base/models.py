@@ -94,11 +94,11 @@ class AbstractFloorPlan(TimeStampedEditableModel):
             raise ValidationError(msg)
 
     def _remove_image(self):
-        path = self.image.file.name
+        path = self.image.path
         if os.path.isfile(path):
             os.remove(path)
         else:
-            msg = 'floorplan image not found while deleting {0}: {1}'
+            msg = 'floorplan image not found while deleting {0}:\n{1}'
             logger.error(msg.format(self, path))
 
 
