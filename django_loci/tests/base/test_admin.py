@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.urls import reverse
 
@@ -45,3 +46,23 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
              'image_height': fl.image.height}
         ]}
         self.assertDictEqual(r.json(), expected)
+
+    def test_location_change_image_removed(self):
+        self._login_as_admin()
+        loc = self._create_location(name='test-admin-location-1', type='indoor')
+        fl = self._create_floorplan(location=loc)
+        # remove floorplan image
+        os.remove(fl.image.path)
+        url = reverse('{0}_location_change'.format(self.url_prefix), args=[loc.pk])
+        r = self.client.get(url)
+        self.assertContains(r, 'test-admin-location-1')
+
+    def test_floorplan_change_image_removed(self):
+        self._login_as_admin()
+        loc = self._create_location(name='test-admin-location-1', type='indoor')
+        fl = self._create_floorplan(location=loc)
+        # remove floorplan image
+        os.remove(fl.image.path)
+        url = reverse('{0}_floorplan_change'.format(self.url_prefix), args=[fl.pk])
+        r = self.client.get(url)
+        self.assertContains(r, 'test-admin-location-1')
