@@ -25,7 +25,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         path = '/loci/location/{0}/'.format(pk)
         if user:
             self.client.force_login(user)
-        self.client.send_and_consume('websocket.connect', path=path)
+        self.client.send_and_consume(u'websocket.connect', path=path)
         return {'pk': pk, 'path': path}
 
     def test_consumer_unauthenticated(self):
@@ -39,7 +39,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
     def test_connect_and_disconnect(self):
         res = self._test_consume(user=self._create_admin())
         self.assertEqual(self.client.receive(), None)
-        self.client.send_and_consume('websocket.disconnect', path=res['path'])
+        self.client.send_and_consume(u'websocket.disconnect', path=res['path'])
 
     def test_consumer_not_staff(self):
         user = self.user_model.objects.create_user(username='user',

@@ -30,8 +30,8 @@ class AbstractFloorPlanForm(forms.ModelForm):
 class AbstractFloorPlanAdmin(TimeReadonlyAdminMixin, admin.ModelAdmin):
     list_display = ['__str__', 'location', 'floor', 'created', 'modified']
     list_select_related = ['location']
-    search_fields = ['location__name',]
-    raw_id_fields = ['location',]
+    search_fields = ['location__name']
+    raw_id_fields = ['location']
     save_on_top = True
 
 

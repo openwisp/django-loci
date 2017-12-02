@@ -33,7 +33,7 @@ class ImageWidget(forms.FileInput):
                     'width': value.width,
                     'height': value.height,
                 })
-            except FileNotFoundError:
+            except IOError:
                 msg = 'floorplan image not found while showing floorplan:\n{0}'
                 logger.error(msg.format(value.name))
         return c

@@ -13,6 +13,7 @@ addons:
 
 python:
   - "3.6"
+  - "2.7"
 
 branches:
   only:
@@ -26,6 +27,7 @@ before_install:
 
 install:
   - python setup.py -q develop
+  - if [[ $TRAVIS_PYTHON_VERSION == "2.7" ]]; then pip install git+git://github.com/tinio/pysqlite.git@extension-enabled#egg=pysqlite; fi
 
 script:
   - coverage run --source=django_loci runtests.py
