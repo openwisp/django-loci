@@ -1,7 +1,6 @@
 """
 Reusable test helpers
 """
-import glob
 import os
 
 from django.conf import settings
@@ -12,10 +11,12 @@ class TestLociMixin(object):
     _object_kwargs = dict(name='test-object')
     _floorplan_path = os.path.join(settings.MEDIA_ROOT, 'floorplan.jpg')
 
-    @classmethod
-    def tearDownClass(cls):
-        for fl in glob.glob(os.path.join(settings.BASE_DIR, 'media/floorplans/*')):
-            os.remove(fl)
+    def tearDown(self):
+        if not hasattr(self, 'floorplan_model'):
+            return
+        for fl in self.floorplan_model.objects.all():
+            fl.objectlocation_set.all().delete()
+            fl.delete()
 
     def _create_object(self, **kwargs):
         self._object_kwargs.update(kwargs)
