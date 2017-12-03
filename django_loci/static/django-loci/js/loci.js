@@ -354,7 +354,7 @@ django.jQuery(function ($) {
     // this is triggered in the location form page
     } else if (!$type.length) {
         var pk = window.location.pathname.split('/').slice('-3', '-2')[0];
-        listenForLocationUpdates(pk);
+        if (pk != 'location') { listenForLocationUpdates(pk) }
     }
     // show existing indoor
     if ($floorplan.val()) {
