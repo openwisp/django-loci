@@ -2,7 +2,7 @@ from channels import Group
 from channels.generic.websockets import WebsocketConsumer
 from django.core.exceptions import ValidationError
 
-location_broadcast_path = r'^/loci/location/(?P<pk>[^/]+)/$'
+location_broadcast_path = r'^/ws/loci/location/(?P<pk>[^/]+)/$'
 
 
 def _get_object_or_none(model, **kwargs):

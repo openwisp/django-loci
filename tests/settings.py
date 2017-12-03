@@ -60,7 +60,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-
 TIME_ZONE = 'Europe/Rome'
 LANGUAGE_CODE = 'en-gb'
 USE_TZ = True

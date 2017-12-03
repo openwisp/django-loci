@@ -22,7 +22,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
             location = self._create_location(is_mobile=True)
             self._create_object_location(location=location)
             pk = location.pk
-        path = '/loci/location/{0}/'.format(pk)
+        path = '/ws/loci/location/{0}/'.format(pk)
         if user:
             self.client.force_login(user)
         self.client.send_and_consume(u'websocket.connect', path=path)
