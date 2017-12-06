@@ -335,7 +335,7 @@ django.jQuery(function ($) {
     // websocket for mobile coords
     function listenForLocationUpdates(pk) {
         var host = window.location.host,
-            protocol = window.location.protocol == 'http' ? 'ws' : 'wss',
+            protocol = window.location.protocol === 'http' ? 'ws' : 'wss',
             ws = new WebSocket(protocol + '://' + host + '/ws/loci/location/' + pk + '/');
         ws.onmessage = function (e) {
             $geometryRow.show();
@@ -368,7 +368,7 @@ django.jQuery(function ($) {
     // this is triggered in the location form page
     } else if (!$type.length) {
         var pk = window.location.pathname.split('/').slice('-3', '-2')[0];
-        if (pk != 'location') { listenForLocationUpdates(pk) }
+        if (pk !== 'location') { listenForLocationUpdates(pk); }
     }
     // show existing indoor
     if ($floorplan.val()) {
