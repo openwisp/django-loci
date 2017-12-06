@@ -41,6 +41,9 @@ django.jQuery(function ($) {
         $floorplanImage = $('.indoor.coords .field-image input'),
         $floorplanMap = $('.indoor.coords .floorplan-widget');
 
+    // define dummy gettext if django i18n is not enabled
+    if (!gettext) { window.gettext = function (text) { return text; }; }
+
     function getLocationJsonUrl(pk) {
         return baseLocationJsonUrl.replace('0000', pk);
     }
