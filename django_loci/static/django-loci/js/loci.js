@@ -321,6 +321,14 @@ django.jQuery(function ($) {
         reader.readAsDataURL(input.files[0]);
     });
 
+    $('#content-main form').submit(function (e) {
+        var indoorPosition = $('.field-indoor .floorplan-raw input').val();
+        if ($type.val() === 'indoor' && !indoorPosition) {
+            e.preventDefault();
+            alert(gettext('Please set the indoor position before saving'));
+        }
+    });
+
     // websocket for mobile coords
     function listenForLocationUpdates(pk) {
         var host = window.location.host,
