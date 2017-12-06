@@ -146,10 +146,13 @@ django.jQuery(function ($) {
         }
     }
 
-    function floorplanSelectionChange() {
+    function floorplanSelectionChange(e, initial) {
         var value = $floorplanSelection.val(),
             optionsLength = $floorplan.find('option').length;
-        resetIndoorForm(true);
+        // do not reset indoor form at first load
+        if (!initial) {
+            resetIndoorForm(true);
+        }
         indoorForm(value);
         if (value === 'existing' && optionsLength > 1) {
             $floorplanRow.show();
@@ -249,7 +252,7 @@ django.jQuery(function ($) {
     });
 
     $floorplanSelection.change(floorplanSelectionChange);
-    floorplanSelectionChange();
+    floorplanSelectionChange(null, true);
 
     $floorplan.change(function () {
         // reset floorplan data if no floorplan is chosen
