@@ -176,11 +176,11 @@ class AbstractObjectLocationForm(forms.ModelForm):
 
     @cached_property
     def floorplan_model(self):
-        return self.Meta.model.floorplan.field.rel.model
+        return self.Meta.model.floorplan.field.remote_field.model
 
     @cached_property
     def location_model(self):
-        return self.Meta.model.location.field.rel.model
+        return self.Meta.model.location.field.remote_field.model
 
     def clean_floorplan(self):
         floorplan_model = self.floorplan_model

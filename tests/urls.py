@@ -8,7 +8,7 @@ from openwisp_utils.admin_theme.admin import admin, openwisp_admin
 openwisp_admin()
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

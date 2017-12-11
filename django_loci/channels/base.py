@@ -29,7 +29,10 @@ class BaseLocationBroadcast(WebsocketConsumer):
 
     def is_authorized(self, user, location):
         perm = '{0}.change_location'.format(self.model._meta.app_label)
-        return user.is_authenticated() and (
+        authenticated = user.is_authenticated
+        if callable(authenticated):
+            authenticated = authenticated()
+        return authenticated and (
             user.is_superuser or (
                 user.is_staff and
                 user.has_perm(perm)
