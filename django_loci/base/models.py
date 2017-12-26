@@ -62,7 +62,7 @@ class AbstractLocation(TimeStampedEditableModel):
 
 @python_2_unicode_compatible
 class AbstractFloorPlan(TimeStampedEditableModel):
-    location = models.ForeignKey('django_loci.Location')
+    location = models.ForeignKey('django_loci.Location', on_delete=models.CASCADE)
     floor = models.SmallIntegerField(_('floor'))
     image = models.ImageField(_('image'),
                               upload_to=app_settings.FLOORPLAN_STORAGE.upload_to,
