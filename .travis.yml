@@ -20,6 +20,7 @@ branches:
     - master
 
 before_install:
+  - npm install -g jslint
   - pip install -U pip wheel setuptools
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
@@ -32,6 +33,7 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION == "2.7" ]]; then pip install git+git://github.com/tinio/pysqlite.git@extension-enabled#egg=pysqlite; fi
 
 script:
+  - jslint --config .jslintrc django-loci/static/django-loci/js/*.js
   - coverage run --source=django_loci runtests.py
 
 after_success:

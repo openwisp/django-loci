@@ -31,7 +31,7 @@
         map.setView([0, 0], 0);
 
         function updateInput(e) {
-            var latlng = e.latlng || e.target._latlng;
+            var latlng = e.latlng || e.target.latlng;
             $input.val(latlng.lat + ',' + latlng.lng);
         }
 
@@ -62,4 +62,4 @@
 
         return map;
     };
-})(django.jQuery);
+}(django.jQuery));
