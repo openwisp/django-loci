@@ -33,7 +33,7 @@
   "forin":      false,
   "fragment":   true,
   "newcap":     false,
-  "nomen":      false,
+  "nomen":      true,
   "on":         false,
   "plusplus":   false,
   "regexp":     true,
