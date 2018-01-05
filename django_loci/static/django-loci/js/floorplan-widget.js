@@ -62,4 +62,4 @@
 
         return map;
     };
-})(django.jQuery);
+}(django.jQuery));

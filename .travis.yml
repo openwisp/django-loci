@@ -24,6 +24,8 @@ before_install:
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
   - ./runisort
+  - npm install -g jslint
+  - jslint django_loci/static/django-loci/js/*.js
 
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == "3.6" ]]; then pip install "django>=2.0,<2.1"; fi
