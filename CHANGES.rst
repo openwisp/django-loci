@@ -1,10 +1,10 @@
 Changelog
 =========
 
-Version 0.1.2 [unreleased]
+Version 0.2.0 [2018-02-19]
 --------------------------
 
-WIP
+* [requirements] Added support for django 2.0
 
 Version 0.1.1 [2017-12-06]
 --------------------------
