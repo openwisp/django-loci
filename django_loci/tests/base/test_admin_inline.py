@@ -1,6 +1,3 @@
-import os
-
-from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models.fields.files import ImageFieldFile
 from django.urls import reverse
@@ -182,7 +179,7 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
         self._login_as_admin()
         p = self._get_prefix()
         params = self.params
-        floorplan_file = open(os.path.join(settings.BASE_DIR, 'media/floorplan.jpg'), 'rb')
+        floorplan_file = open(self._floorplan_path, 'rb')
         params.update({
             'name': 'test-add-indoor-new-location-new-floorplan',
             '{0}-0-type'.format(p): 'indoor',
@@ -216,7 +213,7 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
         pre_loc = self._create_location(type='indoor')
         p = self._get_prefix()
         params = self.params
-        floorplan_file = open(os.path.join(settings.BASE_DIR, 'media/floorplan.jpg'), 'rb')
+        floorplan_file = open(self._floorplan_path, 'rb')
         name = 'test-add-indoor-existing-location-new-floorplan'
         params.update({
             'name': name,
@@ -305,7 +302,7 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
         self.assertContains(r, obj.name)
         # -- post changes
         params = self.params
-        floorplan_file = open(os.path.join(settings.BASE_DIR, 'media/floorplan.jpg'), 'rb')
+        floorplan_file = open(self._floorplan_path, 'rb')
         changed_name = '{0} changed'.format(pre_loc.name)
         params.update({
             'name': obj.name,
