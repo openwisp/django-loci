@@ -45,6 +45,12 @@ Install from pypi:
 Install development version
 ---------------------------
 
+First of all, install the dependencies of `GeoDjango <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/>`_:
+
+- `Geospatial libraries <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/geolibs/>`_
+- `Spatial database <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/spatialite/>`_,
+  for development we use Spatialite, a spatial extension of `sqlite <https://www.sqlite.org/index.html>`_
+
 Install tarball:
 
 .. code-block:: shell
@@ -67,6 +73,9 @@ If you want to contribute, install your cloned fork:
 
 Setup (integrate in an existing django project)
 -----------------------------------------------
+
+First of all, set up your database engine to `one of the spatial databases suppported
+by GeoDjango <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/db-api/#spatial-backends>`_.
 
 Add ``django_loci`` and its dependencies to ``INSTALLED_APPS`` in the following order:
 
@@ -98,6 +107,28 @@ Now run migrations:
 .. code-block:: shell
 
     ./manage.py migrate
+
+Troubleshooting
+---------------
+
+Common issues and solutions when installing GeoDjango.
+
+Unable to load the SpatiaLite library extension
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you get the following exception::
+
+    django.core.exceptions.ImproperlyConfigured: Unable to load the SpatiaLite library extension
+
+You need to specify the ``SPATIALITE_LIBRARY_PATH`` in your ``settings.py`` as explained
+in the `django documentation regarding how to install and configure spatialte
+<https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/spatialite/>`_.
+
+Issues with other geospatial libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please refer to the `geodjango documentation on troubleshooting issues related to
+geospatial libraries <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/#library-environment-settings>`_.
 
 Settings
 --------
