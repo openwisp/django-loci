@@ -53,10 +53,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'urls'
 
+ASGI_APPLICATION = "django_loci.channels.routing.channel_routing"
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
-        "ROUTING": "django_loci.channels.routing.channel_routing",
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
     },
 }
 

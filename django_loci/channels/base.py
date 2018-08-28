@@ -1,8 +1,8 @@
-from channels import Group
-from channels.generic.websockets import WebsocketConsumer
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import WebsocketConsumer
 from django.core.exceptions import ValidationError
 
-location_broadcast_path = r'^/ws/loci/location/(?P<pk>[^/]+)/$'
+location_broadcast_path = r'^ws/loci/location/(?P<pk>[^/]+)/$'
 
 
 def _get_object_or_none(model, **kwargs):
@@ -19,13 +19,25 @@ class BaseLocationBroadcast(WebsocketConsumer):
     """
     http_user = True
 
-    def connect(self, message, pk):
-        location = _get_object_or_none(self.model, pk=pk)
-        if not location or not self.is_authorized(message.user, location):
-            message.reply_channel.send({'close': True})
+    def connect(self):
+        self.pk = None
+        try:
+            user = self.scope["user"]
+            self.pk = self.scope['url_route']['kwargs']['pk']
+        except Exception:
+            # Will fall here when the scope does not have
+            # one of the variables, most commonly, user
+            # (When a user tries to access without loggin in)
+            self.close()
+        location = _get_object_or_none(self.model, pk=self.pk)
+        if not location or not self.is_authorized(user, location):
+            self.close()
             return
-        message.reply_channel.send({'accept': True})
-        Group('loci.mobile-location.{0}'.format(pk)).add(message.reply_channel)
+        self.accept()
+        async_to_sync(self.channel_layer.group_add)(
+            'loci.mobile-location.{0}'.format(self.pk),
+            self.channel_name
+        )
 
     def is_authorized(self, user, location):
         perm = '{0}.change_location'.format(self.model._meta.app_label)
@@ -39,8 +51,14 @@ class BaseLocationBroadcast(WebsocketConsumer):
             )
         )
 
-    def disconnect(self, message, pk):
+    def send_message(self, event):
+        self.send(text_data=event['message'])
+
+    def disconnect(self, message=None):
         """
         Perform things on connection close
         """
-        Group('loci.mobile-location.{0}'.format(pk)).discard(message.reply_channel)
+        async_to_sync(self.channel_layer.group_discard)(
+            'loci.mobile-location.{0}'.format(self.pk),
+            self.channel_name
+        )
