@@ -1,4 +1,3 @@
-from channels.test import ChannelTestCase
 from django.contrib.auth import get_user_model
 
 from ..models import Location, ObjectLocation
@@ -6,7 +5,7 @@ from .base.test_channels import BaseTestChannels
 from .testdeviceapp.models import Device
 
 
-class TestChannels(BaseTestChannels, ChannelTestCase):
+class TestChannels(BaseTestChannels):
     object_model = Device
     location_model = Location
     object_location_model = ObjectLocation

@@ -1,4 +1,7 @@
-from channels import Group
+import json
+
+import channels.layers
+from asgiref.sync import async_to_sync
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -7,7 +10,15 @@ def update_mobile_location(sender, instance, **kwargs):
     if not kwargs.get('created') and instance.geometry:
         group_name = 'loci.mobile-location.{0}'.format(str(instance.pk))
         message = {'text': instance.geometry.geojson}
-        Group(group_name).send(message, immediately=True)
+        json_message = json.dumps(message)
+        channel_layer = channels.layers.get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                'type': 'send_message',
+                'message': json_message
+            }
+        )
 
 
 def load_location_receivers(sender):
