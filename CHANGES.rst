@@ -1,10 +1,10 @@
 Changelog
 =========
 
-Version 0.2.1 [unreleased]
+Version 0.2.1 [2018-09-02]
 --------------------------
 
-WIP
+- [tests] Removed duplication of definition of floorplan test file
 
 Version 0.2.0 [2018-02-19]
 --------------------------
