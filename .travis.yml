@@ -13,7 +13,6 @@ addons:
 
 python:
   - "3.6"
-  - "2.7"
 
 branches:
   only:
@@ -28,13 +27,11 @@ before_install:
   - jslint django_loci/static/django-loci/js/*.js
 
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION == "3.6" ]]; then pip install "django>=2.0,<2.1"; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == "2.7" ]]; then pip install "django>=1.11,<2.0"; fi
   - python setup.py -q develop
-  - if [[ $TRAVIS_PYTHON_VERSION == "2.7" ]]; then pip install git+git://github.com/tinio/pysqlite.git@extension-enabled#egg=pysqlite; fi
 
 script:
-  - coverage run --source=django_loci runtests.py
+  - py.test --cov=django_loci
+  - coverage run -a --source=django_loci runtests.py
 
 after_success:
   coveralls
