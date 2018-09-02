@@ -30,7 +30,7 @@ install:
   - python setup.py -q develop
 
 script:
-  - py.test --cov=django_loci
+  - pytest --cov=django_loci
   - coverage run -a --source=django_loci runtests.py
 
 after_success:

@@ -335,13 +335,12 @@ django.jQuery(function ($) {
     // websocket for mobile coords
     function listenForLocationUpdates(pk) {
         var host = window.location.host,
-            protocol = window.location.protocol === 'http' ? 'ws' : 'wss',
+            protocol = window.location.protocol === 'http:' ? 'ws' : 'wss',
             ws = new WebSocket(protocol + '://' + host + '/ws/loci/location/' + pk + '/');
         ws.onmessage = function (e) {
-            var mapData = JSON.parse(e.data);
             $geometryRow.show();
             $noLocationDiv.hide();
-            $geometryTextarea.val(mapData.text);
+            $geometryTextarea.val(e.data);
             getMap().remove();
             window[loadMapName]();
         };

@@ -35,7 +35,7 @@ Dependencies
 
 
 Compatibility Table
------------------------------------------
+-------------------
 
 ===============  ==================================
 django-loci      Python version
@@ -106,10 +106,10 @@ Configure ``CHANNEL_LAYERS`` according to your needs, a sample configuration can
 
 .. code-block:: python
 
+    ASGI_APPLICATION = "django_loci.channels.routing.channel_routing"
     CHANNEL_LAYERS = {
         "default": {
-            "BACKEND": "asgiref.inmemory.ChannelLayer",
-            "ROUTING": "django_loci.channels.routing.channel_routing",
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
         },
     }
 
@@ -434,8 +434,8 @@ Run tests with:
 
 .. code-block:: shell
 
-    ./runtests.py
-    ./pytest
+    # pytests is used to test django-channels
+    ./runtests.py && pytest
 
 Contributing
 ------------

@@ -1,5 +1,5 @@
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.exceptions import ValidationError
 
 location_broadcast_path = r'^ws/loci/location/(?P<pk>[^/]+)/$'
@@ -12,7 +12,7 @@ def _get_object_or_none(model, **kwargs):
         return None
 
 
-class BaseLocationBroadcast(WebsocketConsumer):
+class BaseLocationBroadcast(JsonWebsocketConsumer):
     """
     Notifies that the coordinates of a location have changed
     to authorized users (superusers or organization operators)
@@ -22,9 +22,9 @@ class BaseLocationBroadcast(WebsocketConsumer):
     def connect(self):
         self.pk = None
         try:
-            user = self.scope["user"]
+            user = self.scope['user']
             self.pk = self.scope['url_route']['kwargs']['pk']
-        except Exception:
+        except KeyError:
             # Will fall here when the scope does not have
             # one of the variables, most commonly, user
             # (When a user tries to access without loggin in)
@@ -42,7 +42,7 @@ class BaseLocationBroadcast(WebsocketConsumer):
     def is_authorized(self, user, location):
         perm = '{0}.change_location'.format(self.model._meta.app_label)
         authenticated = user.is_authenticated
-        if callable(authenticated):
+        if callable(authenticated):  # pragma: nocover
             authenticated = authenticated()
         return authenticated and (
             user.is_superuser or (
@@ -52,7 +52,7 @@ class BaseLocationBroadcast(WebsocketConsumer):
         )
 
     def send_message(self, event):
-        self.send(text_data=event['message'])
+        self.send_json(event['message'])
 
     def disconnect(self, message=None):
         """

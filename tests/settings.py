@@ -90,6 +90,9 @@ TEMPLATES = [
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
-    from local_settings import *
-except ImportError:
-    pass
+    from .local_settings import *
+except (SystemError, ImportError):
+    try:
+        from local_settings import *
+    except ImportError:
+        pass

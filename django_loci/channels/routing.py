@@ -9,9 +9,9 @@ channel_routing = ProtocolTypeRouter({
     'websocket': AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
-                [
-                    url(location_broadcast_path, LocationBroadcast, name='LocationChannel')
-                ]
+                [url(location_broadcast_path,
+                     LocationBroadcast,
+                     name='LocationChannel')]
             )
         ),
     )

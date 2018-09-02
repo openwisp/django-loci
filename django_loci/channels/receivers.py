@@ -9,14 +9,13 @@ from django.dispatch import receiver
 def update_mobile_location(sender, instance, **kwargs):
     if not kwargs.get('created') and instance.geometry:
         group_name = 'loci.mobile-location.{0}'.format(str(instance.pk))
-        message = {'text': instance.geometry.geojson}
-        json_message = json.dumps(message)
         channel_layer = channels.layers.get_channel_layer()
+        message = json.loads(instance.geometry.geojson)
         async_to_sync(channel_layer.group_send)(
             group_name,
             {
                 'type': 'send_message',
-                'message': json_message
+                'message': message
             }
         )
 
