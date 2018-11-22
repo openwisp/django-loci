@@ -41,6 +41,7 @@ class AbstractLocation(TimeStampedEditableModel):
 
     def clean(self):
         self._validate_outdoor_floorplans()
+        self._validate_geometry_if_not_mobile()
 
     def _validate_outdoor_floorplans(self):
         """
@@ -54,6 +55,14 @@ class AbstractLocation(TimeStampedEditableModel):
             msg = 'this location has floorplans associated to it, ' \
                   'please delete them before changing its type'
             raise ValidationError({'type': msg})
+
+    def _validate_geometry_if_not_mobile(self):
+        """
+        geometry can be NULL, but only if_mobile is True
+        otherwise raise a ValidationError
+        """
+        if not self.is_mobile and not self.geometry:
+            raise ValidationError(_('geometry cannot be null'))
 
     @property
     def short_type(self):
