@@ -71,6 +71,21 @@ class BaseTestModels(TestLociMixin):
         else:
             self.fail('ValidationError not raised')
 
+    def test_geometry_if_not_mobile(self):
+        try:
+            self._create_location(geometry=None)
+        except ValidationError as e:
+            err_str = str(e)
+            self.assertIn('geometry cannot be null', err_str)
+        else:
+            self.fail('ValidationError not raised')
+
+    def test_geometry_if_mobile(self):
+        try:
+            self._create_location(is_mobile=True, geometry=None)
+        except ValidationError:
+            self.fail('Unexpected ValidationError raised')
+
     def test_location_change_indoor_to_outdoor(self):
         fl = self._create_floorplan()
         location = fl.location
