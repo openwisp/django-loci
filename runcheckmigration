@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+checkmigrations --migration-path ./django_loci/migrations/ || exit 1
+checkmigrations --migration-path ./django_loci/tests/testdeviceapp/migrations || exit 1
