@@ -22,6 +22,7 @@ before_install:
   - pip install -U pip wheel setuptools
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
+  - ./runcheckmigration
   - ./runisort
   - npm install -g jslint
   - jslint django_loci/static/django-loci/js/*.js
