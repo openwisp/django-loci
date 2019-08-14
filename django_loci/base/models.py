@@ -97,7 +97,9 @@ class AbstractFloorPlan(TimeStampedEditableModel):
         self._remove_image()
 
     def _validate_location_type(self):
-        if self.location and self.location.type != 'indoor':
+        if not hasattr(self, 'location') or not hasattr(self.location, 'type'):
+            return
+        if self.location.type and self.location.type != 'indoor':
             msg = 'floorplans can only be associated '\
                   'to locations of type "indoor"'
             raise ValidationError(msg)
