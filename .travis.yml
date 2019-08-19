@@ -1,6 +1,7 @@
 language: python
 sudo: false
 cache: pip
+dist: trusty
 
 addons:
   apt:
@@ -29,6 +30,8 @@ before_install:
 
 install:
   - python setup.py -q develop
+  # temp check
+  - pip list
 
 script:
   - pytest --cov=django_loci
