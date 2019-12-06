@@ -16,6 +16,12 @@ addons:
 
 python:
   - "3.6"
+  - "3.7"
+
+env:
+  - DJANGO="django>=2.0,<2.1"
+  - DJANGO="django>=2.1,<2.2"
+  - DJANGO="django>=2.2,<2.3"
 
 branches:
   only:
@@ -23,6 +29,7 @@ branches:
 
 before_install:
   - pip install -U pip wheel setuptools
+  - pip install -U $DJANGO
   - pip install --no-cache-dir -U -r requirements-test.txt
   - ./runflake8
   - ./runcheckmigration
