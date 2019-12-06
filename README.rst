@@ -398,7 +398,7 @@ Install sqlite:
 
 .. code-block:: shell
 
-    sudo apt-get install sqlite3 libsqlite3-dev libsqlite3-mod-spatialite
+    sudo apt-get install sqlite3 libsqlite3-dev libsqlite3-mod-spatialite gdal-bin
 
 Install your forked repo:
 
