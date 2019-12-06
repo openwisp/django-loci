@@ -1,5 +1,5 @@
 django>=1.11,<2.2
-django-leaflet>=0.23,<0.25
+django-leaflet>=0.23,<0.27
 channels>=2.1.3,<2.4.0
 Pillow>=6.2.0,<=6.3.0
 openwisp-utils>=0.2.1,<0.4.0
