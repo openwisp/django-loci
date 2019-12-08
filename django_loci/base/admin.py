@@ -40,7 +40,8 @@ class AbstractLocationForm(forms.ModelForm):
         exclude = tuple()
 
     class Media:
-        js = ('django-loci/js/loci.js',
+        js = ('admin/js/jquery.init.js',
+              'django-loci/js/loci.js',
               'django-loci/js/floorplan-inlines.js',)
         css = {'all': ('django-loci/css/loci.css',)}
 
@@ -144,7 +145,8 @@ class AbstractObjectLocationForm(forms.ModelForm):
         exclude = tuple()
 
     class Media:
-        js = ('django-loci/js/loci.js',)
+        js = ('admin/js/jquery.init.js',
+              'django-loci/js/loci.js',)
         css = {'all': ('django-loci/css/loci.css',)}
 
     def __init__(self, *args, **kwargs):
