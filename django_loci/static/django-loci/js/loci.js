@@ -9,7 +9,6 @@ django.jQuery(function ($) {
     var $outdoor = $('.loci.coords'),
         $indoor = $('.indoor.coords'),
         $allSections = $('.coords'),
-        $geoRows = $('.loci.coords .form-row'),
         $geoEdit = $('.field-name, .field-type, .field-is_mobile, ' +
                      '.field-address, .field-geometry', '.loci.coords'),
         $indoorRows = $('.indoor.coords .form-row:not(.field-indoor)'),
@@ -119,12 +118,10 @@ django.jQuery(function ($) {
         if (!initial) { resetDeviceLocationForm(); }
         if (value === 'new') {
             $outdoor.show();
-            $geoRows.hide();
             $typeRow.show();
             indoorForm(value);
         } else if (value === 'existing') {
             $outdoor.show();
-            $geoRows.hide();
             $locationRow.show();
         }
     }
