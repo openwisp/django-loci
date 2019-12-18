@@ -1,7 +1,7 @@
-(function ($) {
+(function () {
     'use strict';
     django.loadFloorPlan = function (widgetName, imageUrl, imageW, imageH) {
-        var $input = $('#id_' + widgetName),
+        var $input = django.jQuery('#id_' + widgetName),
             $parent = $input.parents('fieldset').eq(0),
             url = imageUrl || $parent.find('a.floorplan-image').attr('href'),
             $dim = $parent.find('#id_' + widgetName.replace('indoor', 'image') + '-dim'),
@@ -62,4 +62,4 @@
 
         return map;
     };
-}(django.jQuery));
+}());
