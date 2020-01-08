@@ -553,3 +553,22 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
                              params, follow=True)
         self.assertContains(r, 'errors field-floorplan')
         self.assertContains(r, 'This floorplan is associated to a different location')
+
+    def test_missing_type_error(self):
+        self._login_as_admin()
+        p = self._get_prefix()
+        params = self.params
+        params.update({
+            'name': 'test-outdoor-add-new',
+            '{0}-0-type'.format(p): '',
+            '{0}-0-location_selection'.format(p): 'new',
+            '{0}-0-location'.format(p): '',
+            '{0}-0-floorplan_selection'.format(p): '',
+            '{0}-0-floorplan'.format(p): '',
+            '{0}-0-floor'.format(p): '',
+            '{0}-0-image'.format(p): '',
+            '{0}-0-indoor'.format(p): '',
+            '{0}-0-id'.format(p): '',
+        })
+        r = self.client.post(reverse(self.add_url), params, follow=True)
+        self.assertContains(r, 'errors field-type')

@@ -186,7 +186,9 @@ class AbstractObjectLocationForm(forms.ModelForm):
 
     def clean_floorplan(self):
         floorplan_model = self.floorplan_model
-        if self.cleaned_data['type'] != 'indoor' or self.cleaned_data['floorplan_selection'] == 'new':
+        type_ = self.cleaned_data.get('type')
+        floorplan_selection = self.cleaned_data.get('floorplan_selection')
+        if type_ != 'indoor' or floorplan_selection == 'new':
             return None
         pk = self.cleaned_data['floorplan']
         if not pk:
@@ -201,7 +203,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
 
     def clean(self):
         data = self.cleaned_data
-        type_ = data['type']
+        type_ = data.get('type')
         is_mobile = data['is_mobile']
         msg = _('this field is required for locations of type %(type)s')
         fields = []
