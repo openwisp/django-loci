@@ -66,3 +66,61 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         url = reverse('{0}_floorplan_change'.format(self.url_prefix), args=[fl.pk])
         r = self.client.get(url)
         self.assertContains(r, 'test-admin-location-1')
+
+    def test_geocode(self):
+        self._login_as_admin()
+        address = 'Red Square'
+        url = '{0}?address={1}'.format(reverse('{}_location_geocode_api'.format(self.url_prefix)), address)
+        response = self.client.get(url)
+        response_lat = round(response.json()['lat'])
+        response_lng = round(response.json()['lng'])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_lat, 56)
+        self.assertEqual(response_lng, 38)
+
+    def test_geocode_no_address(self):
+        self._login_as_admin()
+        url = reverse('{}_location_geocode_api'.format(self.url_prefix))
+        response = self.client.get(url)
+        expected = {'error': 'Address parameter not defined'}
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), expected)
+
+    def test_geocode_invalid_address(self):
+        self._login_as_admin()
+        invalid_address = 'thisaddressisnotvalid123abc'
+        url = '{0}?address={1}'.format(reverse('{}_location_geocode_api'.format(self.url_prefix)),
+                                       invalid_address)
+        response = self.client.get(url)
+        expected = {'error': 'Not found location with given name'}
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), expected)
+
+    def test_reverse_geocode(self):
+        self._login_as_admin()
+        lat = 52
+        lng = 21
+        url = '{0}?lat={1}&lng={2}'.format(reverse('{}_location_reverse_geocode_api'.format(self.url_prefix)),
+                                           lat, lng)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'POL')
+
+    def test_reverse_location_with_no_address(self):
+        self._login_as_admin()
+        lat = -30
+        lng = -30
+        url = '{0}?lat={1}&lng={2}'.format(reverse('{}_location_reverse_geocode_api'.format(self.url_prefix)),
+                                           lat, lng)
+        response = self.client.get(url)
+        response_address = response.json()['address']
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response_address, '')
+
+    def test_reverse_geocode_no_coords(self):
+        self._login_as_admin()
+        url = reverse('{}_location_reverse_geocode_api'.format(self.url_prefix))
+        response = self.client.get(url)
+        expected = {'error': 'lat or lng parameter not defined'}
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), expected)

@@ -162,6 +162,68 @@ To understand the details of this statement, take a look at the code of
 `django_loci.storage.OverwriteStorage
 <https://github.com/openwisp/django-loci/blob/master/django_loci/storage.py>`_.
 
+``DJANGO_LOCI_GEOCODER``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
++--------------+-------------+
+| **type**:    | ``str``     |
++--------------+-------------+
+| **default**: | ``ArcGIS``  |
++--------------+-------------+
+
+Service used for geocoding and reverse geocoding.
+
+Supported geolocation services:
+
+* ``ArcGIS``
+* ``Nominatim``
+* ``GoogleV3`` (Google Maps v3)
+
+``DJANGO_LOCI_GEOCODE_STRICT_TEST``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++--------------+-----------+
+| **type**:    | ``bool``  |
++--------------+-----------+
+| **default**: | ``True``  |
++--------------+-----------+
+
+Indicates whether the system should raise an ``ImproperlyConfigured``
+exception in case geocoding doesn't work when the application is started.
+
+``DJANGO_LOCI_GEOCODE_FAILURE_DELAY``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++--------------+----------+
+| **type**:    | ``int``  |
++--------------+----------+
+| **default**: | ``1``    |
++--------------+----------+
+
+Amount of seconds between geocoding retry API calls when geocoding requests fail.
+
+``DJANGO_LOCI_GEOCODE_RETRIES``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++--------------+----------+
+| **type**:    | ``int``  |
++--------------+----------+
+| **default**: | ``3``    |
++--------------+----------+
+
+Amount of retry API calls when geocoding requests fail.
+
+``DJANGO_LOCI_GEOCODE_API_KEY``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++--------------+-----------+
+| **type**:    | ``str``   |
++--------------+-----------+
+| **default**: | ``None``  |
++--------------+-----------+
+
+API key if required (eg: Google Maps).
+
 Extending django-loci
 ---------------------
 
