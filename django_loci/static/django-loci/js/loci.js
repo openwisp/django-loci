@@ -43,6 +43,9 @@ django.jQuery(function ($) {
         $floorplanImage = $('.indoor.coords .field-image input'),
         $floorplanMap = $('.indoor.coords .floorplan-widget'),
         isNew = true;
+        $addressInput = $('.field-address input'),
+        $mapGeojsonTextarea = $('.django-leaflet-raw-textarea'),
+        $form = $('form');
 
     // define dummy gettext if django i18n is not enabled
     if (!gettext) { window.gettext = function (text) { return text; }; }
@@ -370,6 +373,123 @@ django.jQuery(function ($) {
         };
     }
 
+    // returns placed marker
+    function getMarker() {
+        var map = getMap();
+        if (map !== undefined) {
+            var layer;
+            for (layer in map._layers) {
+                if (map._layers.hasOwnProperty(layer)) {
+                    if (map._layers[layer].hasOwnProperty('_latlng') &&
+                            map._layers[layer]._events.click === undefined) {
+                        return map._layers[layer];
+                    }
+                }
+            }
+        } else {
+            window.setTimeout(getMarker, 100);
+        }
+    }
+
+    // returns map's feature group
+    function getFeatureGroup() {
+        var map = getMap();
+        if (map !== undefined) {
+            var layer;
+            for (layer in map._layers) {
+                if (map._layers.hasOwnProperty(layer)) {
+                    if (map._layers[layer].hasOwnProperty('_layers')) {
+                        return map._layers[layer];
+                    }
+                }
+            }
+        } else {
+            window.setTimeout(getFeatureGroup, 100);
+        }
+    }
+
+    // set marker
+    function updateMap() {
+        if ($addressInput.val() !== '') {
+            window.fetch(window.geocodeApi + '?address=' + $addressInput.val())
+                    .then(function (resp) {
+                    var dataPromise = resp.json();
+                    dataPromise.then(function (data) {
+                        if (resp.status === 200) {
+                            var currentMarkerLat = getMarker() !== undefined ?
+                                                        getMarker().getLatLng().lat : null;
+                            var currentMarkerLng = getMarker() !== undefined ?
+                                                        getMarker().getLatLng().lng : null;
+
+                            if (currentMarkerLat !== data.lat || currentMarkerLng !== data.lng) {
+                                var geojson = '{ "type": "Point", "coordinates": [ ' +
+                                        data.lng.toString() + ', ' +
+                                        data.lat.toString() + '] }';
+                                if (getMarker() === undefined) {
+                                    getFeatureGroup().addLayer(L.marker([data.lat, data.lng]));
+                                    $mapGeojsonTextarea.val(geojson);
+                                    window.addressLat = data.lat;
+                                    window.addressLng = data.lng;
+                                    getMap().setView([data.lat, data.lng], 14);
+                                } else {
+                                    if (window.skipGeocode === 0) {
+                                        if (window.confirm('Do you want to update map?')) {
+                                            getFeatureGroup().removeLayer(getMarker());
+                                            getFeatureGroup().addLayer(L.marker([data.lat, data.lng]));
+                                            $mapGeojsonTextarea.val(geojson);
+                                            window.addressLat = data.lat;
+                                            window.addressLng = data.lng;
+                                            window.skipGeocode = 0;
+                                            getMap().setView([data.lat, data.lng], 14);
+                                        } else {
+                                            window.skipGeocode = 1;
+                                        }
+                                    } else {
+                                        window.skipGeocode -= 1;
+                                    }
+                                }
+                            }
+                        } else {
+                            if (window.skipGeocode === 0) {
+                                alert('Not found location with given name');
+                                window.skipGeocode = 1;
+                            } else {
+                                window.skipGeocode -= 1;
+                            }
+                        }
+                    });
+                });
+        }
+    }
+
+    // wait until dragging is not enabled and update address
+    function updateAdress() {
+        if (getMarker().dragging._enabled !== true && window.update === true) {
+            window.update = false;
+            var latLng = getMarker().getLatLng();
+            if (window.beforeEditLat !== latLng.lat || window.beforeEditLng !== latLng.lng) {
+                var reverseApiWithData = window.reverseApi + '?lat=' + latLng.lat + '&lng=' + latLng.lng;
+                window.fetch(reverseApiWithData)
+                    .then(function (resp) {
+                        var dataPromise = resp.json();
+                        dataPromise.then(function (data) {
+                            if (resp.status === 200) {
+                                $addressInput.val(data.address);
+                            } else {
+                                var message = 'We couldn\'t find a related address to the location '
+                                        + 'selected on the map, please enter the address manually';
+                                alert(message);
+                                window.skipGeocode = 2;
+                            }
+                        });
+                    });
+                window.markerCoords = latLng;
+            }
+        } else {
+            window.setTimeout(updateAdress, 200);
+        }
+    }
+
     // show existing location
     var pk;
     if ($location.val()) {
@@ -411,4 +531,121 @@ django.jQuery(function ($) {
         $indoorRows.show();
         indoorForm($locationSelection.val());
     }
+
+    window.geocodeApi = window.location.origin + '/admin/django_loci/location/geocode/';
+    window.reverseApi = window.location.origin + '/admin/django_loci/location/reverse-geocode/';
+    window.setTimeout(function () {
+        window.addressLat = null;
+        window.addressLng = null;
+        window.receivedAlert = false;
+        window.skipGeocode = 0;  // amount of times geocode operation should be not executed
+        window.markerCoords = getMarker() !== undefined ? getMarker().getLatLng() : null;
+        $addressInput.change(function () {
+            if ($addressInput.val().length >= 10) {
+                updateMap(window.geocodeApi);
+            }
+        });
+        var timeout = null;
+        $addressInput.keyup(function () {
+            window.clearTimeout(timeout);
+            timeout = window.setTimeout(function () {
+                if ($addressInput.val().length >= 10) {
+                    updateMap(window.geocodeApi);
+                }
+            }, 1000);
+        });
+
+        window.setInterval(function () {
+            var currentMarkerCoords = getMarker() !== undefined ? getMarker().getLatLng() : null;
+            var currentMarkerLat = getMarker() !== undefined ? getMarker().getLatLng().lat : null;
+            var currentMarkerLng = getMarker() !== undefined ? getMarker().getLatLng().lng : null;
+            if (currentMarkerCoords !== null && window.markerCoords === null && !$addressInput.val()) {
+                window.markerCoords = currentMarkerCoords;
+                var reverseApiWithData = window.reverseApi + '?lat=' + currentMarkerLat + '&lng=' + currentMarkerLng;
+                window.fetch(reverseApiWithData)
+                    .then(function (resp) {
+                        var dataPromise = resp.json();
+                        dataPromise.then(function (data) {
+                            if (resp.status === 200) {
+                                $addressInput.val(data.address);
+                            } else {
+                                var message = 'We couldn\'t find a related address to the location '
+                                        + 'selected on the map, please enter the address manually';
+                                alert(message);
+                                window.skipGeocode = 2;
+                            }
+                        });
+                    });
+            }
+            if (getMarker() !== undefined) {
+                if (getMarker().dragging._enabled === true) {
+                    window.update = true;
+                    updateAdress();
+                } else {
+                    window.beforeEditLat = currentMarkerLat;
+                    window.beforeEditLng = currentMarkerLng;
+                }
+            }
+        }, 500);
+
+        var submit = false;
+        $form.submit(async function (e) {
+            var currentMarkerCoords = getMarker() !== undefined ? getMarker().getLatLng() : null;
+            var currentMarkerLat = getMarker() !== undefined ? getMarker().getLatLng().lat : null;
+            var currentMarkerLng = getMarker() !== undefined ? getMarker().getLatLng().lng : null;
+            if (currentMarkerCoords !== window.markerCoords && currentMarkerCoords !== null &&
+                    getMarker().dragging._enabled !== true) {
+                var reverseApiWithData = window.reverseApi + '?lat=' + currentMarkerLat + '&lng=' + currentMarkerLng;
+                if ($addressInput.val()) {
+                    var promise = window.fetch(reverseApiWithData);
+                    if (currentMarkerLat !== window.addressLat ||
+                            currentMarkerLng !== window.addressLng) {
+                        if (window.confirm('Would you like to update address?')) {
+                            var address;
+                            var resp = await promise;
+                            var respJson = resp.json();
+                            await respJson.then(function (data) {address = data.address })
+                            if (resp.status === 200) {
+                                $.when($addressInput.val(address)).then(function() {
+                                    submit = true;
+                                    $form.submit();
+                                });
+                            } else {
+                                var message = 'We couldn\'t find a related address to the location '
+                                + 'selected on the map, please enter the address manually';
+                                alert(message);
+                                window.skipGeocode = 2;
+                            }
+                        } else {
+                            submit = true;
+                        }
+                    } else {
+                        submit = true;
+                        $form.submit();
+                    }
+                } else {
+                    $.getJSON(reverseApiWithData, function (data) {
+                        $addressInput.val(data.address);
+                        submit = true;
+                        $form.submit();
+                    });
+                }
+                window.markerCoords = currentMarkerCoords;
+            } else if ($addressInput.val() && getMarker() === undefined) {
+                $.getJSON(window.geocodeApi + '?address=' + $addressInput.val(), function (data) {
+                    var geojson = '{ "type": "Point", "coordinates": [ ' +
+                            data.lng.toString() + ', ' +
+                            data.lat.toString() + '] }';
+                    $mapGeojsonTextarea.val(geojson);
+                    submit = true;
+                    $form.submit();
+                });
+            } else {
+                submit = true;
+            }
+            if (!submit) {
+                e.preventDefault();
+            }
+        });
+    }, 100);
 });
