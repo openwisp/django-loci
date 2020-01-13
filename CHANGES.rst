@@ -1,10 +1,14 @@
 Changelog
 =========
 
-Version 0.3.0 [unreleased]
+Version 0.3.0 [2020-01-13]
 --------------------------
 
-WIP
+- Upgraded django-channels to version 2
+- Upgraded dependencies (django, django-leaflet, Pillow)
+- Geometry shouldn't be allowed to be None if not mobile
+- Fixed admin fields hidden by mistake in case of validation errors
+- Fixed type ``KeyError`` exception during form validation
 
 Version 0.2.1 [2018-09-02]
 --------------------------
