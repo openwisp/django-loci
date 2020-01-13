@@ -30,7 +30,7 @@ Dependencies
 ------------
 
 * Python >= 3.5
-* `GeoDjango <https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#requirements>`_
+* GeoDjango (`see GeoDjango Install Instructions <https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#requirements>`_)
 * One of the databases supported by GeoDjango
 
 
