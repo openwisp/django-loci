@@ -42,8 +42,6 @@ class BaseLocationBroadcast(JsonWebsocketConsumer):
     def is_authorized(self, user, location):
         perm = '{0}.change_location'.format(self.model._meta.app_label)
         authenticated = user.is_authenticated
-        if callable(authenticated):  # pragma: nocover
-            authenticated = authenticated()
         return authenticated and (
             user.is_superuser or (
                 user.is_staff and
