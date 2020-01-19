@@ -126,12 +126,30 @@ django.jQuery(function ($) {
         }
     }
 
+    function isMobileChange() {
+        var rows = [
+            $name.parents('.form-row'),
+            $address.parents('.form-row'),
+            $geometryRow
+        ];
+        if ($isMobile.prop('checked')) {
+            $(rows).each(function (i, el) {
+                $(el).hide();
+            });
+        } else {
+            $(rows).each(function (i, el) {
+                $(el).show();
+            });
+        }
+    }
+
     function typeChange(e, initial) {
         var value = $type.val();
         if (value) {
             $outdoor.show();
             $geoEdit.show();
             invalidateMapSize();
+            isMobileChange();
         } else {
             $geoEdit.hide();
             $indoor.hide();
@@ -234,22 +252,7 @@ django.jQuery(function ($) {
     $location.change(locationChange);
     locationChange(null, true);
 
-    $isMobile.change(function () {
-        var rows = [
-            $name.parents('.form-row'),
-            $address.parents('.form-row'),
-            $geometryRow
-        ];
-        if ($isMobile.prop('checked')) {
-            $(rows).each(function (i, el) {
-                $(el).hide();
-            });
-        } else {
-            $(rows).each(function (i, el) {
-                $(el).show();
-            });
-        }
-    });
+    $isMobile.change(isMobileChange);
 
     $floorplanSelection.change(floorplanSelectionChange);
     floorplanSelectionChange(null, true);
