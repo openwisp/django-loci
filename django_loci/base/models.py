@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.contrib.humanize.templatetags.humanize import ordinal
 from django.core.exceptions import ValidationError
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from openwisp_utils.base import TimeStampedEditableModel
@@ -16,7 +15,6 @@ from .. import settings as app_settings
 logger = logging.getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class AbstractLocation(TimeStampedEditableModel):
     LOCATION_TYPES = (
         ('outdoor', _('Outdoor environment (eg: street, square, garden, land)')),
@@ -69,7 +67,6 @@ class AbstractLocation(TimeStampedEditableModel):
         return _(self.type.capitalize())
 
 
-@python_2_unicode_compatible
 class AbstractFloorPlan(TimeStampedEditableModel):
     location = models.ForeignKey('django_loci.Location', on_delete=models.CASCADE)
     floor = models.SmallIntegerField(_('floor'))
@@ -83,7 +80,7 @@ class AbstractFloorPlan(TimeStampedEditableModel):
         unique_together = ('location', 'floor')
 
     def __str__(self):
-        if self.floor is not 0:
+        if self.floor != 0:
             suffix = _('{0} floor').format(ordinal(self.floor))
         else:
             suffix = _('ground floor')
@@ -93,7 +90,7 @@ class AbstractFloorPlan(TimeStampedEditableModel):
         self._validate_location_type()
 
     def delete(self, *args, **kwargs):
-        super(AbstractFloorPlan, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
         self._remove_image()
 
     def _validate_location_type(self):
