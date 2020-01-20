@@ -18,10 +18,10 @@ class ImageWidget(forms.FileInput):
 
     def __init__(self, *args, **kwargs):
         self.thumbnail = kwargs.pop('thumbnail', True)
-        super(ImageWidget, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_context(self, name, value, attrs):
-        c = super(ImageWidget, self).get_context(name, value, attrs)
+        c = super().get_context(name, value, attrs)
         if value and hasattr(value, 'url'):
             c.update({
                 'filename': value.name,

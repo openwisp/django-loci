@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+venv/
 build/
 develop-eggs/
 dist/
@@ -56,6 +57,7 @@ target/
 
 # editors
 *.komodoproject
+.vscode/
 
 # other
 *.DS_Store*

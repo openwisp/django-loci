@@ -69,7 +69,7 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
             url(r'^(?P<pk>[^/]+)/floorplans/json/$',
                 self.admin_site.admin_view(self.floorplans_json_view),
                 name='{0}_location_floorplans_json'.format(app_label))
-        ] + super(AbstractLocationAdmin, self).get_urls()
+        ] + super().get_urls()
 
     def json_view(self, request, pk):
         instance = get_object_or_404(self.model, pk=pk)
@@ -150,7 +150,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
         css = {'all': ('django-loci/css/loci.css',)}
 
     def __init__(self, *args, **kwargs):
-        super(AbstractObjectLocationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # set initial values for custom fields
         initial = {}
         obj = self.instance
@@ -263,7 +263,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
             instance.floorplan = self._get_floorplan_instance()
             instance.floorplan.save()
         # call super
-        return super(AbstractObjectLocationForm, self).save(commit=True)
+        return super().save(commit=True)
 
 
 class ObjectLocationMixin(TimeReadonlyAdminMixin):
