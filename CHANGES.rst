@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.3.1 [2020-01-21]
+--------------------------
+
+- Added support to django 3.0, dropped support for django versions older than 2.2
+- [admin] Fixed UX issue with ``is_mobile`` checkbox
+
 Version 0.3.0 [2020-01-13]
 --------------------------
 
