@@ -379,5 +379,6 @@ django.jQuery(function ($) {
     } else if ($type.val() === 'indoor') {
         $indoor.show();
         $indoorRows.show();
+        indoorForm($locationSelection.val());
     }
 });
