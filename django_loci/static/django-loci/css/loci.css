@@ -36,3 +36,8 @@ input[type=text]{ width: 320px }
     font-size: 14px;
 }
 #floorplan_set-group{ display: none }
+@media (max-width: 767px){
+    .field-geometry > div{
+        flex-direction: column;
+    }
+}
