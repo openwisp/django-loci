@@ -78,7 +78,7 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
             'type': instance.type,
             'is_mobile': instance.is_mobile,
             'address': instance.address,
-            'geometry': json.loads(instance.geometry.json)
+            'geometry': json.loads(instance.geometry.json) if instance.geometry else None
         })
 
     def floorplans_json_view(self, request, pk):

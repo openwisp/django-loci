@@ -134,7 +134,10 @@ django.jQuery(function ($) {
         ];
         if ($isMobile.prop('checked')) {
             $(rows).each(function (i, el) {
-                $(el).hide();
+                if (($(el).attr('class').includes('address') && $address.val()) ||
+                        ($(el).attr('class').includes('geometry') && $geometryTextarea.val())) {
+                    $(el).show();
+                } else { $(el).hide(); }
             });
         } else {
             $(rows).each(function (i, el) {
@@ -207,7 +210,10 @@ django.jQuery(function ($) {
     function locationChange(e, initial) {
         function loadIndoor() {
             indoorForm();
-            if ($type.val() !== 'indoor') { return; }
+            if ($type.val() !== 'indoor') {
+                $indoor.hide();
+                return;
+            }
             var floorplansUrl = getLocationFloorplansJsonUrl($location.val());
             $.getJSON(floorplansUrl, function (data) {
                 var $current = $floorplan.find('option:selected'),
@@ -237,11 +243,12 @@ django.jQuery(function ($) {
                 $type.val(data.type);
                 $isMobile.prop('checked', data.is_mobile);
                 $address.val(data.address);
-                $geometryTextarea.val(JSON.stringify(data.geometry));
+                $geometryTextarea.val(data.geometry ? JSON.stringify(data.geometry) : '');
                 var map = getMap();
                 if (map) { map.remove(); }
                 $geoEdit.show();
                 window[loadMapName]();
+                isMobileChange();
                 loadIndoor();
             });
         } else {
@@ -358,7 +365,7 @@ django.jQuery(function ($) {
         $locationSelection.parents('.form-row').hide();
         $locationRow.hide();
         $name.parents('.form-row').hide();
-        $address.parents('.form-row').hide();
+        if (!$address.val()) { $address.parents('.form-row').hide(); }
         // if no location data yet
         if (!$geometryTextarea.val()) {
             $geometryRow.hide();
