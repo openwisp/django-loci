@@ -19,14 +19,14 @@ django.jQuery(function ($) {
         loadMapName = 'loadmap' + geometryId + '-map',
         $typeRow = $('.inline-group .field-type'),
         $type = $typeRow.find('select'),
-        $isMobile = $('.coords .field-is_mobile input'),
+        $isMobile = $('.coords .field-is_mobile input, #location_form .field-is_mobile input'),
         $locationSelectionRow = $('.field-location_selection'),
         $locationSelection = $locationSelectionRow.find('select'),
         $locationRow = $('.loci.coords .field-location'),
         $location = $locationRow.find('select, input'),
         $locationLabel = $('.field-location .item-label'),
         $name = $('.field-name input', '.loci.coords'),
-        $address = $('.field-address input', '.loci.coords'),
+        $address = $('.coords .field-address input, #location_form .field-address input'),
         $geometryTextarea = $('.field-geometry textarea'),
         baseLocationJsonUrl = $('#loci-location-json-url').attr('data-url'),
         baseLocationFloorplansJsonUrl = $('#loci-location-floorplans-json-url').attr('data-url'),
@@ -128,21 +128,24 @@ django.jQuery(function ($) {
 
     function isMobileChange() {
         var rows = [
-            $name.parents('.form-row'),
-            $address.parents('.form-row'),
-            $geometryRow
+            $address,
+            $geometryTextarea
         ];
         if ($isMobile.prop('checked')) {
             $(rows).each(function (i, el) {
-                if (($(el).attr('class').includes('address') && $address.val()) ||
-                        ($(el).attr('class').includes('geometry') && $geometryTextarea.val())) {
-                    $(el).show();
-                } else { $(el).hide(); }
+                if (!$(el).val()) {
+                    $(el).parents('.form-row').hide();
+                }
             });
+            // name not relevant in mobile locations
+            $name.parents('.form-row').hide();
+            $('.no-location').show();
         } else {
             $(rows).each(function (i, el) {
-                $(el).show();
+                $(el).parents('.form-row').show();
             });
+            $name.parents('.form-row').show();
+            $('.no-location').hide();
         }
     }
 
@@ -160,7 +163,6 @@ django.jQuery(function ($) {
         }
         if (value === 'indoor') {
             $indoor.show();
-            $indoorRows.show();
             indoorForm($locationSelection.val());
         } else {
             $indoor.hide();
