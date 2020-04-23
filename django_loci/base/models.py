@@ -160,6 +160,9 @@ class AbstractObjectLocation(TimeStampedEditableModel):
         # allow empty values for outdoor locations
         elif self.location.type != 'indoor' and self.indoor in [None, '']:
             return
+        # allow empty values for indoor whose coordinates are not yet received
+        elif self.location.type == 'indoor' and self.indoor in [None, ''] and not self.floorplan:
+            return
         # split indoor position
         position = []
         if self.indoor:
