@@ -41,7 +41,8 @@ django.jQuery(function ($) {
         $floorplanRow = $('.indoor .field-floorplan'),
         $floorplan = $floorplanRow.find('select').eq(0),
         $floorplanImage = $('.indoor.coords .field-image input'),
-        $floorplanMap = $('.indoor.coords .floorplan-widget');
+        $floorplanMap = $('.indoor.coords .floorplan-widget'),
+        isNew = true;
 
     // define dummy gettext if django i18n is not enabled
     if (!gettext) { window.gettext = function (text) { return text; }; }
@@ -112,6 +113,10 @@ django.jQuery(function ($) {
         if ($locationSelection.val() === 'new') {
             $floorplanSelection.val('new');
             $floorplanSelectionRow.hide();
+        }
+        if (!$floorplanSelection.val()) {
+            $indoorRows.hide();
+            $floorplanSelectionRow.show();
         }
     }
 
@@ -338,14 +343,15 @@ django.jQuery(function ($) {
 
     $('#content-main form').submit(function (e) {
         var indoorPosition = $('.field-indoor .floorplan-raw input').val();
-        if ($type.val() === 'indoor' && !indoorPosition) {
-            if ($floorplanImage[0].files.length !== 0 && !indoorPosition) {
-                alert('Please set the indoor position before saving');
+        if (isNew && $type.val() === 'indoor' && !indoorPosition) {
+            var message = gettext('You have set this location as indoor but have ' +
+                                  'not specified indoor cordinates on a floorplan, ' +
+                                  'do you want to save anyway?');
+            if (!confirm(message)) {
                 e.preventDefault();
-            } else if ($floorplanImage[0].files.length === 0 && !indoorPosition) {
-                var confirmation = confirm('Do you want to save this indoor' +
-                                        'location without indoor coordinates?');
-                if (!confirmation) { e.preventDefault(); }
+            } else {
+                $floorplanSelection.val('');
+                indoorForm();
             }
         }
     });
@@ -368,6 +374,7 @@ django.jQuery(function ($) {
     if ($location.val()) {
         $locationSelectionRow.hide();
         $geoEdit.show();
+        isNew = false;
     }
     // show mobile map (hide not relevant fields)
     if ($isMobile.prop('checked')) {
@@ -391,8 +398,10 @@ django.jQuery(function ($) {
     // show existing indoor
     if ($floorplan.val()) {
         $indoor.show();
-        $indoorRows.show();
-        $floorplanSelectionRow.hide();
+        if ($floorplanSelection.val()) {
+            $indoorRows.show();
+            $floorplanSelectionRow.hide();
+        }
     // adding indoor
     } else if ($type.val() === 'indoor') {
         $indoor.show();
