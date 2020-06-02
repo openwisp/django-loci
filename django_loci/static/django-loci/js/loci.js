@@ -1,3 +1,6 @@
+/*global
+alert, confirm, console, Debug, opera, prompt, WSH
+*/
 /*
 this JS is shared between:
     - DeviceLocationForm
@@ -336,8 +339,14 @@ django.jQuery(function ($) {
     $('#content-main form').submit(function (e) {
         var indoorPosition = $('.field-indoor .floorplan-raw input').val();
         if ($type.val() === 'indoor' && !indoorPosition) {
-            e.preventDefault();
-            alert(gettext('Please set the indoor position before saving'));
+            if ($floorplanImage[0].files.length !== 0 && !indoorPosition) {
+                alert('Please set the indoor position before saving');
+                e.preventDefault();
+            } else if ($floorplanImage[0].files.length === 0 && !indoorPosition) {
+                var confirmation = confirm('Do you want to save this indoor' +
+                                        'location without indoor coordinates?');
+                if (!confirmation) { e.preventDefault(); }
+            }
         }
     });
 

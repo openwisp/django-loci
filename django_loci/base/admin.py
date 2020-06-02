@@ -100,6 +100,7 @@ class UnvalidatedChoiceField(forms.ChoiceField):
     """
     skips ChoiceField validation to allow custom options
     """
+
     def validate(self, value):
         super(forms.ChoiceField, self).validate(value)
 
@@ -188,7 +189,8 @@ class AbstractObjectLocationForm(forms.ModelForm):
         floorplan_model = self.floorplan_model
         type_ = self.cleaned_data.get('type')
         floorplan_selection = self.cleaned_data.get('floorplan_selection')
-        if type_ != 'indoor' or floorplan_selection == 'new':
+        if type_ != 'indoor' or floorplan_selection == 'new' or \
+                not floorplan_selection:
             return None
         pk = self.cleaned_data['floorplan']
         if not pk:
@@ -210,11 +212,10 @@ class AbstractObjectLocationForm(forms.ModelForm):
         if not is_mobile and type_ in ['outdoor', 'indoor']:
             fields += ['location_selection', 'name', 'address', 'geometry']
         if not is_mobile and type_ == 'indoor':
-            fields += ['floorplan_selection', 'floor', 'indoor']
             if data.get('floorplan_selection') == 'existing':
                 fields.append('floorplan')
-            elif data.get('floorplan_selection') == 'new':
-                fields.append('image')
+            if data.get('image'):
+                fields += ['floor', 'indoor']
         elif is_mobile and not data.get('location'):
             data['name'] = ''
             data['address'] = ''
@@ -259,8 +260,9 @@ class AbstractObjectLocationForm(forms.ModelForm):
             instance.location.name = str(self.instance.content_object)
         instance.location.save()
         # create or update floorplan
-        if data['type'] == 'indoor':
-            instance.floorplan = self._get_floorplan_instance()
+        floorplan = self._get_floorplan_instance()
+        if data['type'] == 'indoor' and floorplan.image:
+            instance.floorplan = floorplan
             instance.floorplan.save()
         # call super
         return super().save(commit=True)

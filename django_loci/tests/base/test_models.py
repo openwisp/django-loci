@@ -124,12 +124,15 @@ class BaseTestModels(TestLociMixin):
         self._test_indoor_position_validation_error(ol)
         ol.indoor = 'TOTALLY.WRONG'
         self._test_indoor_position_validation_error(ol)
-        ol.indoor = ''
-        self._test_indoor_position_validation_error(ol)
-        ol.indoor = None
-        self._test_indoor_position_validation_error(ol)
         ol.indoor = '100.2300,-45.23454'
         ol.full_clean()
+        # allow empty indoor for location whose indoor coordinates are not yet received
+        ol.indoor = ''
+        ol.full_clean()
+        ol.save()
+        ol.indoor = None
+        ol.full_clean()
+        ol.save()
         # outdoor allows empty but not invalid values
         loc.type = 'outdoor'
         loc.full_clean()
