@@ -45,7 +45,7 @@ setup(
     download_url='https://github.com/openwisp/django-loci/releases',
     platforms=['Platform Independent'],
     keywords=['django', 'gis'],
-    packages=find_packages(exclude=['tests', 'docs']),
+    packages=find_packages(exclude=['tests*', 'docs*']),
     include_package_data=True,
     zip_safe=False,
     install_requires=get_install_requires(),
