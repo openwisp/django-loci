@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 0.3.2 [2020-07-01]
+--------------------------
+
+- [fix] Fixed bug in floorplan fields
+- [fix] Fixed bug which caused geographic map to disappears on narrow screens
+- [fix] Fixed bug in JS logic
+- [change] Allow to create an indoor location without specifying indoor coordinates
+
 Version 0.3.1 [2020-01-21]
 --------------------------
 
