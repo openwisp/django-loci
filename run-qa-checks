@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+openwisp-qa-check \
+    --migration-path \
+        "./django_loci/migrations \
+        ./django_loci/tests/testdeviceapp/migrations" \
+    --migration-module django_loci
+
+
+jslint django_loci/static/django-loci/js/*.js

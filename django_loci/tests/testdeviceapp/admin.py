@@ -7,7 +7,7 @@ from .models import Device
 
 
 class DeviceAdmin(TimeReadonlyAdminMixin, admin.ModelAdmin):
-    list_display = ('name', 'created', 'modified')
+    list_display = ("name", "created", "modified")
     save_on_top = True
     inlines = [ObjectLocationInline]
 

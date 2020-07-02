@@ -1,8 +1,14 @@
 from django.contrib import admin
 
-from .base.admin import (AbstractFloorPlanAdmin, AbstractFloorPlanForm, AbstractFloorPlanInline,
-                         AbstractLocationAdmin, AbstractLocationForm, AbstractObjectLocationForm,
-                         AbstractObjectLocationInline)
+from .base.admin import (
+    AbstractFloorPlanAdmin,
+    AbstractFloorPlanForm,
+    AbstractFloorPlanInline,
+    AbstractLocationAdmin,
+    AbstractLocationForm,
+    AbstractObjectLocationForm,
+    AbstractObjectLocationInline,
+)
 from .models import FloorPlan, Location, ObjectLocation
 
 
