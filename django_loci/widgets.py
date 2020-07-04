@@ -5,7 +5,7 @@ from django.templatetags.static import static
 from leaflet.forms.widgets import LeafletWidget as BaseLeafletWidget
 
 logger = logging.getLogger(__name__)
-_floorplan_css = {"all": (static("django-loci/css/floorplan-widget.css"),)}
+_floorplan_css = {'all': (static('django-loci/css/floorplan-widget.css'),)}
 
 
 class ImageWidget(forms.FileInput):
@@ -15,24 +15,24 @@ class ImageWidget(forms.FileInput):
     the image width and height
     """
 
-    template_name = "admin/widgets/image.html"
+    template_name = 'admin/widgets/image.html'
 
     def __init__(self, *args, **kwargs):
-        self.thumbnail = kwargs.pop("thumbnail", True)
+        self.thumbnail = kwargs.pop('thumbnail', True)
         super().__init__(*args, **kwargs)
 
     def get_context(self, name, value, attrs):
         c = super().get_context(name, value, attrs)
-        if value and hasattr(value, "url"):
+        if value and hasattr(value, 'url'):
             c.update(
-                {"filename": value.name, "url": value.url, "thumbnail": self.thumbnail,}
+                {'filename': value.name, 'url': value.url, 'thumbnail': self.thumbnail,}
             )
             try:
                 c.update(
-                    {"width": value.width, "height": value.height,}
+                    {'width': value.width, 'height': value.height,}
                 )
             except IOError:
-                msg = "floorplan image not found while showing floorplan:\n{0}"
+                msg = 'floorplan image not found while showing floorplan:\n{0}'
                 logger.error(msg.format(value.name))
         return c
 
@@ -47,21 +47,21 @@ class FloorPlanWidget(forms.TextInput):
     widget that allows to manage indoor coordinates
     """
 
-    template_name = "admin/widgets/floorplan.html"
+    template_name = 'admin/widgets/floorplan.html'
 
     @property
     def media(self):
-        js = (static("django-loci/js/floorplan-widget.js"),)
+        js = (static('django-loci/js/floorplan-widget.js'),)
         css = _floorplan_css
         return forms.Media(js=js, css=css)
 
 
 class LeafletWidget(BaseLeafletWidget):
     include_media = True
-    geom_type = "GEOMETRY"
-    template_name = "leaflet/admin/widget.html"
+    geom_type = 'GEOMETRY'
+    template_name = 'leaflet/admin/widget.html'
     modifiable = True
-    map_width = "100%"
-    map_height = "400px"
+    map_width = '100%'
+    map_height = '400px'
     display_raw = False
     settings_overrides = {}
