@@ -22,15 +22,15 @@ class BaseTestModels(TestLociMixin):
         l2 = self._create_location(type='indoor')
         fl2 = self._create_floorplan(location=l2)
         obj = self._create_object()
-        ol = self.object_location_model(content_object=obj,
-                                        location=l1,
-                                        floorplan=fl2)
+        ol = self.object_location_model(content_object=obj, location=l1, floorplan=fl2)
         try:
             ol.full_clean()
         except ValidationError as e:
             self.assertIn('__all__', e.message_dict)
-            self.assertEqual(e.message_dict.get('__all__')[0],
-                             'Invalid floorplan (belongs to a different location)')
+            self.assertEqual(
+                e.message_dict.get('__all__')[0],
+                'Invalid floorplan (belongs to a different location)',
+            )
         else:
             self.fail('ValidationError not raised')
 

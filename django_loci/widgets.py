@@ -14,6 +14,7 @@ class ImageWidget(forms.FileInput):
     and carries information regarding
     the image width and height
     """
+
     template_name = 'admin/widgets/image.html'
 
     def __init__(self, *args, **kwargs):
@@ -23,16 +24,13 @@ class ImageWidget(forms.FileInput):
     def get_context(self, name, value, attrs):
         c = super().get_context(name, value, attrs)
         if value and hasattr(value, 'url'):
-            c.update({
-                'filename': value.name,
-                'url': value.url,
-                'thumbnail': self.thumbnail,
-            })
+            c.update(
+                {'filename': value.name, 'url': value.url, 'thumbnail': self.thumbnail,}
+            )
             try:
-                c.update({
-                    'width': value.width,
-                    'height': value.height,
-                })
+                c.update(
+                    {'width': value.width, 'height': value.height,}
+                )
             except IOError:
                 msg = 'floorplan image not found while showing floorplan:\n{0}'
                 logger.error(msg.format(value.name))
@@ -48,6 +46,7 @@ class FloorPlanWidget(forms.TextInput):
     """
     widget that allows to manage indoor coordinates
     """
+
     template_name = 'admin/widgets/floorplan.html'
 
     @property

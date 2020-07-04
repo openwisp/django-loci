@@ -12,11 +12,7 @@ def update_mobile_location(sender, instance, **kwargs):
         channel_layer = channels.layers.get_channel_layer()
         message = json.loads(instance.geometry.geojson)
         async_to_sync(channel_layer.group_send)(
-            group_name,
-            {
-                'type': 'send_message',
-                'message': message
-            }
+            group_name, {'type': 'send_message', 'message': message}
         )
 
 
@@ -27,8 +23,6 @@ def load_location_receivers(sender):
     """
     # using decorator pattern with old syntax
     # in order to decorate an existing function
-    receiver(
-        post_save,
-        sender=sender,
-        dispatch_uid='ws_update_mobile_location'
-    )(update_mobile_location)
+    receiver(post_save, sender=sender, dispatch_uid='ws_update_mobile_location')(
+        update_mobile_location
+    )

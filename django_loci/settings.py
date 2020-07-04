@@ -2,7 +2,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
-FLOORPLAN_STORAGE = getattr(settings, 'LOCI_FLOORPLAN_STORAGE', 'django_loci.storage.OverwriteStorage')
+FLOORPLAN_STORAGE = getattr(
+    settings, 'LOCI_FLOORPLAN_STORAGE', 'django_loci.storage.OverwriteStorage'
+)
 
 try:
     FLOORPLAN_STORAGE = import_string(FLOORPLAN_STORAGE)

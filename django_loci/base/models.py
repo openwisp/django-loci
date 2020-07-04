@@ -18,17 +18,31 @@ logger = logging.getLogger(__name__)
 class AbstractLocation(TimeStampedEditableModel):
     LOCATION_TYPES = (
         ('outdoor', _('Outdoor environment (eg: street, square, garden, land)')),
-        ('indoor', _('Indoor environment (eg: building, roofs, subway, large vehicles)')),
+        (
+            'indoor',
+            _('Indoor environment (eg: building, roofs, subway, large vehicles)'),
+        ),
     )
-    name = models.CharField(_('name'), max_length=75,
-                            help_text=_('A descriptive name of the location '
-                                        '(building name, company name, etc.)'))
-    type = models.CharField(choices=LOCATION_TYPES, max_length=8, db_index=True,
-                            help_text=_('indoor locations can have floorplans associated to them'))
-    is_mobile = models.BooleanField(_('is mobile?'), default=False, db_index=True,
-                                    help_text=_('is this location a moving object?'))
-    address = models.CharField(_('address'), db_index=True,
-                               max_length=256, blank=True)
+    name = models.CharField(
+        _('name'),
+        max_length=75,
+        help_text=_(
+            'A descriptive name of the location ' '(building name, company name, etc.)'
+        ),
+    )
+    type = models.CharField(
+        choices=LOCATION_TYPES,
+        max_length=8,
+        db_index=True,
+        help_text=_('indoor locations can have floorplans associated to them'),
+    )
+    is_mobile = models.BooleanField(
+        _('is mobile?'),
+        default=False,
+        db_index=True,
+        help_text=_('is this location a moving object?'),
+    )
+    address = models.CharField(_('address'), db_index=True, max_length=256, blank=True)
     geometry = models.GeometryField(_('geometry'), blank=True, null=True)
 
     class Meta:
@@ -50,8 +64,10 @@ class AbstractLocation(TimeStampedEditableModel):
         if self.type == 'indoor' or self._state.adding:
             return
         if self.floorplan_set.count() > 0:
-            msg = 'this location has floorplans associated to it, ' \
-                  'please delete them before changing its type'
+            msg = (
+                'this location has floorplans associated to it, '
+                'please delete them before changing its type'
+            )
             raise ValidationError({'type': msg})
 
     def _validate_geometry_if_not_mobile(self):
@@ -70,10 +86,12 @@ class AbstractLocation(TimeStampedEditableModel):
 class AbstractFloorPlan(TimeStampedEditableModel):
     location = models.ForeignKey('django_loci.Location', on_delete=models.CASCADE)
     floor = models.SmallIntegerField(_('floor'))
-    image = models.ImageField(_('image'),
-                              upload_to=app_settings.FLOORPLAN_STORAGE.upload_to,
-                              storage=app_settings.FLOORPLAN_STORAGE(),
-                              help_text=_('floor plan image'))
+    image = models.ImageField(
+        _('image'),
+        upload_to=app_settings.FLOORPLAN_STORAGE.upload_to,
+        storage=app_settings.FLOORPLAN_STORAGE(),
+        help_text=_('floor plan image'),
+    )
 
     class Meta:
         abstract = True
@@ -97,8 +115,7 @@ class AbstractFloorPlan(TimeStampedEditableModel):
         if not hasattr(self, 'location') or not hasattr(self.location, 'type'):
             return
         if self.location.type and self.location.type != 'indoor':
-            msg = 'floorplans can only be associated '\
-                  'to locations of type "indoor"'
+            msg = 'floorplans can only be associated ' 'to locations of type "indoor"'
             raise ValidationError(msg)
 
     def _remove_image(self):
@@ -119,12 +136,15 @@ class AbstractObjectLocation(TimeStampedEditableModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.CharField(max_length=36, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
-    location = models.ForeignKey('django_loci.Location', models.PROTECT,
-                                 blank=True, null=True)
-    floorplan = models.ForeignKey('django_loci.Floorplan', models.PROTECT,
-                                  blank=True, null=True)
-    indoor = models.CharField(_('indoor position'), max_length=64,
-                              blank=True, null=True)
+    location = models.ForeignKey(
+        'django_loci.Location', models.PROTECT, blank=True, null=True
+    )
+    floorplan = models.ForeignKey(
+        'django_loci.Floorplan', models.PROTECT, blank=True, null=True
+    )
+    indoor = models.CharField(
+        _('indoor position'), max_length=64, blank=True, null=True
+    )
 
     class Meta:
         abstract = True
@@ -140,7 +160,9 @@ class AbstractObjectLocation(TimeStampedEditableModel):
         if not self.location or self.location.type != 'indoor' or not self.floorplan:
             return
         if self.location != self.floorplan.location:
-            raise ValidationError(_('Invalid floorplan (belongs to a different location)'))
+            raise ValidationError(
+                _('Invalid floorplan (belongs to a different location)')
+            )
 
     def _raise_invalid_indoor(self):
         raise ValidationError({'indoor': _('invalid value')})
@@ -161,7 +183,11 @@ class AbstractObjectLocation(TimeStampedEditableModel):
         elif self.location.type != 'indoor' and self.indoor in [None, '']:
             return
         # allow empty values for indoor whose coordinates are not yet received
-        elif self.location.type == 'indoor' and self.indoor in [None, ''] and not self.floorplan:
+        elif (
+            self.location.type == 'indoor'
+            and self.indoor in [None, '']
+            and not self.floorplan
+        ):
             return
         # split indoor position
         position = []

@@ -23,10 +23,12 @@ class TestLociMixin(object):
         return self.object_model.objects.create(**self._object_kwargs)
 
     def _create_location(self, **kwargs):
-        options = dict(name='test-location',
-                       address='Via del Corso, Roma, Italia',
-                       geometry='SRID=4326;POINT (12.512124 41.898903)',
-                       type='outdoor')
+        options = dict(
+            name='test-location',
+            address='Via del Corso, Roma, Italia',
+            geometry='SRID=4326;POINT (12.512124 41.898903)',
+            type='outdoor',
+        )
         options.update(kwargs)
         location = self.location_model(**options)
         location.full_clean()
@@ -36,9 +38,9 @@ class TestLociMixin(object):
     def _get_simpleuploadedfile(self):
         with open(self._floorplan_path, 'rb') as f:
             image = f.read()
-        return SimpleUploadedFile(name='floorplan.jpg',
-                                  content=image,
-                                  content_type='image/jpeg')
+        return SimpleUploadedFile(
+            name='floorplan.jpg', content=image, content_type='image/jpeg'
+        )
 
     def _create_floorplan(self, **kwargs):
         options = dict(floor=1)
@@ -77,9 +79,9 @@ class TestAdminMixin(object):
         return 'admin:{0}'.format(self.object_model._meta.app_label)
 
     def _create_admin(self):
-        return self.user_model.objects.create_superuser(username='admin',
-                                                        password='admin',
-                                                        email='admin@email.org')
+        return self.user_model.objects.create_superuser(
+            username='admin', password='admin', email='admin@email.org'
+        )
 
     def _login_as_admin(self):
         admin = self._create_admin()

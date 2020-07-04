@@ -5,14 +5,20 @@ from django.conf.urls import url
 from django_loci.channels.base import location_broadcast_path
 from django_loci.channels.consumers import LocationBroadcast
 
-channel_routing = ProtocolTypeRouter({
-    'websocket': AllowedHostsOriginValidator(
-        AuthMiddlewareStack(
-            URLRouter(
-                [url(location_broadcast_path,
-                     LocationBroadcast,
-                     name='LocationChannel')]
-            )
-        ),
-    )
-})
+channel_routing = ProtocolTypeRouter(
+    {
+        'websocket': AllowedHostsOriginValidator(
+            AuthMiddlewareStack(
+                URLRouter(
+                    [
+                        url(
+                            location_broadcast_path,
+                            LocationBroadcast,
+                            name='LocationChannel',
+                        )
+                    ]
+                )
+            ),
+        )
+    }
+)

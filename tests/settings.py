@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     'leaflet',
     # channels
     'channels',
-
     # test app
     'django_loci.tests.testdeviceapp',
 ]
@@ -57,9 +56,7 @@ ROOT_URLCONF = 'urls'
 
 ASGI_APPLICATION = "django_loci.channels.routing.channel_routing"
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    },
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
 }
 
 TIME_ZONE = 'Europe/Rome'

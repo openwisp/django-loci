@@ -13,10 +13,12 @@ class LociConfig(AppConfig):
         this method can be overridden in 3rd party apps
         """
         from .models import Location
+
         self.location_model = Location
 
     def ready(self):
         import leaflet
+
         leaflet.app_settings['NO_GLOBALS'] = False
         self.__setmodels__()
         self._load_receivers()

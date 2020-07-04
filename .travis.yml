@@ -30,20 +30,13 @@ before_install:
   - pip install -U $DJANGO
   - pip install --no-cache-dir -U -r requirements-test.txt
   - npm install -g jslint
-  - jslint django_loci/static/django-loci/js/*.js
 
 install:
   - pip install -e .
 
 script:
-  - |
-      openwisp-utils-qa-checks \
-      --migration-path \
-        "./django_loci/migrations \
-        ./django_loci/tests/testdeviceapp/migrations" \
-      --migration-module django_loci
+  - ./run-qa-checks
   - pytest --cov=django_loci
   - coverage run -a --source=django_loci runtests.py
 
-after_success:
-  coveralls
+after_success: coveralls

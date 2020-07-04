@@ -40,9 +40,11 @@ class AbstractLocationForm(forms.ModelForm):
         exclude = tuple()
 
     class Media:
-        js = ('admin/js/jquery.init.js',
-              'django-loci/js/loci.js',
-              'django-loci/js/floorplan-inlines.js',)
+        js = (
+            'admin/js/jquery.init.js',
+            'django-loci/js/loci.js',
+            'django-loci/js/floorplan-inlines.js',
+        )
         css = {'all': ('django-loci/css/loci.css',)}
 
 
@@ -63,36 +65,46 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
         # without having to change templates
         app_label = 'django_loci'
         return [
-            url(r'^(?P<pk>[^/]+)/json/$',
+            url(
+                r'^(?P<pk>[^/]+)/json/$',
                 self.admin_site.admin_view(self.json_view),
-                name='{0}_location_json'.format(app_label)),
-            url(r'^(?P<pk>[^/]+)/floorplans/json/$',
+                name='{0}_location_json'.format(app_label),
+            ),
+            url(
+                r'^(?P<pk>[^/]+)/floorplans/json/$',
                 self.admin_site.admin_view(self.floorplans_json_view),
-                name='{0}_location_floorplans_json'.format(app_label))
+                name='{0}_location_floorplans_json'.format(app_label),
+            ),
         ] + super().get_urls()
 
     def json_view(self, request, pk):
         instance = get_object_or_404(self.model, pk=pk)
-        return JsonResponse({
-            'name': instance.name,
-            'type': instance.type,
-            'is_mobile': instance.is_mobile,
-            'address': instance.address,
-            'geometry': json.loads(instance.geometry.json) if instance.geometry else None
-        })
+        return JsonResponse(
+            {
+                'name': instance.name,
+                'type': instance.type,
+                'is_mobile': instance.is_mobile,
+                'address': instance.address,
+                'geometry': json.loads(instance.geometry.json)
+                if instance.geometry
+                else None,
+            }
+        )
 
     def floorplans_json_view(self, request, pk):
         instance = get_object_or_404(self.model, pk=pk)
         choices = []
         for floorplan in instance.floorplan_set.all():
-            choices.append({
-                'id': floorplan.pk,
-                'str': str(floorplan),
-                'floor': floorplan.floor,
-                'image': floorplan.image.url,
-                'image_width': floorplan.image.width,
-                'image_height': floorplan.image.height,
-            })
+            choices.append(
+                {
+                    'id': floorplan.pk,
+                    'str': str(floorplan),
+                    'floor': floorplan.floor,
+                    'image': floorplan.image.url,
+                    'image_width': floorplan.image.width,
+                    'image_height': floorplan.image.height,
+                }
+            )
         return JsonResponse({'choices': choices})
 
 
@@ -112,42 +124,55 @@ class AbstractObjectLocationForm(forms.ModelForm):
     FORM_CHOICES = (
         ('', _('--- Please select an option ---')),
         ('new', _('New')),
-        ('existing', _('Existing'))
+        ('existing', _('Existing')),
     )
     LOCATION_TYPES = (
         FORM_CHOICES[0],
         AbstractLocation.LOCATION_TYPES[0],
-        AbstractLocation.LOCATION_TYPES[1]
+        AbstractLocation.LOCATION_TYPES[1],
     )
     location_selection = forms.ChoiceField(choices=FORM_CHOICES, required=False)
-    name = forms.CharField(label=_('Location name'),
-                           max_length=75, required=False,
-                           help_text=_get_field('name').help_text)
+    name = forms.CharField(
+        label=_('Location name'),
+        max_length=75,
+        required=False,
+        help_text=_get_field('name').help_text,
+    )
     address = forms.CharField(max_length=128, required=False)
-    type = forms.ChoiceField(choices=LOCATION_TYPES, required=True,
-                             help_text=_get_field('type').help_text)
-    is_mobile = forms.BooleanField(label=_get_field('is_mobile').verbose_name,
-                                   help_text=_get_field('is_mobile').help_text,
-                                   required=False)
+    type = forms.ChoiceField(
+        choices=LOCATION_TYPES, required=True, help_text=_get_field('type').help_text
+    )
+    is_mobile = forms.BooleanField(
+        label=_get_field('is_mobile').verbose_name,
+        help_text=_get_field('is_mobile').help_text,
+        required=False,
+    )
     geometry = GeometryField(required=False)
-    floorplan_selection = forms.ChoiceField(required=False,
-                                            choices=FORM_CHOICES)
-    floorplan = UnvalidatedChoiceField(choices=((None, FORM_CHOICES[0][1]),),
-                                       required=False)
+    floorplan_selection = forms.ChoiceField(required=False, choices=FORM_CHOICES)
+    floorplan = UnvalidatedChoiceField(
+        choices=((None, FORM_CHOICES[0][1]),), required=False
+    )
     floor = forms.IntegerField(required=False)
-    image = forms.ImageField(required=False,
-                             widget=ImageWidget(thumbnail=False),
-                             help_text=_('floor plan image'))
-    indoor = forms.CharField(max_length=64, required=False,
-                             label=_('indoor position'),
-                             widget=FloorPlanWidget)
+    image = forms.ImageField(
+        required=False,
+        widget=ImageWidget(thumbnail=False),
+        help_text=_('floor plan image'),
+    )
+    indoor = forms.CharField(
+        max_length=64,
+        required=False,
+        label=_('indoor position'),
+        widget=FloorPlanWidget,
+    )
 
     class Meta:
         exclude = tuple()
 
     class Media:
-        js = ('admin/js/jquery.init.js',
-              'django-loci/js/loci.js',)
+        js = (
+            'admin/js/jquery.init.js',
+            'django-loci/js/loci.js',
+        )
         css = {'all': ('django-loci/css/loci.css',)}
 
     def __init__(self, *args, **kwargs):
@@ -158,23 +183,29 @@ class AbstractObjectLocationForm(forms.ModelForm):
         location = obj.location
         floorplan = obj.floorplan
         if location:
-            initial.update({
-                'location_selection': 'existing',
-                'type': location.type,
-                'is_mobile': location.is_mobile,
-                'name': location.name,
-                'address': location.address,
-                'geometry': location.geometry,
-            })
+            initial.update(
+                {
+                    'location_selection': 'existing',
+                    'type': location.type,
+                    'is_mobile': location.is_mobile,
+                    'name': location.name,
+                    'address': location.address,
+                    'geometry': location.geometry,
+                }
+            )
         if floorplan:
-            initial.update({
-                'floorplan_selection': 'existing',
-                'floorplan': floorplan.pk,
-                'floor': floorplan.floor,
-                'image': floorplan.image
-            })
+            initial.update(
+                {
+                    'floorplan_selection': 'existing',
+                    'floorplan': floorplan.pk,
+                    'floor': floorplan.floor,
+                    'image': floorplan.image,
+                }
+            )
             floorplan_choices = self.fields['floorplan'].choices
-            self.fields['floorplan'].choices = floorplan_choices + [(floorplan.pk, floorplan)]
+            self.fields['floorplan'].choices = floorplan_choices + [
+                (floorplan.pk, floorplan)
+            ]
         self.initial.update(initial)
 
     @cached_property
@@ -189,8 +220,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
         floorplan_model = self.floorplan_model
         type_ = self.cleaned_data.get('type')
         floorplan_selection = self.cleaned_data.get('floorplan_selection')
-        if type_ != 'indoor' or floorplan_selection == 'new' or \
-                not floorplan_selection:
+        if type_ != 'indoor' or floorplan_selection == 'new' or not floorplan_selection:
             return None
         pk = self.cleaned_data['floorplan']
         if not pk:
@@ -200,7 +230,9 @@ class AbstractObjectLocationForm(forms.ModelForm):
         except floorplan_model.DoesNotExist:
             raise ValidationError(_('Selected floorplan does not exist'))
         if fl.location != self.cleaned_data['location']:
-            raise ValidationError(_('This floorplan is associated to a different location'))
+            raise ValidationError(
+                _('This floorplan is associated to a different location')
+            )
         return fl
 
     def clean(self):
@@ -274,6 +306,7 @@ class ObjectLocationMixin(TimeReadonlyAdminMixin):
     mixed in with different inline classes (stacked, tabular).
     If you need the generic inline look below.
     """
+
     verbose_name = _('geographic information')
     verbose_name_plural = verbose_name
     raw_id_fields = ('location',)
@@ -282,16 +315,33 @@ class ObjectLocationMixin(TimeReadonlyAdminMixin):
     template = 'admin/django_loci/location_inline.html'
     fieldsets = (
         (None, {'fields': ('location_selection',)}),
-        ('Geographic coordinates', {
-            'classes': ('loci', 'coords'),
-            'fields': ('location', 'type', 'is_mobile',
-                       'name', 'address', 'geometry'),
-        }),
-        ('Indoor coordinates', {
-            'classes': ('indoor', 'coords'),
-            'fields': ('floorplan_selection', 'floorplan',
-                       'floor', 'image', 'indoor',),
-        })
+        (
+            'Geographic coordinates',
+            {
+                'classes': ('loci', 'coords'),
+                'fields': (
+                    'location',
+                    'type',
+                    'is_mobile',
+                    'name',
+                    'address',
+                    'geometry',
+                ),
+            },
+        ),
+        (
+            'Indoor coordinates',
+            {
+                'classes': ('indoor', 'coords'),
+                'fields': (
+                    'floorplan_selection',
+                    'floorplan',
+                    'floor',
+                    'image',
+                    'indoor',
+                ),
+            },
+        ),
     )
 
 
@@ -299,4 +349,5 @@ class AbstractObjectLocationInline(ObjectLocationMixin, GenericStackedInline):
     """
     Generic Inline + ObjectLocationMixin
     """
+
     pass
