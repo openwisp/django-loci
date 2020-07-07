@@ -30,7 +30,7 @@ input[type=text]{ width: 320px }
     color: #333;
 }
 .no-location{
-    padding: 20px 0 0;
+    padding: 10px 0 10px 0;
     font-weight: bold;
     text-align: center;
     font-size: 14px;
