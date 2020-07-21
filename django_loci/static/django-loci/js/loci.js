@@ -147,7 +147,7 @@ django.jQuery(function ($) {
             });
             // name not relevant in mobile locations
             $name.parents('.form-row').hide();
-            $('.no-location').show();
+            if (!$geometryTextarea.val()) { $('.no-location').show(); }
         } else {
             $(rows).each(function (i, el) {
                 $(el).parents('.form-row').show();
@@ -371,14 +371,18 @@ django.jQuery(function ($) {
     }
 
     // show existing location
+    var pk;
     if ($location.val()) {
         $locationSelectionRow.hide();
         $geoEdit.show();
         isNew = false;
+        pk = $location.val();
+    } else {
+        pk = window.location.pathname.split('/').slice('-3', '-2')[0];
     }
     // show mobile map (hide not relevant fields)
     if ($isMobile.prop('checked')) {
-        listenForLocationUpdates($location.val());
+        listenForLocationUpdates(pk);
         $outdoor.show();
         $locationSelection.parents('.form-row').hide();
         $locationRow.hide();
@@ -392,7 +396,6 @@ django.jQuery(function ($) {
         }
     // this is triggered in the location form page
     } else if (!$type.length) {
-        var pk = window.location.pathname.split('/').slice('-3', '-2')[0];
         if (pk !== 'location') { listenForLocationUpdates(pk); }
     }
     // show existing indoor
