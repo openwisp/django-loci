@@ -1,6 +1,6 @@
 coveralls
 attrs>=17.4.0
-pytest-django>=3.4.2,<3.9.0
-pytest-asyncio>=0.10.0,<0.11.0
-pytest-cov>=2.7.0,<2.9.0
-openwisp-utils[qa]>=0.5.1
+pytest-django>=3.4.2,<3.10.0
+pytest-asyncio>=0.10.0,<0.15.0
+pytest-cov>=2.7.0,<2.11.0
+openwisp-utils[qa]~=0.5.1
