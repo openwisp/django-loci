@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 0.3.3 [2020-07-25]
+--------------------------
+
+- [fix] Fixed websocket connect error for location change view
+- [deps] Added support for Pillow~=7.2.0 & openwisp-utils~=0.5.1 and dropped their lower versions
+- [deps] Added support for django-leaflet version 0.28
+
 Version 0.3.2 [2020-07-01]
 --------------------------
 
