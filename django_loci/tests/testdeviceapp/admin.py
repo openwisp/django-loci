@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django_loci.admin import ObjectLocationInline
 
+from django_loci.admin import ObjectLocationInline
 from openwisp_utils.admin import TimeReadonlyAdminMixin
 
 from .models import Device

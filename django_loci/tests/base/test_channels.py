@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.models import Permission
 from django.http.request import HttpRequest
+
 from django_loci.channels.consumers import LocationBroadcast
 
 from ...channels.base import _get_object_or_none
