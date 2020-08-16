@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.3.4 [2020-08-16]
+--------------------------
+
+- [deps] Added support for django 3.1
+- [deps] Updated to openwisp-utils 0.6
+
 Version 0.3.3 [2020-07-25]
 --------------------------
 
