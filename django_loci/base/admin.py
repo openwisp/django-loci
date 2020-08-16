@@ -172,8 +172,11 @@ class AbstractObjectLocationForm(forms.ModelForm):
         js = (
             'admin/js/jquery.init.js',
             'django-loci/js/loci.js',
+            'django-loci/js/floorplan-widget.js',
         )
-        css = {'all': ('django-loci/css/loci.css',)}
+        css = {
+            'all': ('django-loci/css/loci.css', 'django-loci/css/floorplan-widget.css')
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

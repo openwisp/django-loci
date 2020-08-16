@@ -1,11 +1,9 @@
 import logging
 
 from django import forms
-from django.templatetags.static import static
 from leaflet.forms.widgets import LeafletWidget as BaseLeafletWidget
 
 logger = logging.getLogger(__name__)
-_floorplan_css = {'all': (static('django-loci/css/floorplan-widget.css'),)}
 
 
 class ImageWidget(forms.FileInput):
@@ -36,11 +34,6 @@ class ImageWidget(forms.FileInput):
                 logger.error(msg.format(value.name))
         return c
 
-    @property
-    def media(self):
-        css = _floorplan_css
-        return forms.Media(css=css)
-
 
 class FloorPlanWidget(forms.TextInput):
     """
@@ -48,12 +41,6 @@ class FloorPlanWidget(forms.TextInput):
     """
 
     template_name = 'admin/widgets/floorplan.html'
-
-    @property
-    def media(self):
-        js = (static('django-loci/js/floorplan-widget.js'),)
-        css = _floorplan_css
-        return forms.Media(js=js, css=css)
 
 
 class LeafletWidget(BaseLeafletWidget):
