@@ -5,18 +5,41 @@ django-loci
    :target: https://travis-ci.org/openwisp/django-loci
 
 .. image:: https://coveralls.io/repos/openwisp/django-loci/badge.svg
-  :target: https://coveralls.io/r/openwisp/django-loci
+   :target: https://coveralls.io/r/openwisp/django-loci
 
 .. image:: https://requires.io/github/openwisp/django-loci/requirements.svg?branch=master
    :target: https://requires.io/github/openwisp/django-loci/requirements/?branch=master
    :alt: Requirements Status
 
+.. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square
+   :target: https://gitter.im/openwisp/general
+
 .. image:: https://badge.fury.io/py/django-loci.svg
    :target: http://badge.fury.io/py/django-loci
+
+.. image:: https://pepy.tech/badge/django-loci
+   :target: https://pepy.tech/project/django-loci
+   :alt: downloads
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://pypi.org/project/black/
+   :alt: code style: black
 
 ------------
 
 Reusable django-app for storing GIS and indoor coordinates of objects.
+
+.. image:: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/indoor.png
+   :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/indoor.png
+   :alt: Indoor coordinates
+
+.. image:: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/map.png
+   :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/map.png
+   :alt: Map coordinates
+
+.. image:: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/mobile.png
+   :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/mobile.png
+   :alt: Mobile coordinates
 
 ------------
 
