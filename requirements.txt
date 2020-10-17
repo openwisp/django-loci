@@ -3,3 +3,4 @@ django-leaflet>=0.23,<0.28
 channels>=2.3.0,<2.5.0
 Pillow>=6.2.0,<=8.1.0
 openwisp-utils~=0.6.0
+geopy~=2.0.0

@@ -23,12 +23,14 @@ class LociConfig(AppConfig):
         self.location_model = Location
 
     def _test_geocoder(self):
-        message = 'Geocoding service is experiencing issues or is not properly configured'
+        message = (
+            'Geocoding service is experiencing issues or is not properly configured'
+        )
         location = geocode('Red Square')
         if location is None:
             if DJANGO_LOCI_GEOCODE_STRICT_TEST:
+                self.logger.exception(message)
                 raise ImproperlyConfigured(message)
-            self.logger.exception(message)
 
     def ready(self):
         import leaflet

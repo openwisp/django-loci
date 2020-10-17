@@ -104,7 +104,9 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
     def test_geocode(self):
         self._login_as_admin()
         address = 'Red Square'
-        url = '{0}?address={1}'.format(reverse('{}_location_geocode_api'.format(self.url_prefix)), address)
+        url = '{0}?address={1}'.format(
+            reverse('{}_location_geocode_api'.format(self.url_prefix)), address
+        )
         response = self.client.get(url)
         response_lat = round(response.json()['lat'])
         response_lng = round(response.json()['lng'])
@@ -123,8 +125,9 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
     def test_geocode_invalid_address(self):
         self._login_as_admin()
         invalid_address = 'thisaddressisnotvalid123abc'
-        url = '{0}?address={1}'.format(reverse('{}_location_geocode_api'.format(self.url_prefix)),
-                                       invalid_address)
+        url = '{0}?address={1}'.format(
+            reverse('{}_location_geocode_api'.format(self.url_prefix)), invalid_address
+        )
         response = self.client.get(url)
         expected = {'error': 'Not found location with given name'}
         self.assertEqual(response.status_code, 404)
@@ -134,8 +137,9 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self._login_as_admin()
         lat = 52
         lng = 21
-        url = '{0}?lat={1}&lng={2}'.format(reverse('{}_location_reverse_geocode_api'.format(self.url_prefix)),
-                                           lat, lng)
+        url = '{0}?lat={1}&lng={2}'.format(
+            reverse('{}_location_reverse_geocode_api'.format(self.url_prefix)), lat, lng
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'POL')
@@ -144,8 +148,9 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self._login_as_admin()
         lat = -30
         lng = -30
-        url = '{0}?lat={1}&lng={2}'.format(reverse('{}_location_reverse_geocode_api'.format(self.url_prefix)),
-                                           lat, lng)
+        url = '{0}?lat={1}&lng={2}'.format(
+            reverse('{}_location_reverse_geocode_api'.format(self.url_prefix)), lat, lng
+        )
         response = self.client.get(url)
         response_address = response.json()['address']
         self.assertEqual(response.status_code, 404)

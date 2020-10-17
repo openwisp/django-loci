@@ -74,13 +74,18 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
             url(
                 r'^(?P<pk>[^/]+)/floorplans/json/$',
                 self.admin_site.admin_view(self.floorplans_json_view),
-                name='{0}_location_floorplans_json'.format(app_label)),
-            url(r'^geocode/$',
+                name='{0}_location_floorplans_json'.format(app_label),
+            ),
+            url(
+                r'^geocode/$',
                 self.admin_site.admin_view(geocode_view),
-                name='{0}_location_geocode_api'.format(app_label)),
-            url(r'^reverse-geocode/$',
+                name='{0}_location_geocode_api'.format(app_label),
+            ),
+            url(
+                r'^reverse-geocode/$',
                 self.admin_site.admin_view(reverse_geocode_view),
-                name='{0}_location_reverse_geocode_api'.format(app_label)),
+                name='{0}_location_reverse_geocode_api'.format(app_label),
+            ),
         ] + super().get_urls()
 
     def json_view(self, request, pk):
