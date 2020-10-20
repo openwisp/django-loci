@@ -672,6 +672,32 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
         self.assertEqual(ol.location.type, 'indoor')
         self.assertEqual(ol.indoor, '')
 
+    def test_add_indoor_mobile_location_without_floor(self):
+        self._login_as_admin()
+        p = self._get_prefix()
+        floorplan_file = open(self._floorplan_path, 'rb')
+        params = self.params
+        params.update(
+            {
+                'name': 'test-add-indoor-mobile-location-without-floor',
+                '{0}-0-type'.format(p): 'indoor',
+                '{0}-0-location_selection'.format(p): 'new',
+                '{0}-0-is_mobile'.format(p): True,
+                '{0}-0-location'.format(p): '',
+                '{0}-0-floorplan_selection'.format(p): 'new',
+                '{0}-0-floorplan'.format(p): '',
+                '{0}-0-floor'.format(p): '',
+                '{0}-0-image'.format(p): floorplan_file,
+                '{0}-0-indoor'.format(p): '',
+                '{0}-0-id'.format(p): '',
+            }
+        )
+        r = self.client.post(reverse(self.add_url), params, follow=True)
+        floorplan_file.close()
+        self.assertContains(r, 'errors field-floor')
+        loc = self.location_model.objects.filter(name=params['{0}-0-name'.format(p)])
+        self.assertEqual(loc.count(), 0)
+
     def test_add_indoor_location_without_coords(self):
         self._login_as_admin()
         p = self._get_prefix()
