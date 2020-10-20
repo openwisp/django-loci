@@ -430,7 +430,8 @@ django.jQuery(function ($) {
                 } else {
                     var latlng = marker.getLatLng();
                     if (latlng.lat !== data.lat || latlng.lng !== data.lng) {
-                        message = gettext('Are you sure you wish to change the location?');
+                        message = gettext('The address was changed, would you like to ' +
+                                          'automatically update the location on the map?');
                         if (confirm(message)) {
                             updateLatLng(data);
                             featureGroup.removeLayer(marker);
@@ -448,11 +449,12 @@ django.jQuery(function ($) {
 
     function updateAdress() {
         var marker = getMarker(),
-            message;
+            message,
+            latlng;
         if (marker === undefined) {
             return;
         }
-        var latlng = marker.getLatLng();
+        latlng = marker.getLatLng();
         if (latlng.lat.toString() === $oldLat && latlng.lng.toString() === $oldLng) {
             return;
         }
@@ -462,22 +464,25 @@ django.jQuery(function ($) {
                 if (!$addressInput.val()) {
                     $addressInput.val(data.address);
                 } else {
-                    message = gettext('Do you wish to change this address?');
+                    message = gettext('The location on the map was changed, would you ' +
+                                      'like to update the address to');
+                    message += ' "' + data.address + '"?';
                     if (confirm(message)) {
                         $addressInput.val(data.address);
                     }
                 }
             })
             .fail(function () {
-                message = gettext('Could not find address related to the location.');
+                message = gettext('Could not find any address related to this location.');
                 alert(message);
             });
     }
 
-    // drag marker event
-    function updateAddrOnDrag() {
+    // triggers update of the address when the location on the map is changed
+    function updateAddressOnMapChange() {
         var marker = getMarker();
-        marker.on('dragend', function () {
+        if (!marker) { return; }
+        getMap().on('draw:edited', function (e) {
             updateAdress();
             updateMapView(marker.getLatLng());
         });
@@ -492,13 +497,14 @@ django.jQuery(function ($) {
             marker = getMarker();
         featureGroup.on('layeradd', function () {
             updateAdress();
-            updateAddrOnDrag();
+            updateAddressOnMapChange();
             marker = getMarker();
+            if (!marker) { return; }
             updateMapView(marker.getLatLng());
         });
         if (marker !== undefined) {
             updateLatLng(marker.getLatLng());
-            updateAddrOnDrag();
+            updateAddressOnMapChange();
         }
     });
 
@@ -543,5 +549,4 @@ django.jQuery(function ($) {
         $indoorRows.show();
         indoorForm($locationSelection.val());
     }
-
 });
