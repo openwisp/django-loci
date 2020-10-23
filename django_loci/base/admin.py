@@ -257,7 +257,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
         fields = []
         if not is_mobile and type_ in ['outdoor', 'indoor']:
             fields += ['location_selection', 'name', 'address', 'geometry']
-        if not is_mobile and type_ == 'indoor':
+        if type_ == 'indoor':
             if data.get('floorplan_selection') == 'existing':
                 fields.append('floorplan')
             if data.get('image'):
@@ -288,8 +288,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
         instance = self.instance
         floorplan = data.get('floorplan') or self.floorplan_model()
         floorplan.location = instance.location
-        floor = data.get('floor')
-        floorplan.floor = floor if floor is not None else floorplan.floor
+        floorplan.floor = data.get('floor')
         # the image path is updated only during creation
         # or if the image has been actually changed
         if data.get('image') and self.initial.get('image') != data.get('image'):
