@@ -47,8 +47,8 @@ django.jQuery(function ($) {
         $mapGeojsonTextarea = $('.django-leaflet-raw-textarea'),
         $oldLat,
         $oldLng,
-        $getCoordsUrl = window.location.origin + '/admin/django_loci/location/geocode/',
-        $getAddrUrl = window.location.origin + '/admin/django_loci/location/reverse-geocode/';
+        $coordsUrl = $('#loci-geocode-url').attr('data-url'),
+        $addrUrl = $('#loci-reverse-geocode-url').attr('data-url');
 
     // define dummy gettext if django i18n is not enabled
     if (!gettext) { window.gettext = function (text) { return text; }; }
@@ -420,7 +420,7 @@ django.jQuery(function ($) {
             getFeatureGroup().clearLayers();
             return;
         }
-        $.get($getCoordsUrl, {address: addressValue})
+        $.get($coordsUrl, {address: addressValue})
             .done(function (data) {
                 var marker = getMarker(),
                     featureGroup = getFeatureGroup();
@@ -459,7 +459,7 @@ django.jQuery(function ($) {
             return;
         }
         updateLatLng(latlng);
-        $.get($getAddrUrl, {lat: latlng.lat, lng: latlng.lng})
+        $.get($addrUrl, {lat: latlng.lat, lng: latlng.lng})
             .done(function (data) {
                 if (!$addressInput.val()) {
                     $addressInput.val(data.address);

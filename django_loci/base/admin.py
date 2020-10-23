@@ -59,6 +59,7 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
     search_fields = ['name', 'address']
     list_filter = ['type', 'is_mobile']
     save_on_top = True
+    change_form_template = 'admin/django_loci/location_change_form.html'
 
     def get_urls(self):
         # hardcoding django_loci as the prefix for the

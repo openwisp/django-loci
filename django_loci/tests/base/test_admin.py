@@ -105,7 +105,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self._login_as_admin()
         address = 'Red Square'
         url = '{0}?address={1}'.format(
-            reverse('{}_location_geocode_api'.format(self.url_prefix)), address
+            reverse('admin:django_loci_location_geocode_api'), address
         )
         response = self.client.get(url)
         response_lat = round(response.json()['lat'])
@@ -116,7 +116,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
 
     def test_geocode_no_address(self):
         self._login_as_admin()
-        url = reverse('{}_location_geocode_api'.format(self.url_prefix))
+        url = reverse('admin:django_loci_location_geocode_api')
         response = self.client.get(url)
         expected = {'error': 'Address parameter not defined'}
         self.assertEqual(response.status_code, 400)
@@ -126,7 +126,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self._login_as_admin()
         invalid_address = 'thisaddressisnotvalid123abc'
         url = '{0}?address={1}'.format(
-            reverse('{}_location_geocode_api'.format(self.url_prefix)), invalid_address
+            reverse('admin:django_loci_location_geocode_api'), invalid_address
         )
         response = self.client.get(url)
         expected = {'error': 'Not found location with given name'}
@@ -138,7 +138,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         lat = 52
         lng = 21
         url = '{0}?lat={1}&lng={2}'.format(
-            reverse('{}_location_reverse_geocode_api'.format(self.url_prefix)), lat, lng
+            reverse('admin:django_loci_location_reverse_geocode_api'), lat, lng
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -149,7 +149,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         lat = -30
         lng = -30
         url = '{0}?lat={1}&lng={2}'.format(
-            reverse('{}_location_reverse_geocode_api'.format(self.url_prefix)), lat, lng
+            reverse('admin:django_loci_location_reverse_geocode_api'), lat, lng
         )
         response = self.client.get(url)
         response_address = response.json()['address']
@@ -158,7 +158,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
 
     def test_reverse_geocode_no_coords(self):
         self._login_as_admin()
-        url = reverse('{}_location_reverse_geocode_api'.format(self.url_prefix))
+        url = reverse('admin:django_loci_location_reverse_geocode_api')
         response = self.client.get(url)
         expected = {'error': 'lat or lng parameter not defined'}
         self.assertEqual(response.status_code, 400)
