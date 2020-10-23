@@ -277,8 +277,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
         instance = self.instance
         floorplan = data.get('floorplan') or self.floorplan_model()
         floorplan.location = instance.location
-        floor = data.get('floor')
-        floorplan.floor = floor
+        floorplan.floor = data.get('floor')
         # the image path is updated only during creation
         # or if the image has been actually changed
         if data.get('image') and self.initial.get('image') != data.get('image'):
