@@ -59,7 +59,7 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
     search_fields = ['name', 'address']
     list_filter = ['type', 'is_mobile']
     save_on_top = True
-    
+
     # This allows apps which extend django-loci to load this template with less hacks
     change_form_template = 'admin/django_loci/location_change_form.html'
 
