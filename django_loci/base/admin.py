@@ -280,7 +280,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
         data = self.cleaned_data
         location = data.get('location') or self.location_model()
         location.type = data.get('type') or location.type
-        location.is_mobile = data.get('is_mobile') or location.is_mobile
+        location.is_mobile = data.get('is_mobile', location.is_mobile)
         location.name = data.get('name') or location.name
         location.address = data.get('address') or location.address
         location.geometry = data.get('geometry') or location.geometry
