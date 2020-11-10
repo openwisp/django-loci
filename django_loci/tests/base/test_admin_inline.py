@@ -514,6 +514,35 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
             loc.objectlocation_set.first().content_object.name, params['name']
         )
 
+    def test_remove_mobile(self):
+        self._login_as_admin()
+        p = self._get_prefix()
+        obj = self._create_object(name='test-remove-mobile')
+        pre_loc = self._create_location(name=obj.name, is_mobile=True)
+        ol = self._create_object_location(content_object=obj, location=pre_loc)
+        # -- post changes
+        params = self.params
+        params.update(
+            {
+                'name': 'test-remove-mobile',
+                '{0}-0-type'.format(p): 'outdoor',
+                '{0}-0-is_mobile'.format(p): False,
+                '{0}-0-location_selection'.format(p): 'existing',
+                '{0}-0-location'.format(p): pre_loc.id,
+                '{0}-0-name'.format(p): pre_loc.name,
+                '{0}-0-address'.format(p): pre_loc.address,
+                '{0}-0-geometry'.format(p): pre_loc.geometry.geojson,
+                '{0}-0-id'.format(p): ol.id,
+                '{0}-INITIAL_FORMS'.format(p): '1',
+            }
+        )
+        r = self.client.post(
+            reverse(self.change_url, args=[ol.content_object.pk]), params, follow=True
+        )
+        self.assertNotContains(r, 'errors')
+        self.assertEqual(self.location_model.objects.filter(is_mobile=False).count(), 1)
+        self.assertEqual(self.location_model.objects.count(), 1)
+
     def test_change_indoor_missing_floorplan_pk(self):
         self._login_as_admin()
         p = self._get_prefix()
