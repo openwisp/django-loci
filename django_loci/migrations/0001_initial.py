@@ -13,9 +13,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-    ]
+    dependencies = [('contenttypes', '0002_remove_content_type_name')]
 
     operations = [
         migrations.CreateModel(
@@ -137,7 +135,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={'abstract': False,},
+            options={'abstract': False},
         ),
         migrations.CreateModel(
             name='ObjectLocation',
@@ -212,9 +210,9 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name='objectlocation', unique_together=set([('content_type', 'object_id')]),
+            name='objectlocation', unique_together=set([('content_type', 'object_id')])
         ),
         migrations.AlterUniqueTogether(
-            name='floorplan', unique_together=set([('location', 'floor')]),
+            name='floorplan', unique_together=set([('location', 'floor')])
         ),
     ]

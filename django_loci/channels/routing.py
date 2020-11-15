@@ -19,7 +19,7 @@ channel_routing = ProtocolTypeRouter(
                         )
                     ]
                 )
-            ),
+            )
         )
     }
 )

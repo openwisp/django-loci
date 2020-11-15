@@ -23,12 +23,10 @@ class ImageWidget(forms.FileInput):
         c = super().get_context(name, value, attrs)
         if value and hasattr(value, 'url'):
             c.update(
-                {'filename': value.name, 'url': value.url, 'thumbnail': self.thumbnail,}
+                {'filename': value.name, 'url': value.url, 'thumbnail': self.thumbnail}
             )
             try:
-                c.update(
-                    {'width': value.width, 'height': value.height,}
-                )
+                c.update({'width': value.width, 'height': value.height})
             except IOError:
                 msg = 'floorplan image not found while showing floorplan:\n{0}'
                 logger.error(msg.format(value.name))

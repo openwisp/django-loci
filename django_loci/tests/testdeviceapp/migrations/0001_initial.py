@@ -43,6 +43,6 @@ class Migration(migrations.Migration):
                 ),
                 ('name', models.CharField(max_length=75, verbose_name='name')),
             ],
-            options={'abstract': False,},
-        ),
+            options={'abstract': False},
+        )
     ]
