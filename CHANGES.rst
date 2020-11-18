@@ -1,6 +1,27 @@
 Changelog
 =========
 
+Version 0.4.0 [2020-11-19]
+--------------------------
+
+Features
+~~~~~~~~
+
+- [ux] Automatically fetch map coordinates from address field and vice versa +
+  configurable geocoding
+
+Changes
+~~~~~~~
+
+- [deps] Increased Pillow range to allow new 8.0.0 version
+- [deps] Updated openwisp-utils version range to support 0.6 and 0.7
+
+Bugfixes
+~~~~~~~~
+
+- [fix] Fixed integrity error in ``floorplan.floor`` when ``is_mobile=True``
+- [fix] Fixed corner case involving restoring ``is_mobile=False``
+
 Version 0.3.4 [2020-08-16]
 --------------------------
 
