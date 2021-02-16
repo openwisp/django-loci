@@ -6,7 +6,7 @@ from django.conf.urls import url
 from django_loci.channels.base import location_broadcast_path
 from django_loci.channels.consumers import LocationBroadcast
 
-channel_routing = ProtocolTypeRouter(
+application = ProtocolTypeRouter(
     {
         'websocket': AllowedHostsOriginValidator(
             AuthMiddlewareStack(
@@ -14,7 +14,7 @@ channel_routing = ProtocolTypeRouter(
                     [
                         url(
                             location_broadcast_path,
-                            LocationBroadcast,
+                            LocationBroadcast.as_asgi(),
                             name='LocationChannel',
                         )
                     ]

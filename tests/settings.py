@@ -56,7 +56,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'urls'
 
-ASGI_APPLICATION = "django_loci.channels.routing.channel_routing"
+ASGI_APPLICATION = "django_loci.channels.asgi.application"
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 TIME_ZONE = 'Europe/Rome'
