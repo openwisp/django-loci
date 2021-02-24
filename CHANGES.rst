@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 0.4.1 [2021-02-24]
+--------------------------
+
+Bugfixes
+~~~~~~~~
+
+- Fixed the ``DJANGO_LOCI_GEOCODE_STRICT_TEST`` setting,
+  which internally was using a different name, therefore the documented
+  setting was not working
+
 Version 0.4.0 [2020-11-19]
 --------------------------
 
