@@ -87,3 +87,7 @@ class TestAdminMixin(object):
         admin = self._create_admin()
         self.client.force_login(admin)
         return admin
+
+    def _load_content(self, file):
+        d = os.path.dirname(os.path.abspath(__file__))
+        return open(os.path.join(d, file)).read()

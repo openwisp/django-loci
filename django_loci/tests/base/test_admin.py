@@ -1,6 +1,7 @@
 import json
 import os
 
+import responses
 from django.urls import reverse
 
 from .. import TestAdminMixin, TestLociMixin
@@ -101,11 +102,20 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         }
         self.assertEqual(content1, expected)
 
+    @responses.activate
     def test_geocode(self):
         self._login_as_admin()
         address = 'Red Square'
         url = '{0}?address={1}'.format(
             reverse('admin:django_loci_location_geocode_api'), address
+        )
+        # Mock HTTP request to the URL to work offline
+        responses.add(
+            responses.GET,
+            'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
+            'findAddressCandidates?singleLine=Red+Square&f=json&maxLocations=1',
+            body=self._load_content('base/static/test-geocode.json'),
+            content_type='application/json',
         )
         response = self.client.get(url)
         response_lat = round(response.json()['lat'])
@@ -133,12 +143,21 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json(), expected)
 
+    @responses.activate
     def test_reverse_geocode(self):
         self._login_as_admin()
         lat = 52
         lng = 21
         url = '{0}?lat={1}&lng={2}'.format(
             reverse('admin:django_loci_location_reverse_geocode_api'), lat, lng
+        )
+        # Mock HTTP request to the URL to work offline
+        responses.add(
+            responses.GET,
+            'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
+            'reverseGeocode?location=21.0%2C52.0&f=json&outSR=4326',
+            body=self._load_content('base/static/test-reverse-geocode.json'),
+            content_type='application/json',
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
