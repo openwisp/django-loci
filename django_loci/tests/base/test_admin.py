@@ -8,6 +8,12 @@ from .. import TestAdminMixin, TestLociMixin
 
 
 class BaseTestAdmin(TestAdminMixin, TestLociMixin):
+    def setUp(self):
+        self.geocode_url = (
+            'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
+        )
+        super().setUp()
+
     def test_location_list(self):
         self._login_as_admin()
         self._create_location(name='test-admin-location-1')
@@ -112,8 +118,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         # Mock HTTP request to the URL to work offline
         responses.add(
             responses.GET,
-            'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
-            'findAddressCandidates?singleLine=Red+Square&f=json&maxLocations=1',
+            f'{self.geocode_url}findAddressCandidates?singleLine=Red+Square&f=json&maxLocations=1',
             body=self._load_content('base/static/test-geocode.json'),
             content_type='application/json',
         )
@@ -132,11 +137,19 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), expected)
 
+    @responses.activate
     def test_geocode_invalid_address(self):
         self._login_as_admin()
         invalid_address = 'thisaddressisnotvalid123abc'
         url = '{0}?address={1}'.format(
             reverse('admin:django_loci_location_geocode_api'), invalid_address
+        )
+        responses.add(
+            responses.GET,
+            f'{self.geocode_url}findAddressCandidates?singleLine=thisaddressisnotvalid123abc'
+            '&f=json&maxLocations=1',
+            body=self._load_content('base/static/test-geocode-invalid-address.json'),
+            content_type='application/json',
         )
         response = self.client.get(url)
         expected = {'error': 'Not found location with given name'}
@@ -154,8 +167,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         # Mock HTTP request to the URL to work offline
         responses.add(
             responses.GET,
-            'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
-            'reverseGeocode?location=21.0%2C52.0&f=json&outSR=4326',
+            f'{self.geocode_url}reverseGeocode?location=21.0%2C52.0&f=json&outSR=4326',
             body=self._load_content('base/static/test-reverse-geocode.json'),
             content_type='application/json',
         )
@@ -163,12 +175,21 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'POL')
 
+    @responses.activate
     def test_reverse_location_with_no_address(self):
         self._login_as_admin()
         lat = -30
         lng = -30
         url = '{0}?lat={1}&lng={2}'.format(
             reverse('admin:django_loci_location_reverse_geocode_api'), lat, lng
+        )
+        responses.add(
+            responses.GET,
+            f'{self.geocode_url}reverseGeocode?location=-30.0%2C-30.0&f=json&outSR=4326',
+            body=self._load_content(
+                'base/static/test-reverse-location-with-no-address.json'
+            ),
+            content_type='application/json',
         )
         response = self.client.get(url)
         response_address = response.json()['address']
