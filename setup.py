@@ -44,7 +44,7 @@ setup(
     version=get_version(),
     license='BSD',
     author='Federico Capoano',
-    author_email='federico.capoano@gmail.com',
+    author_email='support@openwisp.io',
     description='Reusable django-app for outdoor and indoor mapping',
     long_description=open('README.rst').read(),
     url='http://openwisp.org',
