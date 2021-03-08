@@ -162,6 +162,6 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         loc.save()
 
     def test_routing(self):
-        from django_loci.channels.asgi import application
+        from django_loci.channels.asgi import channel_routing
 
-        assert isinstance(application, ProtocolTypeRouter)
+        assert isinstance(channel_routing, ProtocolTypeRouter)
