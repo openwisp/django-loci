@@ -8,11 +8,7 @@ from .. import TestAdminMixin, TestLociMixin
 
 
 class BaseTestAdmin(TestAdminMixin, TestLociMixin):
-    def setUp(self):
-        self.geocode_url = (
-            'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
-        )
-        super().setUp()
+    geocode_url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
 
     def test_location_list(self):
         self._login_as_admin()
