@@ -4,7 +4,6 @@
 /* hide redundant heading in objectlocationinline */
 .loci.coords > h2{ display: none }
 /* improve raw_id_field look */
-/* .coords .field-location input[type=text]{ display: none } */
 .field-location .related-lookup{
     width: auto;
     padding-left: 20px;
