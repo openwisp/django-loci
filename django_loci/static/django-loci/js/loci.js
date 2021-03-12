@@ -27,6 +27,7 @@ django.jQuery(function ($) {
         $locationSelection = $locationSelectionRow.find('select'),
         $locationRow = $('.loci.coords .field-location'),
         $location = $locationRow.find('select, input'),
+        $locationSelect = $locationRow.find('a'),
         $locationLabel = $('.field-location .item-label'),
         $name = $('.field-name input', '.loci.coords'),
         $address = $('.coords .field-address input, #location_form .field-address input'),
@@ -271,7 +272,7 @@ django.jQuery(function ($) {
             loadIndoor();
         }
     }
-
+    $locationSelect.on('focus', locationChange);
     $location.change(locationChange);
     locationChange(null, true);
 
