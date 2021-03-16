@@ -204,7 +204,7 @@ django.jQuery(function ($) {
     // `dismissAddAnotherPopup()` in Django's RelatedObjectLookups.js to
     // trigger change event when an ID is selected or added via popup.
     function triggerChangeOnField(win, chosenId) {
-        $(document.getElementById(windowname_to_id(win.name))).change();
+        $(document.getElementById(win.name)).change();
     }
     window.ORIGINAL_dismissRelatedLookupPopup = window.dismissRelatedLookupPopup;
     window.dismissRelatedLookupPopup = function (win, chosenId) {
@@ -272,7 +272,11 @@ django.jQuery(function ($) {
         }
     }
 
+    // listen to change events
+    // although these events are being artificially triggered
+    // see the override of dismissRelatedLookupPopup above
     $location.change(locationChange);
+    // initial set up
     locationChange(null, true);
 
     $isMobile.change(isMobileChange);
