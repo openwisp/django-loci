@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.4.2 [2021-03-16]
+--------------------------
+
+- Fixed broken UI in inline geo selection flow caused by a JS change in django
+  (`issue #85 <https://github.com/openwisp/django-loci/issues/85>`_)
+
 Version 0.4.1 [2021-02-24]
 --------------------------
 
