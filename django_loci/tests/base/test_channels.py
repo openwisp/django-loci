@@ -46,7 +46,9 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         return {'pk': pk, 'path': path, 'session': session}
 
     def _get_communicator(self, request_vars, user=None):
-        communicator = WebsocketCommunicator(LocationBroadcast, request_vars['path'])
+        communicator = WebsocketCommunicator(
+            LocationBroadcast.as_asgi(), request_vars['path']
+        )
         if user:
             communicator.scope.update(
                 {
@@ -69,7 +71,9 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
     @pytest.mark.django_db(transaction=True)
     async def test_consumer_unauthenticated(self):
         request_vars = await self._get_request_dict()
-        communicator = WebsocketCommunicator(LocationBroadcast, request_vars['path'])
+        communicator = WebsocketCommunicator(
+            LocationBroadcast.as_asgi(), request_vars['path']
+        )
         connected, _ = await communicator.connect()
         assert not connected
         await communicator.disconnect()
@@ -158,6 +162,6 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         loc.save()
 
     def test_routing(self):
-        from django_loci.channels.routing import channel_routing
+        from django_loci.channels.asgi import channel_routing
 
         assert isinstance(channel_routing, ProtocolTypeRouter)

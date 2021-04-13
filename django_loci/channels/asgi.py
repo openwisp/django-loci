@@ -14,7 +14,7 @@ channel_routing = ProtocolTypeRouter(
                     [
                         url(
                             location_broadcast_path,
-                            LocationBroadcast,
+                            LocationBroadcast.as_asgi(),
                             name='LocationChannel',
                         )
                     ]
