@@ -1,6 +1,6 @@
 django>=2.2,<3.2
-django-leaflet>=0.23,<0.28
 channels>=2.3.0,<2.5.0
-Pillow>=6.2.0,<=8.1.0
-openwisp-utils>=0.6.0,<0.8
-geopy~=2.0.0
+django-leaflet~=0.28.0
+Pillow~=8.2.0
+openwisp-utils~=0.7.5
+geopy~=2.1.0
