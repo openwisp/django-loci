@@ -40,16 +40,16 @@ jobs:
         libsqlite3-mod-spatialite \
         gdal-bin
 
-    - name: Install python dependencies
-      run: pip install -r requirements-test.txt
-
     - name: Install npm dependencies
       run: sudo npm install -g jslint
-    
+
     - name: Installing django-loci
       run: |
         pip install -e .
         pip install ${{ matrix.django-version }}
+
+    - name: Install python dependencies
+      run: pip install -r requirements-test.txt
 
     - name: QA checks
       run: ./run-qa-checks

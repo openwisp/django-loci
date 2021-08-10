@@ -2,6 +2,6 @@ django>=2.2,<3.2
 channels>=2.3.0,<2.5.0
 django-leaflet~=0.28.0
 Pillow~=8.2.0
-# TODO: point to openwisp before merge or release
-openwisp-utils @ https://github.com/niteshsinha17/openwisp-utils/tarball/gsoc/new-navigation-menu-design
+# TODO: change this when next point version of openwisp-utils is released
+openwisp-utils[rest] @ https://github.com/openwisp/openwisp-utils/tarball/master
 geopy~=2.1.0
