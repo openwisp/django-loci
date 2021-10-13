@@ -3,9 +3,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
 DJANGO_LOCI_GEOCODER = getattr(settings, 'DJANGO_LOCI_GEOCODER', 'ArcGIS')
-DJANGO_LOCI_GEOCODE_STRICT_TEST = getattr(
-    settings, 'DJANGO_LOCI_GEOCODE_STRICT_TEST', True
-)
 DJANGO_LOCI_GEOCODE_FAILURE_DELAY = getattr(
     settings, 'DJANGO_LOCI_GEOCODE_FAILURE_DELAY', 1
 )
