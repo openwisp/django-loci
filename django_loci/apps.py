@@ -11,8 +11,8 @@ from .channels.receivers import load_location_receivers
 logger = logging.getLogger(__name__)
 
 
-@register('geocoding')
-def test_geocoding(app_configs, **kwargs):
+@register('geocoding', deploy=True)
+def test_geocoding(app_configs=None, **kwargs):
     warnings = []
     # do not run check during development, testing or if feature is disabled
     if not settings.DEBUG or not getattr(settings, 'TESTING', False):
@@ -44,7 +44,6 @@ class LociConfig(AppConfig):
         leaflet.app_settings['NO_GLOBALS'] = False
         self.__setmodels__()
         self._load_receivers()
-        test_geocoding(None)
 
     def _load_receivers(self):
         load_location_receivers(sender=self.location_model)

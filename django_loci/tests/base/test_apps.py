@@ -11,7 +11,7 @@ class BaseTestApps(TestLociMixin):
     @patch('django_loci.apps.geocode', return_value=None)
     @patch.object(settings, 'TESTING', False)
     def test_geocode_strict(self, geocode_mocked):
-        warning = test_geocoding(None)
+        warning = test_geocoding()
         self.assertEqual(
             warning,
             [

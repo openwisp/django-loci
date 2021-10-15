@@ -239,14 +239,14 @@ API key if required (eg: Google Maps).
 Checks
 ------
 
-``test_geocoding``
+``geocoding``
 ~~~~~~~~~~~~~~~~~~
 
 Use to check if geocoding is working as expected or not.
 
 Run this checks with::
 
-    python manage.py check --tag geocoding
+    python manage.py check --deploy --tag geocoding
 
 Extending django-loci
 ---------------------
