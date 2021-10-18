@@ -3,7 +3,7 @@ import logging
 from django.apps import AppConfig
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from . import settings as app_settings
 from .base.geocoding_views import geocode
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class LociConfig(AppConfig):
     name = 'django_loci'
     verbose_name = _('django-loci')
-
+    default_auto_field = 'django.db.models.AutoField'
     def __setmodels__(self):
         """
         this method can be overridden in 3rd party apps
