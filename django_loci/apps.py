@@ -16,6 +16,7 @@ class LociConfig(AppConfig):
     name = 'django_loci'
     verbose_name = _('django-loci')
     default_auto_field = 'django.db.models.AutoField'
+    
     def __setmodels__(self):
         """
         this method can be overridden in 3rd party apps
