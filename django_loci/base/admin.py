@@ -1,7 +1,7 @@
 import json
 
 from django import forms
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core.exceptions import ValidationError
@@ -69,22 +69,22 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
         # without having to change templates
         app_label = 'django_loci'
         return [
-            url(
+            re_path(
                 r'^(?P<pk>[^/]+)/json/$',
                 self.admin_site.admin_view(self.json_view),
                 name='{0}_location_json'.format(app_label),
             ),
-            url(
+            re_path(
                 r'^(?P<pk>[^/]+)/floorplans/json/$',
                 self.admin_site.admin_view(self.floorplans_json_view),
                 name='{0}_location_floorplans_json'.format(app_label),
             ),
-            url(
+            re_path(
                 r'^geocode/$',
                 self.admin_site.admin_view(geocode_view),
                 name='{0}_location_geocode_api'.format(app_label),
             ),
-            url(
+            re_path(
                 r'^reverse-geocode/$',
                 self.admin_site.admin_view(reverse_geocode_view),
                 name='{0}_location_reverse_geocode_api'.format(app_label),
