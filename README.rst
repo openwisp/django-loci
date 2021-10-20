@@ -203,18 +203,6 @@ Supported geolocation services:
 * ``Nominatim``
 * ``GoogleV3`` (Google Maps v3)
 
-``DJANGO_LOCI_GEOCODE_STRICT_TEST``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-+--------------+-----------+
-| **type**:    | ``bool``  |
-+--------------+-----------+
-| **default**: | ``True``  |
-+--------------+-----------+
-
-Indicates whether the system should raise an ``ImproperlyConfigured``
-exception in case geocoding doesn't work when the application is started.
-
 ``DJANGO_LOCI_GEOCODE_FAILURE_DELAY``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -247,6 +235,18 @@ Amount of retry API calls when geocoding requests fail.
 +--------------+-----------+
 
 API key if required (eg: Google Maps).
+
+System Checks
+-------------
+
+``geocoding``
+~~~~~~~~~~~~~
+
+Use to check if geocoding is working as expected or not.
+
+Run this checks with::
+
+    ./manage.py check --deploy --tag geocoding
 
 Extending django-loci
 ---------------------
