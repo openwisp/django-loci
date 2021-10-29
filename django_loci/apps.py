@@ -2,8 +2,8 @@ import logging
 
 from django.apps import AppConfig
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.checks import Warning, register
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
 from .base.geocoding_views import geocode

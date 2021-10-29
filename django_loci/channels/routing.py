@@ -1,7 +1,7 @@
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
-from django.urls import re_path
+from django.urls import path
 
 from django_loci.channels.base import location_broadcast_path
 from django_loci.channels.consumers import LocationBroadcast
@@ -12,7 +12,7 @@ channel_routing = ProtocolTypeRouter(
             AuthMiddlewareStack(
                 URLRouter(
                     [
-                        re_path(
+                        path(
                             location_broadcast_path,
                             LocationBroadcast,
                             name='LocationChannel',
