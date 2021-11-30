@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.7, 3.8, 3.9]
-        django-version: 
+        django-version:
           - django~=3.0.0
           - django~=3.1.0
           - django~=3.2.0
@@ -45,12 +45,15 @@ jobs:
         libsqlite3-mod-spatialite \
         gdal-bin
 
+    - name: Upgrade python system packages
+      run: pip install -U "pip==20.2.4" wheel
+
     - name: Install python dependencies
-      run: pip install -r requirements-test.txt
+      run: pip install -U -r requirements-test.txt
 
     - name: Install npm dependencies
       run: sudo npm install -g jslint
-    
+
     - name: Installing django-loci
       run: |
         pip install -e .
@@ -63,14 +66,14 @@ jobs:
       run: |
         pytest --cov=django_loci
         coverage run --source=django_loci runtests.py
-        
+
     - name: Upload Coverage
       run: coveralls --service=github
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: python-${{ matrix.python-version }}-django-${{ matrix.django-version }}
         COVERALLS_PARALLEL: true
-    
+
   coveralls:
     name: Finish Coveralls
     needs: build
