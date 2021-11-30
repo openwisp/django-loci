@@ -70,22 +70,22 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
         app_label = 'django_loci'
         return [
             path(
-                r'^(?P<pk>[^/]+)/json/$',
+                '<uuid:pk>/json/',
                 self.admin_site.admin_view(self.json_view),
                 name='{0}_location_json'.format(app_label),
             ),
             path(
-                r'^(?P<pk>[^/]+)/floorplans/json/$',
+                '<uuid:pk>/floorplans/json/',
                 self.admin_site.admin_view(self.floorplans_json_view),
                 name='{0}_location_floorplans_json'.format(app_label),
             ),
             path(
-                r'^geocode/$',
+                'geocode/',
                 self.admin_site.admin_view(geocode_view),
                 name='{0}_location_geocode_api'.format(app_label),
             ),
             path(
-                r'^reverse-geocode/$',
+                'reverse-geocode/',
                 self.admin_site.admin_view(reverse_geocode_view),
                 name='{0}_location_reverse_geocode_api'.format(app_label),
             ),
