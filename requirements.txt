@@ -2,5 +2,5 @@ django>=2.2,<3.2
 channels>=2.3.0,<2.5.0
 django-leaflet~=0.28.0
 Pillow~=8.2.0
-openwisp-utils @ https://github.com/openwisp/openwisp-utils/tarball/master
+openwisp-utils~=0.7.5
 geopy~=2.1.0
