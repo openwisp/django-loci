@@ -22,9 +22,10 @@ jobs:
           - django~=3.1.0
           - django~=3.2.0
         include:
-          - django-version: django~=4.0a1
+          - django-version: django~=4.0.0
+            python-version: 3.9
+          - django-version: django~=4.0.0
             python-version: 3.8
-            experimental: true
 
     steps:
     - uses: actions/checkout@v2
@@ -49,7 +50,7 @@ jobs:
       run: pip install -U "pip==20.2.4" wheel
 
     - name: Install python dependencies
-      run: pip install -U -r requirements-test.txt
+      run: pip install --no-cache -U -r requirements-test.txt
 
     - name: Install npm dependencies
       run: sudo npm install -g jslint
@@ -57,7 +58,8 @@ jobs:
     - name: Installing django-loci
       run: |
         pip install -e .
-        pip install ${{ matrix.django-version }}
+        pip install --no-cache -U ${{ matrix.django-version }}
+        pip uninstall -y django-compress-staticfiles
 
     - name: QA checks
       run: ./run-qa-checks

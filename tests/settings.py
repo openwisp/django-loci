@@ -8,13 +8,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': 'django-loci.db',
-    }
-}
-
 SPATIALITE_LIBRARY_PATH = 'mod_spatialite.so'
 
 SECRET_KEY = 'fn)t*+$)ugeyip6-#txyy$5wf2ervc0d2n#h)qb)y5@ly$t*@w'
@@ -86,6 +79,13 @@ TEMPLATES = [
         },
     }
 ]
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+        'NAME': 'django-loci.db',
+    }
+}
 
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
