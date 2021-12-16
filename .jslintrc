@@ -8,7 +8,7 @@
     "gettext",
     "windowname_to_id",
     "jQuery",
-    "WebSocket",
+    "ReconnectingWebSocket",
     "$",
     "dismissRelatedLookupPopup",
     "dismissAddAnotherPopup",

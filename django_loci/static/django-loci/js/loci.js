@@ -370,7 +370,7 @@ django.jQuery(function ($) {
     function listenForLocationUpdates(pk) {
         var host = window.location.host,
             protocol = window.location.protocol === 'http:' ? 'ws' : 'wss',
-            ws = new WebSocket(protocol + '://' + host + '/ws/loci/location/' + pk + '/');
+            ws = new ReconnectingWebSocket(protocol + '://' + host + '/ws/loci/location/' + pk + '/');
         ws.onmessage = function (e) {
             $geometryRow.show();
             $noLocationDiv.hide();
