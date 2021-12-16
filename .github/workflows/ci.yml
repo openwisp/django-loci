@@ -46,27 +46,22 @@ jobs:
         libsqlite3-mod-spatialite \
         gdal-bin
 
-    - name: Upgrade python system packages
-      run: pip install -U "pip==20.2.4" wheel
-
     - name: Install python dependencies
-      run: pip install --no-cache -U -r requirements-test.txt
+      run: pip install -U -r requirements-test.txt
 
     - name: Install npm dependencies
       run: sudo npm install -g jslint
 
     - name: Installing django-loci
       run: |
-        pip install -e .
-        pip install --no-cache -U ${{ matrix.django-version }}
-        pip uninstall -y django-compress-staticfiles
+        pip install -U -e .
+        pip install -U ${{ matrix.django-version }}
 
     - name: QA checks
       run: ./run-qa-checks
 
     - name: Tests
       run: |
-        pytest --cov=django_loci
         coverage run --source=django_loci runtests.py
 
     - name: Upload Coverage
