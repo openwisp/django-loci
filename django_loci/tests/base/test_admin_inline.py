@@ -50,9 +50,12 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
     def test_json_urls(self):
         self._login_as_admin()
         r = self.client.get(reverse(self.add_url))
-        url = reverse('admin:django_loci_location_json', args=['0000'])
+        placeholder_pk = '00000000-0000-0000-0000-000000000000'
+        url = reverse('admin:django_loci_location_json', args=[placeholder_pk])
         self.assertContains(r, url)
-        url = reverse('admin:django_loci_location_floorplans_json', args=['0000'])
+        url = reverse(
+            'admin:django_loci_location_floorplans_json', args=[placeholder_pk]
+        )
         self.assertContains(r, url)
 
     def test_add_outdoor_new(self):

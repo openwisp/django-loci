@@ -3,7 +3,7 @@ import logging
 from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import Warning, register
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .base.geocoding_views import geocode
 from .channels.receivers import load_location_receivers
@@ -29,6 +29,7 @@ def test_geocoding(app_configs=None, **kwargs):
 class LociConfig(AppConfig):
     name = 'django_loci'
     verbose_name = _('django-loci')
+    default_auto_field = 'django.db.models.AutoField'
 
     def __setmodels__(self):
         """

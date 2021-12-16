@@ -54,9 +54,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'openwisp2.urls'
 
-ASGI_APPLICATION = "django_loci.channels.routing.channel_routing"
+ASGI_APPLICATION = "django_loci.channels.asgi.channel_routing"
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 TIME_ZONE = 'Europe/Rome'

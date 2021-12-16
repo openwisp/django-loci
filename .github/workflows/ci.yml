@@ -17,9 +17,15 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.7, 3.8, 3.9]
-        django-version: 
+        django-version:
           - django~=3.0.0
           - django~=3.1.0
+          - django~=3.2.0
+        include:
+          - django-version: django~=4.0.0
+            python-version: 3.9
+          - django-version: django~=4.0.0
+            python-version: 3.8
 
     steps:
     - uses: actions/checkout@v2
@@ -41,31 +47,30 @@ jobs:
         gdal-bin
 
     - name: Install python dependencies
-      run: pip install -r requirements-test.txt
+      run: pip install -U -r requirements-test.txt
 
     - name: Install npm dependencies
       run: sudo npm install -g jslint
-    
+
     - name: Installing django-loci
       run: |
-        pip install -e .
-        pip install ${{ matrix.django-version }}
+        pip install -U -e .
+        pip install -U ${{ matrix.django-version }}
 
     - name: QA checks
       run: ./run-qa-checks
 
     - name: Tests
       run: |
-        pytest --cov=django_loci
         coverage run --source=django_loci runtests.py
-        
+
     - name: Upload Coverage
       run: coveralls --service=github
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: python-${{ matrix.python-version }}-django-${{ matrix.django-version }}
         COVERALLS_PARALLEL: true
-    
+
   coveralls:
     name: Finish Coveralls
     needs: build

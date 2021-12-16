@@ -1,14 +1,14 @@
 import json
 
 from django import forms
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.urls import path
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from leaflet.admin import LeafletGeoAdmin
 
 from openwisp_utils.admin import TimeReadonlyAdminMixin
@@ -69,23 +69,23 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
         # without having to change templates
         app_label = 'django_loci'
         return [
-            url(
-                r'^(?P<pk>[^/]+)/json/$',
+            path(
+                '<uuid:pk>/json/',
                 self.admin_site.admin_view(self.json_view),
                 name='{0}_location_json'.format(app_label),
             ),
-            url(
-                r'^(?P<pk>[^/]+)/floorplans/json/$',
+            path(
+                '<uuid:pk>/floorplans/json/',
                 self.admin_site.admin_view(self.floorplans_json_view),
                 name='{0}_location_floorplans_json'.format(app_label),
             ),
-            url(
-                r'^geocode/$',
+            path(
+                'geocode/',
                 self.admin_site.admin_view(geocode_view),
                 name='{0}_location_geocode_api'.format(app_label),
             ),
-            url(
-                r'^reverse-geocode/$',
+            path(
+                'reverse-geocode/',
                 self.admin_site.admin_view(reverse_geocode_view),
                 name='{0}_location_reverse_geocode_api'.format(app_label),
             ),

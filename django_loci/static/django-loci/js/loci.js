@@ -54,11 +54,11 @@ django.jQuery(function ($) {
     if (!gettext) { window.gettext = function (text) { return text; }; }
 
     function getLocationJsonUrl(pk) {
-        return baseLocationJsonUrl.replace('0000', pk);
+        return baseLocationJsonUrl.replace('00000000-0000-0000-0000-000000000000', pk);
     }
 
     function getLocationFloorplansJsonUrl(pk) {
-        return baseLocationFloorplansJsonUrl.replace('0000', pk);
+        return baseLocationFloorplansJsonUrl.replace('00000000-0000-0000-0000-000000000000', pk);
     }
 
     function getMap() {
