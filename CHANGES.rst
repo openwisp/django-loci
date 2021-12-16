@@ -1,6 +1,21 @@
 Changelog
 =========
 
+Version 0.4.3 [2021-06-29]
+--------------------------
+
+- The dependency on the Pillow library was updated to a recent
+  version which was patched for security vulnerabilities
+- Several other dependencies and test dependencies were updated
+  (django-leaflet, geopy, pytest-django, pytest-asyncio, pytest-cov,
+  responses, openwisp-utils)
+
+Version 0.4.2 [2021-03-16]
+--------------------------
+
+- Fixed broken UI in inline geo selection flow caused by a JS change in django
+  (`issue #85 <https://github.com/openwisp/django-loci/issues/85>`_)
+
 Version 0.4.1 [2021-02-24]
 --------------------------
 

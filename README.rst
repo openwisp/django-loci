@@ -1,8 +1,9 @@
 django-loci
 ===========
 
-.. image:: https://travis-ci.org/openwisp/django-loci.svg
-   :target: https://travis-ci.org/openwisp/django-loci
+.. image:: https://github.com/openwisp/django-loci/workflows/Django%20Loci%20Build/badge.svg?branch=master
+   :target: https://github.com/openwisp/django-loci/actions?query=workflow%3A"Django+Loci+Build"
+   :alt: CI build status
 
 .. image:: https://coveralls.io/repos/openwisp/django-loci/badge.svg
    :target: https://coveralls.io/r/openwisp/django-loci
@@ -52,7 +53,7 @@ Reusable django-app for storing GIS and indoor coordinates of objects.
 Dependencies
 ------------
 
-* Python >= 3.6
+* Python >= 3.7
 * GeoDjango (`see GeoDjango Install Instructions <https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#requirements>`_)
 * One of the databases supported by GeoDjango
 
@@ -202,18 +203,6 @@ Supported geolocation services:
 * ``Nominatim``
 * ``GoogleV3`` (Google Maps v3)
 
-``DJANGO_LOCI_GEOCODE_STRICT_TEST``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-+--------------+-----------+
-| **type**:    | ``bool``  |
-+--------------+-----------+
-| **default**: | ``True``  |
-+--------------+-----------+
-
-Indicates whether the system should raise an ``ImproperlyConfigured``
-exception in case geocoding doesn't work when the application is started.
-
 ``DJANGO_LOCI_GEOCODE_FAILURE_DELAY``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -246,6 +235,18 @@ Amount of retry API calls when geocoding requests fail.
 +--------------+-----------+
 
 API key if required (eg: Google Maps).
+
+System Checks
+-------------
+
+``geocoding``
+~~~~~~~~~~~~~
+
+Use to check if geocoding is working as expected or not.
+
+Run this checks with::
+
+    ./manage.py check --deploy --tag geocoding
 
 Extending django-loci
 ---------------------
