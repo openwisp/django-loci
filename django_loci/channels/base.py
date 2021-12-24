@@ -2,7 +2,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.exceptions import ValidationError
 
-location_broadcast_path = r'^ws/loci/location/(?P<pk>[^/]+)/$'
+location_broadcast_path = 'ws/loci/location/<uuid:pk>/'
 
 
 def _get_object_or_none(model, **kwargs):
