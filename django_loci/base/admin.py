@@ -45,6 +45,7 @@ class AbstractLocationForm(forms.ModelForm):
             'admin/js/jquery.init.js',
             'django-loci/js/loci.js',
             'django-loci/js/floorplan-inlines.js',
+            'django-loci/js/vendor/reconnecting-websocket.min.js',
         )
         css = {'all': ('django-loci/css/loci.css',)}
 
@@ -187,6 +188,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
             'admin/js/jquery.init.js',
             'django-loci/js/loci.js',
             'django-loci/js/floorplan-widget.js',
+            'django-loci/js/vendor/reconnecting-websocket.min.js',
         )
         css = {
             'all': ('django-loci/css/loci.css', 'django-loci/css/floorplan-widget.css')
