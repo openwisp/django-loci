@@ -1,6 +1,25 @@
 Changelog
 =========
 
+Version 1.0.0 [2022-02-25]
+--------------------------
+
+Changes
+~~~~~~~
+
+- Converted geocoding test to check
+  `#90 <https://github.com/openwisp/django-loci/issues/90>`_
+- Use ``ReconnectingWebsocket`` to websocket connection
+  `#101 <https://github.com/openwisp/django-loci/issues/101>`_
+- Dropped support for Python ``3.6``
+- Added support for Python ``3.8`` and ``3.9``
+- Added support for Django ``3.2.x`` and ``4.0.x``
+- Migrated to ``channels~=3.0.4``
+- Bumped ``Pillow~=9.0.0``
+- Bumped ``geopy~=2.2.0``
+- Bumped ``openwisp-utils~=1.0.0``
+- Set lowest django version supported to ``django~=3.0.0``
+
 Version 0.4.3 [2021-06-29]
 --------------------------
 
