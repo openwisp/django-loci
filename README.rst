@@ -8,9 +8,9 @@ django-loci
 .. image:: https://coveralls.io/repos/openwisp/django-loci/badge.svg
    :target: https://coveralls.io/r/openwisp/django-loci
 
-.. image:: https://requires.io/github/openwisp/django-loci/requirements.svg?branch=master
-   :target: https://requires.io/github/openwisp/django-loci/requirements/?branch=master
-   :alt: Requirements Status
+.. image:: https://img.shields.io/librariesio/release/github/openwisp/django-loci
+  :target: https://libraries.io/github/openwisp/django-loci#repository_dependencies
+  :alt: Dependency monitoring
 
 .. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square
    :target: https://gitter.im/openwisp/general
