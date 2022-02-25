@@ -1,4 +1,4 @@
-django>=2.2,<4.1.0
+django>=3.0,<4.1.0
 channels~=3.0.4
 django-leaflet~=0.28.0
 Pillow~=8.2.0
