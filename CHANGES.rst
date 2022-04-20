@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 1.0.1 [2022-04-20]
+--------------------------
+
+Bugfixes
+~~~~~~~~
+
+- Updated Pillow to ~=9.1.0 to fix a security CVE
+- Fixed channels deprecation warning
+
 Version 1.0.0 [2022-02-25]
 --------------------------
 
