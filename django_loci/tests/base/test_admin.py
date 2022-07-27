@@ -1,5 +1,4 @@
 import json
-import os
 
 import responses
 from django.urls import reverse
@@ -63,7 +62,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         loc = self._create_location(name='test-admin-location-1', type='indoor')
         fl = self._create_floorplan(location=loc)
         # remove floorplan image
-        os.remove(fl.image.path)
+        fl.image.delete(save=False)
         url = reverse('{0}_location_change'.format(self.url_prefix), args=[loc.pk])
         r = self.client.get(url)
         self.assertContains(r, 'test-admin-location-1')
@@ -73,7 +72,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         loc = self._create_location(name='test-admin-location-1', type='indoor')
         fl = self._create_floorplan(location=loc)
         # remove floorplan image
-        os.remove(fl.image.path)
+        fl.image.delete(save=False)
         url = reverse('{0}_floorplan_change'.format(self.url_prefix), args=[fl.pk])
         r = self.client.get(url)
         self.assertContains(r, 'test-admin-location-1')

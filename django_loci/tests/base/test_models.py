@@ -1,5 +1,3 @@
-import os
-
 from django.core.exceptions import ValidationError
 
 from .. import TestLociMixin
@@ -51,12 +49,13 @@ class BaseTestModels(TestLociMixin):
         self.assertEqual(name, '{0}.jpg'.format(fl.id))
         self.assertEqual(dir_, 'floorplans')
         # delete
+        image_path = fl.image.file.name
         fl.delete()
-        self.assertFalse(os.path.isfile(fl.image.file.name))
+        self.assertFalse(fl.image.storage.exists(image_path))
 
     def test_floorplan_delete_corner_case(self):
         fl = self._create_floorplan()
-        os.remove(fl.image.path)
+        fl.image.storage.delete(fl.image.file.name)
         # there should be no failure
         fl.delete()
 

@@ -1,10 +1,7 @@
-import os
-
-from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
 
-class OverwriteStorage(FileSystemStorage):
+class OverwriteMixin:
     floorplan_upload_dir = "floorplans"
 
     @classmethod
@@ -21,5 +18,9 @@ class OverwriteStorage(FileSystemStorage):
         removes file if it already exists
         """
         if self.exists(name):
-            os.remove(os.path.join(settings.MEDIA_ROOT, name))
+            self.delete(name)
         return name
+
+
+class OverwriteStorage(OverwriteMixin, FileSystemStorage):
+    pass
