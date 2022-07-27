@@ -1,5 +1,4 @@
 import logging
-import os
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -119,9 +118,9 @@ class AbstractFloorPlan(TimeStampedEditableModel):
             raise ValidationError(msg)
 
     def _remove_image(self):
-        path = self.image.path
-        if os.path.isfile(path):
-            os.remove(path)
+        path = self.image.name
+        if self.image.storage.exists(path):
+            self.image.delete(save=False)
         else:
             msg = 'floorplan image not found while deleting {0}:\n{1}'
             logger.error(msg.format(self, path))
