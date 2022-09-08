@@ -26,4 +26,9 @@ class OverwriteMixin:
 
 
 class OverwriteStorage(OverwriteMixin, DefaultFileStorageClass):
+    """
+    Adds the overwrite functionality to the file storage class
+    currently in-use by the Django project.
+    """
+
     pass
