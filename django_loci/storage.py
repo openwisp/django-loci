@@ -1,4 +1,7 @@
-from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from django.utils.module_loading import import_string
+
+DefaultFileStorageClass = import_string(getattr(settings, 'DEFAULT_FILE_STORAGE'))
 
 
 class OverwriteMixin:
@@ -22,5 +25,10 @@ class OverwriteMixin:
         return name
 
 
-class OverwriteStorage(OverwriteMixin, FileSystemStorage):
+class OverwriteStorage(OverwriteMixin, DefaultFileStorageClass):
+    """
+    Adds the overwrite functionality to the file storage class
+    currently in-use by the Django project.
+    """
+
     pass
