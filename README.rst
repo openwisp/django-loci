@@ -28,6 +28,7 @@ django-loci
 
 ------------
 
+<<<<<<< Updated upstream
 Reusable django-app for storing GIS and indoor coordinates of objects.
 
 .. image:: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/indoor.png
@@ -41,6 +42,9 @@ Reusable django-app for storing GIS and indoor coordinates of objects.
 .. image:: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/mobile.png
    :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/mobile.png
    :alt: Mobile coordinates
+=======
+Reusable Django app designed to store GIS and indoor coordinates of objects.
+>>>>>>> Stashed changes
 
 ------------
 
