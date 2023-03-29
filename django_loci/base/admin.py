@@ -51,11 +51,9 @@ class AbstractFloorPlanAdmin(TimeReadonlyAdminMixin, admin.ModelAdmin):
     save_on_top = True
 
     def get_form(self, request, obj=None, **kwargs):
-        from ..models import FloorPlan
-
         form = super(AbstractFloorPlanAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields['location'].widget = LocationRawIdWidget(
-            rel=FloorPlan._meta.get_field('location').remote_field, admin_site=site
+            rel=self.model._meta.get_field('location').remote_field, admin_site=site
         )
         return form
 
