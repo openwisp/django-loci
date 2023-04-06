@@ -77,6 +77,33 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         r = self.client.get(url)
         self.assertContains(r, 'test-admin-location-1')
 
+    def test_floorplan_add_view_filters_indoor_location(self):
+        self._login_as_admin()
+        loc_indoor = self._create_location(
+            name='test-admin-indoor-location', type='indoor'
+        )
+        loc_outdoor = self._create_location(
+            name='test-admin-outdoor-location', type='outdoor'
+        )
+        url = reverse('{0}_floorplan_add'.format(self.url_prefix))
+        filter_url = '/admin/django_loci/location/?_to_field=id&type__exact=indoor'
+        r1 = self.client.get(url)
+        self.assertContains(
+            r1,
+            f"""
+                <a href="{filter_url}"
+                class="related-lookup" id="lookup_id_location" title="Lookup">
+                    Select item
+                </a>
+            """,
+            html=True,
+        )
+        # Ensure that when the user clicks on the
+        # filter URL only indoor locations are displayed
+        r2 = self.client.get(filter_url)
+        self.assertContains(r2, f'{loc_indoor.name}</a>')
+        self.assertNotContains(r2, f'{loc_outdoor.name}</a>')
+
     def test_is_mobile_location_json_view(self):
         self._login_as_admin()
         loc = self._create_location(is_mobile=True, geometry=None)

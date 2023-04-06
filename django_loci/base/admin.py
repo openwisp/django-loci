@@ -2,6 +2,8 @@ import json
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin import widgets
+from django.contrib.admin.sites import site
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
@@ -28,12 +30,32 @@ class AbstractFloorPlanForm(forms.ModelForm):
         css = {'all': ('django-loci/css/loci.css',)}
 
 
+class LocationRawIdWidget(widgets.ForeignKeyRawIdWidget):
+    """
+    When selecting a location object
+    via a popup window in the floorplan
+    admin add view, display only indoor locations
+    """
+
+    def url_parameters(self):
+        url_params = super().url_parameters()
+        url_params['type__exact'] = 'indoor'
+        return url_params
+
+
 class AbstractFloorPlanAdmin(TimeReadonlyAdminMixin, admin.ModelAdmin):
     list_display = ['__str__', 'location', 'floor', 'created', 'modified']
     list_select_related = ['location']
     search_fields = ['location__name']
     raw_id_fields = ['location']
     save_on_top = True
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(AbstractFloorPlanAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['location'].widget = LocationRawIdWidget(
+            rel=self.model._meta.get_field('location').remote_field, admin_site=site
+        )
+        return form
 
 
 class AbstractLocationForm(forms.ModelForm):
