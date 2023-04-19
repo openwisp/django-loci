@@ -7,6 +7,7 @@ from .. import TestAdminMixin, TestLociMixin
 
 
 class BaseTestAdmin(TestAdminMixin, TestLociMixin):
+    app_label = 'django_loci'
     geocode_url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
 
     def test_location_list(self):
@@ -86,7 +87,9 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
             name='test-admin-outdoor-location', type='outdoor'
         )
         url = reverse('{0}_floorplan_add'.format(self.url_prefix))
-        filter_url = '/admin/django_loci/location/?_to_field=id&type__exact=indoor'
+        filter_url = (
+            f'/admin/{self.app_label}/location/?_to_field=id&type__exact=indoor'
+        )
         r1 = self.client.get(url)
         self.assertContains(
             r1,
