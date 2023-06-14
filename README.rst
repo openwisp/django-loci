@@ -57,7 +57,6 @@ Dependencies
 * GeoDjango (`see GeoDjango Install Instructions <https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#requirements>`_)
 * One of the databases supported by GeoDjango
 
-
 Compatibility Table
 -------------------
 
@@ -65,7 +64,8 @@ Compatibility Table
 django-loci      Python version
 0.2              2.7 or >=3.4
 0.3 - 0.4        >=3.6
-0.5              >=3.7
+1.0              >=3.7
+dev              >=3.8
 ===============  ==================================
 
 
