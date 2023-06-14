@@ -60,7 +60,8 @@ jobs:
 
     - name: Tests
       run: |
-        coverage run --source=django_loci runtests.py
+        coverage run runtests.py --parallel
+        coverage combine
 
     - name: Upload Coverage
       run: coveralls --service=github
