@@ -53,7 +53,7 @@ Reusable django-app for storing GIS and indoor coordinates of objects.
 Dependencies
 ------------
 
-* Python >= 3.7
+* Python >= 3.8
 * GeoDjango (`see GeoDjango Install Instructions <https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#requirements>`_)
 * One of the databases supported by GeoDjango
 

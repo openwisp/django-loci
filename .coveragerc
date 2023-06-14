@@ -5,3 +5,6 @@ omit =
     /*/__init__.py
     /setup.py
     /*/migrations/*
+source = django_loci
+parallel = true
+concurrency = multiprocessing
