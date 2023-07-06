@@ -10,7 +10,7 @@ ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+        'ENGINE': 'openwisp_utils.db.backends.spatialite',
         'NAME': 'django-loci.db',
     }
 }
