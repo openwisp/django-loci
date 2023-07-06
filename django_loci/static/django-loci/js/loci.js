@@ -204,7 +204,9 @@ django.jQuery(function ($) {
     // `dismissAddAnotherPopup()` in Django's RelatedObjectLookups.js to
     // trigger change event when an ID is selected or added via popup.
     function triggerChangeOnField(win, chosenId) {
-        $(document.getElementById(win.name)).change();
+        // In Django 4.2, the popup index is appended to the window name.
+        // Hence, we remove that before selecting the element.
+        $(document.getElementById(win.name.replace(/__\d+$/, ''))).change();
     }
     window.ORIGINAL_dismissRelatedLookupPopup = window.dismissRelatedLookupPopup;
     window.dismissRelatedLookupPopup = function (win, chosenId) {
