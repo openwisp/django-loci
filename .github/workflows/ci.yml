@@ -44,14 +44,11 @@ jobs:
         libsqlite3-mod-spatialite \
         gdal-bin
 
-    - name: Install python dependencies
-      run: pip install -U -r requirements-test.txt
-
-    - name: Install npm dependencies
-      run: sudo npm install -g jslint
-
-    - name: Installing django-loci
+    - name: Install Dependencies
+      id: deps
       run: |
+        pip install -U -r requirements-test.txt
+        sudo npm install -g jslint
         pip install -U -e .
         pip install -U ${{ matrix.django-version }}
 
@@ -59,11 +56,13 @@ jobs:
       run: ./run-qa-checks
 
     - name: Tests
+      if: ${{ !cancelled() && steps.deps.conclusion == 'success' }}
       run: |
         coverage run runtests.py --parallel
         coverage combine
 
     - name: Upload Coverage
+      if: ${{ success() }}
       run: coveralls --service=github
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
