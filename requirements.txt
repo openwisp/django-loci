@@ -1,5 +1,5 @@
 # Does not supports Django 4.0.0
-django>=3.2.18,!=4.0.*,<4.3
+django>=3.2.18,!=4.0.0.a,<5.1
 channels~=3.0.4
 django-leaflet~=0.29.0
 Pillow~=10.4.0
