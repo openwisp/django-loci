@@ -1,0 +1,29 @@
+[tool.coverage.run]
+source = ["django_loci"]
+parallel = true
+# To ensure correct coverage, we need to include both
+# "multiprocessing" and "thread" in the concurrency list.
+# This is because Django test suite incorrectly reports coverage
+# when "multiprocessing" is omitted and the "--parallel" flag
+# is used. Similarly, coverage for websocket consumers is
+# incorrect when "thread" is omitted and pytest is used.
+concurrency = ["multiprocessing", "thread"]
+omit = [
+    "django_loci/__init__.py",
+    "*/tests/*",
+    "*/migrations/*",
+]
+
+[tool.docstrfmt]
+extend_exclude = ["**/*.py"]
+
+[tool.isort]
+known_third_party = ["django"]
+known_first_party = ["django_loci", "openwisp_utils"]
+default_section = "THIRDPARTY"
+line_length = 88
+multi_line_output = 3
+use_parentheses = true
+include_trailing_comma = true
+force_grid_wrap = 0
+
