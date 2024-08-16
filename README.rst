@@ -2,72 +2,72 @@ django-loci
 ===========
 
 .. image:: https://github.com/openwisp/django-loci/workflows/Django%20Loci%20Build/badge.svg?branch=master
-   :target: https://github.com/openwisp/django-loci/actions?query=workflow%3A"Django+Loci+Build"
-   :alt: CI build status
+    :target: https://github.com/openwisp/django-loci/actions?query=workflow%3A"Django+Loci+Build"
+    :alt: CI build status
 
 .. image:: https://coveralls.io/repos/openwisp/django-loci/badge.svg
-   :target: https://coveralls.io/r/openwisp/django-loci
+    :target: https://coveralls.io/r/openwisp/django-loci
 
 .. image:: https://img.shields.io/librariesio/release/github/openwisp/django-loci
-  :target: https://libraries.io/github/openwisp/django-loci#repository_dependencies
-  :alt: Dependency monitoring
+    :target: https://libraries.io/github/openwisp/django-loci#repository_dependencies
+    :alt: Dependency monitoring
 
 .. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square
-   :target: https://gitter.im/openwisp/general
+    :target: https://gitter.im/openwisp/general
 
 .. image:: https://badge.fury.io/py/django-loci.svg
-   :target: http://badge.fury.io/py/django-loci
+    :target: http://badge.fury.io/py/django-loci
 
 .. image:: https://pepy.tech/badge/django-loci
-   :target: https://pepy.tech/project/django-loci
-   :alt: downloads
+    :target: https://pepy.tech/project/django-loci
+    :alt: downloads
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://pypi.org/project/black/
-   :alt: code style: black
+    :target: https://pypi.org/project/black/
+    :alt: code style: black
 
-------------
+----
 
 Reusable django-app for storing GIS and indoor coordinates of objects.
 
 .. image:: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/indoor.png
-   :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/indoor.png
-   :alt: Indoor coordinates
+    :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/indoor.png
+    :alt: Indoor coordinates
 
 .. image:: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/map.png
-   :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/map.png
-   :alt: Map coordinates
+    :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/map.png
+    :alt: Map coordinates
 
 .. image:: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/mobile.png
-   :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/mobile.png
-   :alt: Mobile coordinates
+    :target: https://raw.githubusercontent.com/openwisp/django-loci/master/docs/mobile.png
+    :alt: Mobile coordinates
 
-------------
+----
 
 .. contents:: **Table of Contents**:
-   :backlinks: none
-   :depth: 3
+    :backlinks: none
+    :depth: 3
 
-------------
+----
 
 Dependencies
 ------------
 
-* Python >= 3.8
-* GeoDjango (`see GeoDjango Install Instructions <https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#requirements>`_)
-* One of the databases supported by GeoDjango
+- Python >= 3.8
+- GeoDjango (`see GeoDjango Install Instructions
+  <https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#requirements>`_)
+- One of the databases supported by GeoDjango
 
 Compatibility Table
 -------------------
 
-===============  ==================================
-django-loci      Python version
-0.2              2.7 or >=3.4
-0.3 - 0.4        >=3.6
-1.0              >=3.7
-dev              >=3.8
-===============  ==================================
-
+=========== ==============
+django-loci Python version
+0.2         2.7 or >=3.4
+0.3 - 0.4   >=3.6
+1.0         >=3.7
+dev         >=3.8
+=========== ==============
 
 Install stable version from pypi
 --------------------------------
@@ -81,11 +81,15 @@ Install from pypi:
 Install development version
 ---------------------------
 
-First of all, install the dependencies of `GeoDjango <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/>`_:
+First of all, install the dependencies of `GeoDjango
+<https://docs.djangoproject.com/en/2.1/ref/contrib/gis/>`_:
 
-- `Geospatial libraries <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/geolibs/>`_
-- `Spatial database <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/spatialite/>`_,
-  for development we use Spatialite, a spatial extension of `sqlite <https://www.sqlite.org/index.html>`_
+- `Geospatial libraries
+  <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/geolibs/>`_
+- `Spatial database
+  <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/spatialite/>`_,
+  for development we use Spatialite, a spatial extension of `sqlite
+  <https://www.sqlite.org/index.html>`_
 
 Install tarball:
 
@@ -110,24 +114,27 @@ If you want to contribute, install your cloned fork:
 Setup (integrate in an existing django project)
 -----------------------------------------------
 
-First of all, set up your database engine to `one of the spatial databases suppported
-by GeoDjango <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/db-api/#spatial-backends>`_.
+First of all, set up your database engine to `one of the spatial databases
+suppported by GeoDjango
+<https://docs.djangoproject.com/en/2.1/ref/contrib/gis/db-api/#spatial-backends>`_.
 
-Add ``django_loci`` and its dependencies to ``INSTALLED_APPS`` in the following order:
+Add ``django_loci`` and its dependencies to ``INSTALLED_APPS`` in the
+following order:
 
 .. code-block:: python
 
     INSTALLED_APPS = [
         # ...
-        'django.contrib.gis',
-        'django_loci',
-        'django.contrib.admin',
-        'leaflet',
-        'channels'
+        "django.contrib.gis",
+        "django_loci",
+        "django.contrib.admin",
+        "leaflet",
+        "channels"
         # ...
     ]
 
-Configure ``CHANNEL_LAYERS`` according to your needs, a sample configuration can be:
+Configure ``CHANNEL_LAYERS`` according to your needs, a sample
+configuration can be:
 
 .. code-block:: python
 
@@ -152,19 +159,23 @@ Common issues and solutions when installing GeoDjango.
 Unable to load the SpatiaLite library extension
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you get the following exception::
+If you get the following exception:
+
+::
 
     django.core.exceptions.ImproperlyConfigured: Unable to load the SpatiaLite library extension
 
-You need to specify the ``SPATIALITE_LIBRARY_PATH`` in your ``settings.py`` as explained
-in the `django documentation regarding how to install and configure spatialte
+You need to specify the ``SPATIALITE_LIBRARY_PATH`` in your
+``settings.py`` as explained in the `django documentation regarding how to
+install and configure spatialte
 <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/spatialite/>`_.
 
 Issues with other geospatial libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Please refer to the `geodjango documentation on troubleshooting issues related to
-geospatial libraries <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/#library-environment-settings>`_.
+Please refer to the `geodjango documentation on troubleshooting issues
+related to geospatial libraries
+<https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/#library-environment-settings>`_.
 
 Settings
 --------
@@ -172,16 +183,16 @@ Settings
 ``LOCI_FLOORPLAN_STORAGE``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-+--------------+-------------------------------------------+
-| **type**:    | ``str``                                   |
-+--------------+-------------------------------------------+
-| **default**: | ``django_loci.storage.OverwriteStorage``  |
-+--------------+-------------------------------------------+
+============ ========================================
+**type**:    ``str``
+**default**: ``django_loci.storage.OverwriteStorage``
+============ ========================================
 
 The django file storage class used for uploading floorplan images.
 
 The filestorage can be changed to a different one as long as it has an
-``upload_to`` class method which will be passed to ``FloorPlan.image.upload_to``.
+``upload_to`` class method which will be passed to
+``FloorPlan.image.upload_to``.
 
 To understand the details of this statement, take a look at the code of
 `django_loci.storage.OverwriteStorage
@@ -190,50 +201,47 @@ To understand the details of this statement, take a look at the code of
 ``DJANGO_LOCI_GEOCODER``
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-+--------------+-------------+
-| **type**:    | ``str``     |
-+--------------+-------------+
-| **default**: | ``ArcGIS``  |
-+--------------+-------------+
+============ ==========
+**type**:    ``str``
+**default**: ``ArcGIS``
+============ ==========
 
 Service used for geocoding and reverse geocoding.
 
 Supported geolocation services:
 
-* ``ArcGIS``
-* ``Nominatim``
-* ``GoogleV3`` (Google Maps v3)
+- ``ArcGIS``
+- ``Nominatim``
+- ``GoogleV3`` (Google Maps v3)
 
 ``DJANGO_LOCI_GEOCODE_FAILURE_DELAY``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-+--------------+----------+
-| **type**:    | ``int``  |
-+--------------+----------+
-| **default**: | ``1``    |
-+--------------+----------+
+============ =======
+**type**:    ``int``
+**default**: ``1``
+============ =======
 
-Amount of seconds between geocoding retry API calls when geocoding requests fail.
+Amount of seconds between geocoding retry API calls when geocoding
+requests fail.
 
 ``DJANGO_LOCI_GEOCODE_RETRIES``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-+--------------+----------+
-| **type**:    | ``int``  |
-+--------------+----------+
-| **default**: | ``3``    |
-+--------------+----------+
+============ =======
+**type**:    ``int``
+**default**: ``3``
+============ =======
 
 Amount of retry API calls when geocoding requests fail.
 
 ``DJANGO_LOCI_GEOCODE_API_KEY``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-+--------------+-----------+
-| **type**:    | ``str``   |
-+--------------+-----------+
-| **default**: | ``None``  |
-+--------------+-----------+
+============ ========
+**type**:    ``str``
+**default**: ``None``
+============ ========
 
 API key if required (eg: Google Maps).
 
@@ -245,40 +253,46 @@ System Checks
 
 Use to check if geocoding is working as expected or not.
 
-Run this checks with::
+Run this checks with:
+
+::
 
     ./manage.py check --deploy --tag geocoding
 
 Extending django-loci
 ---------------------
 
-*django-loci* provides a set of models and admin classes which can be imported,
-extended and reused by third party apps.
+*django-loci* provides a set of models and admin classes which can be
+imported, extended and reused by third party apps.
 
-To extend *django-loci*, **you MUST NOT** add it to ``settings.INSTALLED_APPS``,
-but you must create your own app (which goes into ``settings.INSTALLED_APPS``),
-import the base classes of django-loci and add your customizations.
+To extend *django-loci*, **you MUST NOT** add it to
+``settings.INSTALLED_APPS``, but you must create your own app (which goes
+into ``settings.INSTALLED_APPS``), import the base classes of django-loci
+and add your customizations.
 
 Extending models
 ~~~~~~~~~~~~~~~~
 
 This example provides an example of how to extend the base models of
-*django-loci* by adding a relation to another django model named `Organization`.
+*django-loci* by adding a relation to another django model named
+`Organization`.
 
 .. code-block:: python
 
     # models.py of your app
     from django.db import models
-    from django_loci.base.models import (AbstractFloorPlan,
-                                         AbstractLocation,
-                                         AbstractObjectLocation)
+    from django_loci.base.models import (
+        AbstractFloorPlan,
+        AbstractLocation,
+        AbstractObjectLocation,
+    )
 
     # the model ``organizations.Organization`` is omitted for brevity
     # if you are curious to see a real implementation, check out django-organizations
 
 
     class OrganizationMixin(models.Model):
-        organization = models.ForeignKey('organizations.Organization')
+        organization = models.ForeignKey("organizations.Organization")
 
         class Meta:
             abstract = True
@@ -305,10 +319,12 @@ This example provides an example of how to extend the base models of
 
 
     class ObjectLocation(OrganizationMixin, AbstractObjectLocation):
-        location = models.ForeignKey(Location, models.PROTECT,
-                                     blank=True, null=True)
-        floorplan = models.ForeignKey(FloorPlan, models.PROTECT,
-                                      blank=True, null=True)
+        location = models.ForeignKey(
+            Location, models.PROTECT, blank=True, null=True
+        )
+        floorplan = models.ForeignKey(
+            FloorPlan, models.PROTECT, blank=True, null=True
+        )
 
         class Meta(AbstractObjectLocation.Meta):
             abstract = False
@@ -320,27 +336,29 @@ This example provides an example of how to extend the base models of
 Extending the admin
 ~~~~~~~~~~~~~~~~~~~
 
-Following the previous `Organization` example, you can avoid duplicating the admin
-code by importing the base admin classes and registering your models with them.
+Following the previous `Organization` example, you can avoid duplicating
+the admin code by importing the base admin classes and registering your
+models with them.
 
-But first you have to change a few settings in your ``settings.py``, these are needed in
-order to load the admin templates and static files of *django-loci* even if it's not
-listed in ``settings.INSTALLED_APPS``.
+But first you have to change a few settings in your ``settings.py``, these
+are needed in order to load the admin templates and static files of
+*django-loci* even if it's not listed in ``settings.INSTALLED_APPS``.
 
-Add ``django.forms`` to ``INSTALLED_APPS``, now it should look like the following:
+Add ``django.forms`` to ``INSTALLED_APPS``, now it should look like the
+following:
 
 .. code-block:: python
 
     INSTALLED_APPS = [
         # ...
-        'django.contrib.gis',
-        'django_loci',
-        'django.contrib.admin',
+        "django.contrib.gis",
+        "django_loci",
+        "django.contrib.admin",
         #      ↓
-        'django.forms', # <-- add this
+        "django.forms",  # <-- add this
         #      ↑
-        'leaflet',
-        'channels'
+        "leaflet",
+        "channels"
         # ...
     ]
 
@@ -352,16 +370,17 @@ Now add ``EXTENDED_APPS`` after ``INSTALLED_APPS``:
         # ...
     ]
 
-    EXTENDED_APPS = ('django_loci',)
+    EXTENDED_APPS = ("django_loci",)
 
-Add ``openwisp_utils.staticfiles.DependencyFinder`` to ``STATICFILES_FINDERS``:
+Add ``openwisp_utils.staticfiles.DependencyFinder`` to
+``STATICFILES_FINDERS``:
 
 .. code-block:: python
 
     STATICFILES_FINDERS = [
-        'django.contrib.staticfiles.finders.FileSystemFinder',
-        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-        'openwisp_utils.staticfiles.DependencyFinder',
+        "django.contrib.staticfiles.finders.FileSystemFinder",
+        "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+        "openwisp_utils.staticfiles.DependencyFinder",
     ]
 
 Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES``:
@@ -370,20 +389,20 @@ Add ``openwisp_utils.loaders.DependencyLoader`` to ``TEMPLATES``:
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
-            'OPTIONS': {
-                'loaders': [
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [],
+            "OPTIONS": {
+                "loaders": [
+                    "django.template.loaders.filesystem.Loader",
+                    "django.template.loaders.app_directories.Loader",
                     # add the following line
-                    'openwisp_utils.loaders.DependencyLoader'
+                    "openwisp_utils.loaders.DependencyLoader",
                 ],
-                'context_processors': [
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.request',
-                    'django.contrib.auth.context_processors.auth',
-                    'django.contrib.messages.context_processors.messages',
+                "context_processors": [
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.contrib.auth.context_processors.auth",
+                    "django.contrib.messages.context_processors.messages",
                 ],
             },
         }
@@ -393,19 +412,25 @@ Last step, add ``FORM_RENDERER``:
 
 .. code-block:: python
 
-    FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+    FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
-Then you can go ahead and create your ``admin.py`` file following the example below:
+Then you can go ahead and create your ``admin.py`` file following the
+example below:
 
 .. code-block:: python
 
     # admin.py of your app
     from django.contrib import admin
 
-    from django_loci.base.admin import (AbstractFloorPlanAdmin, AbstractFloorPlanForm,
-                                        AbstractFloorPlanInline, AbstractLocationAdmin,
-                                        AbstractLocationForm, AbstractObjectLocationForm,
-                                        AbstractObjectLocationInline)
+    from django_loci.base.admin import (
+        AbstractFloorPlanAdmin,
+        AbstractFloorPlanForm,
+        AbstractFloorPlanInline,
+        AbstractLocationAdmin,
+        AbstractLocationForm,
+        AbstractObjectLocationForm,
+        AbstractObjectLocationInline,
+    )
     from django_loci.models import FloorPlan, Location, ObjectLocation
 
 
@@ -471,11 +496,12 @@ You may want to reuse the ``AppConfig`` class of *django-loci* too:
 
 
     class MyConfig(LociConfig):
-        name = 'myapp'
-        verbose_name = _('My custom app')
+        name = "myapp"
+        verbose_name = _("My custom app")
 
         def __setmodels__(self):
             from .models import Location
+
             self.location_model = Location
 
 Installing for development
@@ -527,7 +553,8 @@ Run tests with:
 Contributing
 ------------
 
-1. Announce your intentions in the `OpenWISP Mailing List <https://groups.google.com/d/forum/openwisp>`_
+1. Announce your intentions in the `OpenWISP Mailing List
+   <https://groups.google.com/d/forum/openwisp>`_
 2. Fork this repo and install it
 3. Follow `PEP8, Style Guide for Python Code`_
 4. Write code
@@ -537,14 +564,16 @@ Contributing
 8. Document your changes
 9. Send pull request
 
-.. _PEP8, Style Guide for Python Code: http://www.python.org/dev/peps/pep-0008/
+.. _pep8, style guide for python code: http://www.python.org/dev/peps/pep-0008/
 
 Changelog
 ---------
 
-See `CHANGES <https://github.com/openwisp/django-loci/blob/master/CHANGES.rst>`_.
+See `CHANGES
+<https://github.com/openwisp/django-loci/blob/master/CHANGES.rst>`_.
 
 License
 -------
 
-See `LICENSE <https://github.com/openwisp/django-loci/blob/master/LICENSE>`_.
+See `LICENSE
+<https://github.com/openwisp/django-loci/blob/master/LICENSE>`_.

@@ -26,14 +26,17 @@ jobs:
           - django~=4.2.0
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+        cache-dependency-path: |
+          **/requirements*.txt
 
     - name: Install Dependencies
       id: deps
@@ -57,24 +60,22 @@ jobs:
       run: |
         coverage run runtests.py --parallel
         coverage combine
+        coverage xml
 
     - name: Upload Coverage
       if: ${{ success() }}
-      run: coveralls --service=github
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_FLAG_NAME: python-${{ matrix.python-version }}-django-${{ matrix.django-version }}
-        COVERALLS_PARALLEL: true
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel: true
+        format: cobertura
+        flag-name: python-${{ matrix.env.env }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
   coveralls:
-    name: Finish Coveralls
     needs: build
     runs-on: ubuntu-latest
-    container: python:3-slim
     steps:
-      - name: Finished
-        run: |
-          pip3 install --upgrade coveralls
-          coveralls --finish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
