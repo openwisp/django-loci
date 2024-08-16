@@ -1,6 +1,6 @@
 # Does not supports Django 4.0.0
 django>=3.2.18,!=4.0.*,<4.3
-channels~=3.0.4
+channels~=4.1.0
 django-leaflet~=0.29.0
 Pillow~=10.4.0
 geopy~=2.3.0
