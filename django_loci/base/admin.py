@@ -220,9 +220,8 @@ class AbstractObjectLocationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # set initial values for custom fields
         initial = {}
-        obj = self.instance
-        location = obj.location
-        floorplan = obj.floorplan
+        location = self._get_initial_location()
+        floorplan = self._get_initial_floorplan()
         if location:
             initial.update(
                 {
@@ -248,6 +247,12 @@ class AbstractObjectLocationForm(forms.ModelForm):
                 (floorplan.pk, floorplan)
             ]
         self.initial.update(initial)
+
+    def _get_initial_location(self):
+        return self.instance.location
+
+    def _get_initial_floorplan(self):
+        return self.instance.floorplan
 
     @cached_property
     def floorplan_model(self):
