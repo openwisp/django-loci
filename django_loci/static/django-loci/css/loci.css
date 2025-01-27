@@ -1,46 +1,63 @@
-.coords, .coords .form-row{ display: none }
+.coords,
+.coords .form-row {
+  display: none;
+}
 .coords .field-location_selection,
-.coords .field-floorplan_selection{ display: block }
+.coords .field-floorplan_selection {
+  display: block;
+}
 /* hide redundant heading in objectlocationinline */
-.loci.coords > h2{ display: none }
+.loci.coords > h2 {
+  display: none;
+}
 /* improve raw_id_field look */
-.coords .field-location input[type=text]{ display: none }
-.field-location .related-lookup{
-    width: auto;
-    padding-left: 20px;
-    background-position: left center;
+.coords .field-location input[type="text"] {
+  display: none;
 }
-.field-location .item-label{
-    display: inline-block;
-    height: 16px;
-    font-weight: bold;
-    margin-left: 6px;
+.field-location .related-lookup {
+  width: auto;
+  padding-left: 20px;
+  background-position: left center;
 }
-#floorplan_form .field-location .item-label{ vertical-align: middle }
+.field-location .item-label {
+  display: inline-block;
+  height: 16px;
+  font-weight: bold;
+  margin-left: 6px;
+}
+#floorplan_form .field-location .item-label {
+  vertical-align: middle;
+}
 .coords .field-location .item-label,
-.field-location strong{
-    position: relative;
-    bottom: -3px;
+.field-location strong {
+  position: relative;
+  bottom: -3px;
 }
-.field-location strong{ margin-left: 3px }
-input[type=text]{ width: 320px }
+.field-location strong {
+  margin-left: 3px;
+}
+input[type="text"] {
+  width: 320px;
+}
 /* simulate required fields */
-.coords.loci label{
-    font-weight: bold;
-    color: #333;
+.coords.loci label {
+  font-weight: bold;
+  color: #333;
 }
-.no-location{
-    padding: 10px 0 10px 0;
-    font-weight: bold;
-    text-align: center;
-    font-size: 14px;
+.no-location {
+  padding: 10px 0 10px 0;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14px;
 }
 .form-row.field-geometry .flex-container {
-    display: block;
+  display: block;
 }
-#floorplan_set-group{ display: none }
-@media (max-width: 767px){
-    .field-geometry > div{
-        flex-direction: column;
-    }
+#floorplan_set-group {
+  display: none;
+}
+@media (max-width: 767px) {
+  .field-geometry > div {
+    flex-direction: column;
+  }
 }
