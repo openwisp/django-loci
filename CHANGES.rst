@@ -6,6 +6,12 @@ Version 1.2.0 [Unreleased]
 
 Work in progress.
 
+Version 1.1.2 [2025-01-27]
+--------------------------
+
+- Refactored code to move logic to helper methods in
+  AbstractObjectLocationForm
+
 Version 1.1.1 [2024-11-20]
 --------------------------
 
