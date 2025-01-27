@@ -1,8 +1,8 @@
 django-loci
 ===========
 
-.. image:: https://github.com/openwisp/django-loci/workflows/Django%20Loci%20Build/badge.svg?branch=master
-    :target: https://github.com/openwisp/django-loci/actions?query=workflow%3A"Django+Loci+Build"
+.. image:: https://github.com/openwisp/django-loci/actions/workflows/ci.yml/badge.svg
+    :target: https://github.com/openwisp/django-loci/actions/workflows/ci.yml
     :alt: CI build status
 
 .. image:: https://coveralls.io/repos/openwisp/django-loci/badge.svg
