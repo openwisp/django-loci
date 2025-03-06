@@ -1,8 +1,8 @@
 django-loci
 ===========
 
-.. image:: https://github.com/openwisp/django-loci/workflows/Django%20Loci%20Build/badge.svg?branch=master
-    :target: https://github.com/openwisp/django-loci/actions?query=workflow%3A"Django+Loci+Build"
+.. image:: https://github.com/openwisp/django-loci/actions/workflows/ci.yml/badge.svg
+    :target: https://github.com/openwisp/django-loci/actions/workflows/ci.yml
     :alt: CI build status
 
 .. image:: https://coveralls.io/repos/openwisp/django-loci/badge.svg
@@ -66,6 +66,7 @@ django-loci Python version
 0.2         2.7 or >=3.4
 0.3 - 0.4   >=3.6
 1.0         >=3.7
+1.1         >=3.8
 dev         >=3.8
 =========== ==============
 
@@ -82,12 +83,12 @@ Install development version
 ---------------------------
 
 First of all, install the dependencies of `GeoDjango
-<https://docs.djangoproject.com/en/2.1/ref/contrib/gis/>`_:
+<https://docs.djangoproject.com/en/4.2/ref/contrib/gis/>`_:
 
 - `Geospatial libraries
-  <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/geolibs/>`_
+  <https://docs.djangoproject.com/en/4.2/ref/contrib/gis/install/geolibs/>`_
 - `Spatial database
-  <https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/spatialite/>`_,
+  <https://docs.djangoproject.com/en/4.2/ref/contrib/gis/install/spatialite/>`_,
   for development we use Spatialite, a spatial extension of `sqlite
   <https://www.sqlite.org/index.html>`_
 
@@ -116,7 +117,7 @@ Setup (integrate in an existing django project)
 
 First of all, set up your database engine to `one of the spatial databases
 suppported by GeoDjango
-<https://docs.djangoproject.com/en/2.1/ref/contrib/gis/db-api/#spatial-backends>`_.
+<https://docs.djangoproject.com/en/4.2/ref/contrib/gis/db-api/#spatial-backends>`_.
 
 Add ``django_loci`` and its dependencies to ``INSTALLED_APPS`` in the
 following order:
@@ -168,14 +169,14 @@ If you get the following exception:
 You need to specify the ``SPATIALITE_LIBRARY_PATH`` in your
 ``settings.py`` as explained in the `django documentation regarding how to
 install and configure spatialte
-<https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/spatialite/>`_.
+<https://docs.djangoproject.com/en/4.2/ref/contrib/gis/install/spatialite/>`_.
 
 Issues with other geospatial libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Please refer to the `geodjango documentation on troubleshooting issues
 related to geospatial libraries
-<https://docs.djangoproject.com/en/2.1/ref/contrib/gis/install/#library-environment-settings>`_.
+<https://docs.djangoproject.com/en/4.2/ref/contrib/gis/install/#library-environment-settings>`_.
 
 Settings
 --------

@@ -1,10 +1,49 @@
 Changelog
 =========
 
-Version 1.1.0 [unreleased]
+Version 1.2.0 [Unreleased]
 --------------------------
 
-WIP
+Work in progress.
+
+Version 1.1.2 [2025-01-27]
+--------------------------
+
+- Refactored code to move logic to helper methods in
+  AbstractObjectLocationForm
+
+Version 1.1.1 [2024-11-20]
+--------------------------
+
+- [deps] Updated django-leaflet to ~=0.31.0.
+
+Version 1.1.0 [2024-08-16]
+--------------------------
+
+Changes
+~~~~~~~
+
+- Use ``settings.DEFAULT_STORAGE_CLASS`` as base for OverwriteStorage,
+  adapting the storage backend to project settings.
+
+**Dependencies:**
+
+- Bumped ``django-leaflet~=0.30.1``
+- Bumped ``Pillow~=10.4.0``
+- Bumped ``geopy~=2.4.1``
+- Bumped ``openwisp-utils~=1.1.0``
+- Added support for Python ``3.10``.
+- Added support for Django ``4.2``.
+- Dropped support for Python ``3.7``.
+- Dropped support for Django ``3.0.x``, ``3.1.x`` and ``4.0.x``.
+
+Bugfixes
+~~~~~~~~
+
+- Fixed an issue with deleting ``FloorPlan.image`` by using the
+  appropriate storage backend method.
+- Resolved a bug causing outdoor locations to incorrectly appear in the
+  location list when creating floorplans.
 
 Version 1.0.1 [2022-04-20]
 --------------------------
