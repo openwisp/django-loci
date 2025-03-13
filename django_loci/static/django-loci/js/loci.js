@@ -32,6 +32,7 @@ django.jQuery(function ($) {
     $locationSelection = $locationSelectionRow.find("select"),
     $locationRow = $(".loci.coords .field-location"),
     $location = $locationRow.find("select, input"),
+    $initialLocation = sessionStorage.getItem("initialLocation") || $location.val(),
     $locationLabel = $(".field-location .item-label"),
     $name = $(".field-name input", ".loci.coords"),
     $address = $(
@@ -188,7 +189,8 @@ django.jQuery(function ($) {
   }
 
   function typeChange(e, initial) {
-    var value = $type.val();
+    var value = $type.val(),
+    floorplans_length = $floorplan.find("option").length;
     if (value) {
       $outdoor.show();
       $geoEdit.show();
@@ -198,6 +200,15 @@ django.jQuery(function ($) {
       $geoEdit.hide();
       $indoor.hide();
       $typeRow.show();
+    }
+    // Show alert when switching from indoor to outdoor within same location
+    if (value === "outdoor" && $initialLocation === $location.val() && floorplans_length > 0){
+      var msg =
+        "Please remove the associated floorplans first " +
+        'and save; then you can switch to type "indoor"';
+      alert(gettext(msg));
+      e.preventDefault();
+      $type.val("indoor");
     }
     if (value === "indoor") {
       $indoor.show();
@@ -299,6 +310,7 @@ django.jQuery(function ($) {
         loadIndoor();
       });
     } else {
+      sessionStorage.setItem("initialLocation", $location.val());
       loadIndoor();
     }
   }

@@ -289,6 +289,10 @@ class AbstractObjectLocationForm(forms.ModelForm):
         fields = []
         if not is_mobile and type_ in ['outdoor', 'indoor']:
             fields += ['location_selection', 'name', 'address', 'geometry']
+        # sync location and clean indoor field basis type
+        if location := data.get('location'):
+            location.type = type_
+            data['indoor'] = None if type_ != 'indoor' else data.get('indoor')
         if type_ == 'indoor':
             if data.get('floorplan_selection') == 'existing':
                 fields.append('floorplan')
