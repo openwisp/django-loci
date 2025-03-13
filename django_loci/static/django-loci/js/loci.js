@@ -32,7 +32,6 @@ django.jQuery(function ($) {
     $locationSelection = $locationSelectionRow.find("select"),
     $locationRow = $(".loci.coords .field-location"),
     $location = $locationRow.find("select, input"),
-    $initialLocation = sessionStorage.getItem("initialLocation") || $location.val(),
     $locationLabel = $(".field-location .item-label"),
     $name = $(".field-name input", ".loci.coords"),
     $address = $(
@@ -201,8 +200,8 @@ django.jQuery(function ($) {
       $indoor.hide();
       $typeRow.show();
     }
-    // Show alert when switching from indoor to outdoor within same location
-    if (value === "outdoor" && $initialLocation === $location.val() && floorplans_length > 0){
+      // Show alert when switching from indoor to outdoor if floorplans exist
+    if (value === "outdoor" && floorplans_length > 1){
       var msg =
         "Please remove the associated floorplans first " +
         'and save; then you can switch to type "indoor"';
@@ -265,6 +264,8 @@ django.jQuery(function ($) {
       indoorForm();
       if ($type.val() !== "indoor") {
         $indoor.hide();
+        // reset indoor form when type is outdoor
+        resetIndoorForm(true);
         return;
       }
       var floorplansUrl = getLocationFloorplansJsonUrl($location.val());
@@ -310,7 +311,6 @@ django.jQuery(function ($) {
         loadIndoor();
       });
     } else {
-      sessionStorage.setItem("initialLocation", $location.val());
       loadIndoor();
     }
   }
