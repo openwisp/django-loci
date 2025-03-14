@@ -776,3 +776,46 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
         r = self.client.post(reverse(self.add_url), params)
         floorplan_file.close()
         self.assertEqual(r.status_code, 302)
+
+    def test_device_change_location_from_outdoor_to_indoor(self):
+        self._login_as_admin()
+        p = self._get_prefix()
+        outdoor_loc = self._create_location()
+        obj = self._create_object()
+        ol = self._create_object_location(location=outdoor_loc, content_object=obj)
+        floorplan_file = open(self._floorplan_path, 'rb')
+        params = self.params
+        params.update(
+            {
+                'name': obj.name,
+                '{0}-0-type'.format(p): 'indoor',
+                '{0}-0-location_selection'.format(p): 'existing',
+                '{0}-0-location'.format(p): outdoor_loc.id,
+                '{0}-0-name'.format(p): outdoor_loc.name,
+                '{0}-0-address'.format(p): outdoor_loc.address,
+                '{0}-0-location-geometry'.format(p): outdoor_loc.geometry,
+                '{0}-0-floorplan_selection'.format(p): 'new',
+                '{0}-0-floorplan'.format(p): '',
+                '{0}-0-floor'.format(p): '1',
+                '{0}-0-image'.format(p): floorplan_file,
+                '{0}-0-indoor'.format(p): '-100,100',
+                '{0}-0-id'.format(p): ol.id,
+                '{0}-INITIAL_FORMS'.format(p): '1',
+            }
+        )
+        r = self.client.post(
+            reverse(self.change_url, args=[obj.pk]), params, follow=True
+        )
+        self.assertNotContains(r, 'errors')
+        self.assertEqual(self.location_model.objects.count(), 1)
+        self.assertEqual(self.object_location_model.objects.count(), 1)
+        self.assertEqual(self.location_model.objects.first().type, 'indoor')
+        self.assertEqual(
+            self.location_model.objects.first().objectlocation_set.count(), 1
+        )
+        self.assertEqual(
+            self.location_model.objects.first()
+            .objectlocation_set.first()
+            .content_object,
+            obj,
+        )
