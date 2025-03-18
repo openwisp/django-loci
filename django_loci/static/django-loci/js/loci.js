@@ -20,7 +20,7 @@ django.jQuery(function ($) {
     $indoorRows = $(".indoor.coords .form-row:not(.field-indoor)"),
     $indoorEdit = $(".indoor.coords .form-row:not(.field-floorplan_selection)"),
     $indoorPositionRow = $(".indoor.coords .field-indoor"),
-    geometryId = $(".field-geometry label").attr("for"),
+    geometryId = $(".field-geometry label").attr("for") || "geometry", // fallback for readonly
     mapName = "leafletmap" + geometryId + "-map",
     loadMapName = "loadmap" + geometryId + "-map",
     $typeRow = $(".inline-group .field-type"),
@@ -150,7 +150,10 @@ django.jQuery(function ($) {
   }
 
   function locationSelectionChange(e, initial) {
-    var value = $locationSelection.val();
+    // get value from 'readonly' in case of view only permissions
+    var value =
+      $locationSelection.val() ||
+      $locationSelectionRow.find(".readonly").text();
     $allSections.hide();
     if (!initial) {
       resetDeviceLocationForm();
@@ -188,7 +191,8 @@ django.jQuery(function ($) {
   }
 
   function typeChange(e, initial) {
-    var value = $type.val(),
+    // get value from 'readonly' in case of view only permissions
+    var value = $type.val() || $typeRow.find(".readonly").text(),
       // floorplansLength for choice field includes the placeholder option so
       // need to subtract it.
       floorplansLength = $floorplan.find("option").length - 1;

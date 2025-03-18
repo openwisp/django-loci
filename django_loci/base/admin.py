@@ -217,6 +217,8 @@ class AbstractObjectLocationForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        # user is passed via partialmethod in ObjectLocationInline
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         # set initial values for custom fields
         initial = {}
@@ -246,6 +248,17 @@ class AbstractObjectLocationForm(forms.ModelForm):
             self.fields['floorplan'].choices = floorplan_choices + [
                 (floorplan.pk, floorplan)
             ]
+        # setting attributes basis user permissions
+        if (
+            user
+            and user.has_perm('django_loci.view_objectlocation')
+            and not user.has_perm('django_loci.change_objectlocation')
+        ):
+            # For view only permissions, 'AdminReadonlyField' reads from instance
+            for field, value in initial.items():
+                setattr(self.instance, field, value)
+
+            setattr(self.fields['geometry'].widget, 'read_only', True)
         self.initial.update(initial)
 
     def _get_initial_location(self):

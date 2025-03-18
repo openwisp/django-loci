@@ -1,3 +1,5 @@
+from functools import partialmethod
+
 from django.contrib import admin
 
 from .base.admin import (
@@ -62,6 +64,14 @@ class ObjectLocationForm(AbstractObjectLocationForm):
 class ObjectLocationInline(AbstractObjectLocationInline):
     model = ObjectLocation
     form = ObjectLocationForm
+
+    # override get_formset method to pass user to form
+    def get_formset(self, request, obj=..., **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        formset._construct_form = partialmethod(
+            formset._construct_form, user=request.user
+        )
+        return formset
 
 
 admin.site.register(FloorPlan, FloorPlanAdmin)
