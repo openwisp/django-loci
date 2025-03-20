@@ -188,8 +188,7 @@ django.jQuery(function ($) {
   }
 
   function typeChange(e, initial) {
-    var value = $type.val(),
-    floorplans_length = $floorplan.find("option").length;
+    var value = $type.val();
     if (value) {
       $outdoor.show();
       $geoEdit.show();
@@ -199,15 +198,6 @@ django.jQuery(function ($) {
       $geoEdit.hide();
       $indoor.hide();
       $typeRow.show();
-    }
-      // Show alert when switching from indoor to outdoor if floorplans exist
-    if (value === "outdoor" && floorplans_length > 1){
-      var msg =
-        "Please remove the associated floorplans first " +
-        'and save; then you can switch to type "indoor"';
-      alert(gettext(msg));
-      e.preventDefault();
-      $type.val("indoor");
     }
     if (value === "indoor") {
       $indoor.show();
@@ -264,8 +254,6 @@ django.jQuery(function ($) {
       indoorForm();
       if ($type.val() !== "indoor") {
         $indoor.hide();
-        // reset indoor form when type is outdoor
-        resetIndoorForm(true);
         return;
       }
       var floorplansUrl = getLocationFloorplansJsonUrl($location.val());

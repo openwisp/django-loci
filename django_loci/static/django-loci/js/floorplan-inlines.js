@@ -9,16 +9,9 @@ django.jQuery(function ($) {
       var value = $type_field.val();
       if (value === "indoor") {
         $floorplan_set.show();
-      } else if (value === "outdoor" && $floorplans_length === 0) {
+      } else if (value === "outdoor" && $floorplans_length >= 0) {
         $floorplan_set.hide();
-      } else if (value === "outdoor" && $floorplans_length > 0) {
-        var msg =
-          "Please remove the associated floorplans first " +
-          'and save; then you can switch to type "indoor"';
-        alert(gettext(msg));
-        e.preventDefault();
-        $type_field.val("indoor");
-      }
+      } 
     };
   $type_field.change(type_change_event);
   type_change_event();

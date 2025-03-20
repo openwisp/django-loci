@@ -71,6 +71,12 @@ class AbstractLocationForm(forms.ModelForm):
         )
         css = {'all': ('django-loci/css/loci.css',)}
 
+    def clean(self):
+        # if changing existing location to outdoor, delete all floorplans
+        if self.instance and self.cleaned_data.get('type') == "outdoor":
+            self.instance.type = self.cleaned_data['type']
+            self.instance.floorplan_set.all().delete()
+
 
 class AbstractFloorPlanInline(TimeReadonlyAdminMixin, admin.StackedInline):
     extra = 0
@@ -289,10 +295,14 @@ class AbstractObjectLocationForm(forms.ModelForm):
         fields = []
         if not is_mobile and type_ in ['outdoor', 'indoor']:
             fields += ['location_selection', 'name', 'address', 'geometry']
-        # sync location and clean indoor field basis type
+        # sync location, clean indoor field basis type and delete floorplans if type is not outdoor
         if location := data.get('location'):
             location.type = type_
-            data['indoor'] = None if type_ != 'indoor' else data.get('indoor')
+            if type_ != "indoor":
+                data['indoor'] = None
+                # set floorplans of all objectlocations to None where this location is related
+                location.objectlocation_set.update(floorplan=None)
+                location.floorplan_set.all().delete()
         if type_ == 'indoor':
             if data.get('floorplan_selection') == 'existing':
                 fields.append('floorplan')
