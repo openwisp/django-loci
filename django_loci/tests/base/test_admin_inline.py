@@ -780,38 +780,36 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
     # Test for ensuring that the floorplan is not created when the location is outdoor
     def test_add_outdoor_with_floorplan(self):
         self._login_as_admin()
-        p = self._get_prefix()
+        p = 'floorplan_set'
         floorplan_file = open(self._floorplan_path, 'rb')
-        params = self.params
-        params.update(
-            {
+        params = {
                 'name': 'test-add-outdoor-with-floorplan',
-                '{0}-0-type'.format(p): 'outdoor',
-                '{0}-0-location_selection'.format(p): 'new',
-                '{0}-0-location'.format(p): '',
-                '{0}-0-floorplan_selection'.format(p): 'new',
-                '{0}-0-floorplan'.format(p): '',
+                'type': 'outdoor',
+                'geometry': 'SRID=4326;POINT (12.512324 41.898703)',
+                'address': 'Piazza Venezia, Roma, Italia',
                 '{0}-0-floor'.format(p): '1',
                 '{0}-0-image'.format(p): floorplan_file,
-                '{0}-0-indoor'.format(p): '-100,100',
                 '{0}-0-id'.format(p): '',
+                '{0}-0-location'.format(p): '',
+                '{0}-TOTAL_FORMS'.format(p): '1',
+                '{0}-INITIAL_FORMS'.format(p): '0',
+                '{0}-MIN_NUM_FORMS'.format(p): '0',
+                '{0}-MAX_NUM_FORMS'.format(p): '1',
             }
+        location_url = '{0}_{1}_add'.format(
+            self.url_prefix, self.location_model.__name__.lower()
         )
-        r = self.client.post(reverse(self.add_url), params, follow=True)
+        r = self.client.post(reverse(location_url), params, follow=True)
         floorplan_file.close()
         self.assertNotContains(r, 'errors')
-        loc = self.location_model.objects.get(name=params['{0}-0-name'.format(p)])
-        self.assertEqual(loc.address, params['{0}-0-address'.format(p)])
+        self.assertNotContains(r, 'errornote')
+        loc = self.location_model.objects.get(name=params['name'])
+        self.assertEqual(loc.address, params['address'])
         self.assertEqual(
-            loc.geometry.coords, GEOSGeometry(params['{0}-0-geometry'.format(p)]).coords
+            loc.geometry.coords, GEOSGeometry(params['geometry']).coords
         )
-        self.assertEqual(loc.objectlocation_set.count(), 1)
         self.assertEqual(self.location_model.objects.count(), 1)
         self.assertEqual(self.floorplan_model.objects.count(), 0)
-        ol = loc.objectlocation_set.first()
-        self.assertEqual(ol.content_object.name, params['name'])
-        self.assertEqual(ol.location.type, 'outdoor')
-        self.assertIsNone(ol.floorplan)
 
     # Test for ensuring that location is changed from outdoor to indoor, with related floorplans created
     def test_device_change_location_from_outdoor_to_indoor(self):

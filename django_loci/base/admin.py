@@ -72,9 +72,15 @@ class AbstractLocationForm(forms.ModelForm):
         css = {'all': ('django-loci/css/loci.css',)}
 
     def clean(self):
-        # if changing existing location to outdoor, delete all floorplans
-        if self.instance and self.cleaned_data.get('type') == "outdoor":
-            self.instance.type = self.cleaned_data['type']
+        location_type = self.cleaned_data.get('type')
+        instance_type = self.instance.type
+        # if 'type' is not None implies that location is being changed, hence delete floorplans
+        if (
+            location_type == 'outdoor'
+            and instance_type
+            and instance_type != location_type
+        ):
+            self.instance.objectlocation_set.all().update(floorplan=None)
             self.instance.floorplan_set.all().delete()
 
 
@@ -298,7 +304,7 @@ class AbstractObjectLocationForm(forms.ModelForm):
         # sync location, clean indoor field basis type and delete floorplans if type is not outdoor
         if location := data.get('location'):
             location.type = type_
-            if type_ != "indoor":
+            if type_ != 'indoor':
                 data['indoor'] = None
                 # set floorplans of all objectlocations to None where this location is related
                 location.objectlocation_set.update(floorplan=None)
