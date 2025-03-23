@@ -52,13 +52,20 @@ class AbstractFloorPlanAdmin(TimeReadonlyAdminMixin, admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(AbstractFloorPlanAdmin, self).get_form(request, obj, **kwargs)
-        form.base_fields['location'].widget = LocationRawIdWidget(
-            rel=self.model._meta.get_field('location').remote_field, admin_site=site
-        )
+        permissions = self.get_model_perms(request)
+        # location field is not in base_fields if user has only view-only permission
+        if permissions['add'] and permissions['change'] and permissions['delete']:
+            form.base_fields['location'].widget = LocationRawIdWidget(
+                rel=self.model._meta.get_field('location').remote_field, admin_site=site
+            )
         return form
 
 
 class AbstractLocationForm(forms.ModelForm):
+    # adding geometry field to render it for view-only
+    # as 'AdminReadonly' renders widget if it is present in self.fields
+    geometry = GeometryField(required=True)
+
     class Meta:
         exclude = tuple()
 
@@ -70,6 +77,18 @@ class AbstractLocationForm(forms.ModelForm):
             'django-loci/js/vendor/reconnecting-websocket.min.js',
         )
         css = {'all': ('django-loci/css/loci.css',)}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if (
+            self._user
+            and self._user.has_perm('django_loci.view_location')
+            and not self._user.has_perm('django_loci.change_location')
+        ):
+            # set read_only attribute as 'AdminReadonlyField' renders if 'read_only' is set
+            setattr(self.fields['geometry'].widget, 'read_only', True)
+        # remove user attribute to avoid any side effects
+        self._user = None
 
 
 class AbstractFloorPlanInline(TimeReadonlyAdminMixin, admin.StackedInline):
@@ -249,16 +268,25 @@ class AbstractObjectLocationForm(forms.ModelForm):
                 (floorplan.pk, floorplan)
             ]
         # setting attributes basis user permissions
+        app_label = self.Meta.model._meta.app_label
+        model_name = self.Meta.model._meta.model_name
         if (
             user
-            and user.has_perm('django_loci.view_objectlocation')
-            and not user.has_perm('django_loci.change_objectlocation')
+            and user.has_perm(f'{app_label}.view_{model_name}')
+            and not user.has_perm(f'{app_label}.change_{model_name}')
         ):
             # For view only permissions, 'AdminReadonlyField' reads from instance
             for field, value in initial.items():
-                setattr(self.instance, field, value)
-
+                if field != 'floorplan':
+                    setattr(self.instance, field, value)
+                else:
+                    setattr(self.instance.floorplan, 'pk', value)
+            # setting read_only attribute as 'AdminReadonlyField' renders if 'read_only' is set
             setattr(self.fields['geometry'].widget, 'read_only', True)
+            setattr(self.fields['image'].widget, 'read_only', True)
+            setattr(self.fields['indoor'].widget, 'read_only', True)
+            # adding id to indoor widget to display indoor position
+            self.fields['indoor'].widget.attrs.update({'id': 'id_indoor'})
         self.initial.update(initial)
 
     def _get_initial_location(self):

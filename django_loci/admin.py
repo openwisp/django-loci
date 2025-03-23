@@ -55,6 +55,13 @@ class LocationAdmin(AbstractLocationAdmin):
             formset_kwargs['data']['floorplan_set-TOTAL_FORMS'] = '0'
         return formset_kwargs
 
+    # override get_form method to pass user to form
+    # for handling permissions
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form._user = request.user
+        return form
+
 
 class ObjectLocationForm(AbstractObjectLocationForm):
     class Meta(AbstractObjectLocationForm.Meta):

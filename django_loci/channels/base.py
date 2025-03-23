@@ -41,10 +41,11 @@ class BaseLocationBroadcast(JsonWebsocketConsumer):
 
     def is_authorized(self, user, location):
         perm = '{0}.change_location'.format(self.model._meta.app_label)
+        # allow users with view permission
+        readperm = '{0}.view_location'.format(self.model._meta.app_label)
         authenticated = user.is_authenticated
-        return authenticated and (
-            user.is_superuser or (user.is_staff and user.has_perm(perm))
-        )
+        is_permitted = user.has_perm(perm) or user.has_perm(readperm)
+        return authenticated and (user.is_superuser or (user.is_staff and is_permitted))
 
     def send_message(self, event):
         self.send_json(event['message'])

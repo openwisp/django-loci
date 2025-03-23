@@ -126,7 +126,15 @@ django.jQuery(function ($) {
   }
 
   function indoorForm(selection) {
-    if ($type.val() !== "indoor") {
+    // fallbacks for view only users
+    var type = $type.val() || $typeRow.find(".readonly").text(),
+      floorplanValue =
+        $floorplanSelection.val() ||
+        $floorplanSelectionRow.find(".readonly").text(),
+      locationSelectionValue =
+        $locationSelection.val() ||
+        $locationSelectionRow.find(".readonly").text();
+    if (type !== "indoor") {
       return;
     }
     $indoorPositionRow.hide();
@@ -139,11 +147,11 @@ django.jQuery(function ($) {
       $floorplan.val("");
       $floorplanRow.hide();
     }
-    if ($locationSelection.val() === "new") {
+    if (locationSelectionValue === "new") {
       $floorplanSelection.val("new");
       $floorplanSelectionRow.hide();
     }
-    if (!$floorplanSelection.val()) {
+    if (!floorplanValue) {
       $indoorRows.hide();
       $floorplanSelectionRow.show();
     }
@@ -228,17 +236,23 @@ django.jQuery(function ($) {
   }
 
   function floorplanSelectionChange(e, initial) {
-    var value = $floorplanSelection.val(),
-      optionsLength = $floorplan.find("option").length;
+    // fallbacks for view only users
+    var value =
+        $floorplanSelection.val() ||
+        $floorplanSelectionRow.find(".readonly").text(),
+      optionsLength =
+        $floorplan.find("option").length ||
+        $floorplanSelectionRow.find(".readonly").length;
     // do not reset indoor form at first load
     if (!initial) {
       resetIndoorForm(true);
     }
     indoorForm(value);
-    if (value === "existing" && optionsLength > 1) {
+    // optionslength includes the placeholder option
+    if (value === "existing" && optionsLength >= 1) {
       $floorplanRow.show();
       // if no floorplan available, make it obvious
-    } else if (value === "existing" && optionsLength <= 1) {
+    } else if (value === "existing" && optionsLength < 1) {
       alert(gettext("This location has no floorplans available yet"));
       $floorplanSelection.val("");
     }
@@ -272,7 +286,9 @@ django.jQuery(function ($) {
   function locationChange(e, initial) {
     function loadIndoor() {
       indoorForm();
-      if ($type.val() !== "indoor") {
+      // fallback for view only users
+      var type = $type.val() || $typeRow.find(".readonly").text();
+      if (type !== "indoor") {
         $indoor.hide();
         return;
       }
@@ -599,6 +615,8 @@ django.jQuery(function ($) {
   } else {
     pk = window.location.pathname.split("/").slice("-3", "-2")[0];
   }
+  // fallback for view only users
+  var typeLength = $type.length || $typeRow.find(".readonly").length;
   // show mobile map (hide not relevant fields)
   if ($isMobile.prop("checked")) {
     listenForLocationUpdates(pk);
@@ -618,22 +636,33 @@ django.jQuery(function ($) {
       $noLocationDiv = $(".no-location", ".loci.coords");
     }
     // this is triggered in the location form page
-  } else if (!$type.length) {
+  } else if (!typeLength) {
     if (pk !== "location") {
       listenForLocationUpdates(pk);
     }
   }
   // show existing indoor
-  if ($floorplan.val()) {
+  // fallbacks for view only users
+  if ($floorplan.val() || $floorplanSelectionRow.find(".readonly").text()) {
     $indoor.show();
-    if ($floorplanSelection.val()) {
+    if (
+      $floorplanSelection.val() ||
+      $floorplanSelectionRow.find(".readonly").text()
+    ) {
       $indoorRows.show();
       $floorplanSelectionRow.hide();
     }
     // adding indoor
-  } else if ($type.val() === "indoor") {
+  } else if (($type.val() || $typeRow.find(".readonly").text()) === "indoor") {
     $indoor.show();
     $indoorRows.show();
-    indoorForm($locationSelection.val());
+    indoorForm(
+      $locationSelection.val() ||
+        $locationSelectionRow.find(".readonly").text(),
+    );
+  }
+  // hide image input for view only users
+  if ($indoor.find(".field-image .readonly").length) {
+    $indoor.find(".field-image input").hide();
   }
 });
