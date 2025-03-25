@@ -5,7 +5,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.contrib.humanize.templatetags.humanize import ordinal
 from django.core.exceptions import ValidationError
-from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from openwisp_utils.base import TimeStampedEditableModel
@@ -48,6 +47,11 @@ class AbstractLocation(TimeStampedEditableModel):
     class Meta:
         abstract = True
 
+    # overriding __init__ to store the initial type
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._initial_type = self.type
+
     def __str__(self):
         return self.name
 
@@ -66,12 +70,16 @@ class AbstractLocation(TimeStampedEditableModel):
     def short_type(self):
         return _(self.type.capitalize())
 
+    # save method is automatically wrapped in atomic transaction
     def save(self, *args, **kwargs):
         # if location type is changed to outdoor, remove all associated floorplans
-        if self.type == 'outdoor' and not self._state.adding:
-            with transaction.atomic():
-                self.objectlocation_set.all().update(floorplan=None, indoor=None)
-                self.floorplan_set.all().delete()
+        if (
+            self.type != self._initial_type
+            and self.type == 'outdoor'
+            and self.floorplan_set.exists()
+        ):
+            self.objectlocation_set.update(floorplan=None, indoor=None)
+            self.floorplan_set.all().delete()
         return super().save(*args, **kwargs)
 
 
