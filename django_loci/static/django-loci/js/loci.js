@@ -385,7 +385,16 @@ django.jQuery(function ($) {
   });
 
   $("#content-main form").submit(function (e) {
-    var indoorPosition = $(".field-indoor .floorplan-raw input").val();
+    var indoorPosition = $(".field-indoor .floorplan-raw input").val(),
+      // floorplansLength for choice field includes the placeholder option so
+      // need to subtract it. Fallbacks to classes for location form
+      floorplansLength =
+        $floorplan.find("option").length > 1
+          ? $floorplan.find("option").length - 1
+          : $("#floorplan_set-group").find("div.has_original").length,
+      typeSelect = $type.find("option").length
+        ? $type
+        : $(".module.aligned .field-type").find("select");
     if (isNew && $type.val() === "indoor" && !indoorPosition) {
       var message = gettext(
         "You have set this location as indoor but have " +
@@ -397,6 +406,19 @@ django.jQuery(function ($) {
       } else {
         $floorplanSelection.val("");
         indoorForm();
+      }
+    }
+    // Confirm deletion on switching indoor to outdoor, if floorplans exist
+    if (typeSelect.val() === "outdoor" && floorplansLength >= 1) {
+      var msg = gettext(
+        "This location has floorplans associated to it. " +
+          "Converting it to outdoor will remove all these floorplans, " +
+          "affecting all devices related to this location. " +
+          "Do you want to proceed?",
+      );
+      if (!confirm(msg)) {
+        e.preventDefault();
+        typeSelect.val("indoor");
       }
     }
   });

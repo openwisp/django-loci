@@ -11,7 +11,7 @@ django.jQuery(function ($) {
         $floorplan_set.show();
       } else if (value === "outdoor" && $floorplans_length >= 0) {
         $floorplan_set.hide();
-      } 
+      }
     };
   $type_field.change(type_change_event);
   type_change_event();
