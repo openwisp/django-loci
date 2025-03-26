@@ -1,6 +1,8 @@
 import json
 
 import responses
+from django.contrib.auth.models import Permission
+from django.contrib.humanize.templatetags.humanize import ordinal
 from django.urls import reverse
 
 from .. import TestAdminMixin, TestLociMixin
@@ -228,3 +230,23 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         expected = {'error': 'lat or lng parameter not defined'}
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), expected)
+
+    # for users with view only permissions to floorplans
+    def test_view_floorplans(self):
+        user = self.user_model.objects.create_user(
+            username='admin', password='admin', email='admin@email.org', is_staff=True
+        )
+        # add view permission to client
+        view_permission = Permission.objects.filter(codename__in=["view_floorplan"])
+        user.user_permissions.add(*view_permission)
+        self.client.force_login(user)
+        loc = self._create_location(name='test-admin-location-1', type='indoor')
+        fl = self._create_floorplan(location=loc)
+        url = reverse('{0}_floorplan_change'.format(self.url_prefix), args=[fl.pk])
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        # assert if image is being rendered or not
+        self.assertContains(r, 'img src="{0}"'.format(fl.image.url))
+        self.assertContains(r, f'{loc.name} {ordinal(fl.floor)}')
+        self.assertContains(r, fl.floor)
+        self.assertContains(r, loc.name)

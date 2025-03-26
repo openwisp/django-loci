@@ -661,8 +661,4 @@ django.jQuery(function ($) {
         $locationSelectionRow.find(".readonly").text(),
     );
   }
-  // hide image input for view only users
-  if ($indoor.find(".field-image .readonly").length) {
-    $indoor.find(".field-image input").hide();
-  }
 });

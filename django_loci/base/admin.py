@@ -22,12 +22,30 @@ from .models import AbstractLocation
 
 
 class AbstractFloorPlanForm(forms.ModelForm):
+    # adding image field to render it for view-only
+    # as 'AdminReadonly' renders widget if it is present in self.fields
+    image = forms.ImageField(widget=ImageWidget(), help_text=_('floor plan image'))
+
     class Meta:
         exclude = tuple()
-        widgets = {'image': ImageWidget()}
 
     class Media:
         css = {'all': ('django-loci/css/loci.css',)}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # setting attributes basis user permissions
+        app_label = self.Meta.model._meta.app_label
+        model_name = self.Meta.model._meta.model_name
+        if (
+            getattr(self, '_user', None)
+            and self._user.has_perm(f'{app_label}.view_{model_name}')
+            and not self._user.has_perm(f'{app_label}.change_{model_name}')
+        ):
+            # set read_only attribute as 'AdminReadonlyField' renders if 'read_only' is set
+            setattr(self.fields['image'].widget, 'read_only', True)
+        # remove user attribute to avoid any side effects
+        self._user = None
 
 
 class LocationRawIdWidget(widgets.ForeignKeyRawIdWidget):
@@ -80,10 +98,13 @@ class AbstractLocationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # setting attributes basis user permissions
+        app_label = self.Meta.model._meta.app_label
+        model_name = self.Meta.model._meta.model_name
         if (
-            self._user
-            and self._user.has_perm('django_loci.view_location')
-            and not self._user.has_perm('django_loci.change_location')
+            getattr(self, '_user', None)
+            and self._user.has_perm(f'{app_label}.view_{model_name}')
+            and not self._user.has_perm(f'{app_label}.change_{model_name}')
         ):
             # set read_only attribute as 'AdminReadonlyField' renders if 'read_only' is set
             setattr(self.fields['geometry'].widget, 'read_only', True)

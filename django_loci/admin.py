@@ -22,6 +22,13 @@ class FloorPlanForm(AbstractFloorPlanForm):
 class FloorPlanAdmin(AbstractFloorPlanAdmin):
     form = FloorPlanForm
 
+    # override get_form method to pass user to form
+    # for handling permissions
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form._user = request.user
+        return form
+
 
 class LocationForm(AbstractLocationForm):
     class Meta(AbstractLocationForm.Meta):
