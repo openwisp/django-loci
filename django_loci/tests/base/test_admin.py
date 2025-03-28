@@ -232,12 +232,12 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self.assertEqual(response.json(), expected)
 
     # for users with view only permissions to floorplans
-    def test_view_floorplans(self):
+    def test_readonly_floorplans(self):
         user = self.user_model.objects.create_user(
             username='admin', password='admin', email='admin@email.org', is_staff=True
         )
         # add view permission to client
-        view_permission = Permission.objects.filter(codename__in=["view_floorplan"])
+        view_permission = Permission.objects.filter(codename__in=['view_floorplan'])
         user.user_permissions.add(*view_permission)
         self.client.force_login(user)
         loc = self._create_location(name='test-admin-location-1', type='indoor')

@@ -883,13 +883,13 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
         )
 
     # for users with view only permissions to location
-    def test_view_location_with_floorplans(self):
+    def test_readonly_indoor_location(self):
         user = self.user_model.objects.create_user(
             username='admin', password='admin', email='admin@email.org', is_staff=True
         )
         # add view permission to client
         view_permission = Permission.objects.filter(
-            codename__in=["view_location", "view_floorplan"]
+            codename__in=['view_location', 'view_floorplan']
         )
         user.user_permissions.add(*view_permission)
         self.client.force_login(user)
@@ -910,13 +910,13 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
         self.assertContains(r, loc.is_mobile)
 
     # for users with view only permissions to objectlocation
-    def test_view_objectlocation_with_floorplans(self):
+    def test_readonly_indoor_object_location(self):
         user = self.user_model.objects.create_user(
             username='admin', password='admin', email='admin@gmail.com', is_staff=True
         )
         # add view permission to client
         view_permission = Permission.objects.filter(
-            codename__in=["view_device", "view_objectlocation"]
+            codename__in=['view_device', 'view_objectlocation']
         )
         user.user_permissions.add(*view_permission)
         self.client.force_login(user)

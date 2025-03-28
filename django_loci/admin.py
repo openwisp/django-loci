@@ -1,5 +1,3 @@
-from functools import partialmethod
-
 from django.contrib import admin
 
 from .base.admin import (
@@ -21,13 +19,6 @@ class FloorPlanForm(AbstractFloorPlanForm):
 
 class FloorPlanAdmin(AbstractFloorPlanAdmin):
     form = FloorPlanForm
-
-    # override get_form method to pass user to form
-    # for handling permissions
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        form._user = request.user
-        return form
 
 
 class LocationForm(AbstractLocationForm):
@@ -62,13 +53,6 @@ class LocationAdmin(AbstractLocationAdmin):
             formset_kwargs['data']['floorplan_set-TOTAL_FORMS'] = '0'
         return formset_kwargs
 
-    # override get_form method to pass user to form
-    # for handling permissions
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        form._user = request.user
-        return form
-
 
 class ObjectLocationForm(AbstractObjectLocationForm):
     class Meta(AbstractObjectLocationForm.Meta):
@@ -78,14 +62,6 @@ class ObjectLocationForm(AbstractObjectLocationForm):
 class ObjectLocationInline(AbstractObjectLocationInline):
     model = ObjectLocation
     form = ObjectLocationForm
-
-    # override get_formset method to pass user to form
-    def get_formset(self, request, obj=..., **kwargs):
-        formset = super().get_formset(request, obj, **kwargs)
-        formset._construct_form = partialmethod(
-            formset._construct_form, user=request.user
-        )
-        return formset
 
 
 admin.site.register(FloorPlan, FloorPlanAdmin)
