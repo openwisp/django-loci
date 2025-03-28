@@ -75,6 +75,7 @@ class AbstractLocation(TimeStampedEditableModel):
         # if location type is changed to outdoor, remove all associated floorplans
         if (
             self.type != self._initial_type
+            and not self._state.adding
             and self.type == 'outdoor'
             and self.floorplan_set.exists()
         ):
