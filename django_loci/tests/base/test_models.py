@@ -85,19 +85,32 @@ class BaseTestModels(TestLociMixin):
         except ValidationError:
             self.fail('Unexpected ValidationError raised')
 
+    # changing location type from indoor to outdoor, deletes floorplans
     def test_location_change_indoor_to_outdoor(self):
         fl = self._create_floorplan()
         location = fl.location
         location.type = 'outdoor'
-        try:
-            location.full_clean()
-        except ValidationError as e:
-            self.assertIn('type', e.message_dict)
-            err_str = str(e.message_dict['type'])
-            self.assertIn('this location has floorplans', err_str)
-            self.assertIn('please delete them', err_str)
-        else:
-            self.fail('ValidationError not raised')
+        location.save()
+        self.assertEqual(location.floorplan_set.count(), 0)
+
+    # similar to 'test_location_change_indoor_to_outdoor' but with object location
+    def test_object_location_change_indoor_to_outdoor(self):
+        l1 = self._create_location(type='indoor')
+        fl = self._create_floorplan(location=l1)
+        obj = self._create_object()
+        ol = self.object_location_model(
+            content_object=obj, location=l1, floorplan=fl, indoor='-100,100'
+        )
+        ol.full_clean()
+        ol.save()
+        l1.type = 'outdoor'
+        l1.save()
+        # refetching again to check if object location is updated
+        ol = self.object_location_model.objects.get(pk=ol.pk)
+        self.assertIsNone(ol.floorplan)
+        self.assertIsNone(ol.indoor)
+        self.assertEqual(ol.location.type, 'outdoor')
+        self.assertEqual(ol.location.floorplan_set.count(), 0)
 
     def _test_indoor_position_validation_error(self, ol):
         try:

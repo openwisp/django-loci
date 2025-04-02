@@ -164,7 +164,10 @@ django.jQuery(function ($) {
     }
 
     function typeChange(e, initial) {
-        var value = $type.val();
+        var value = $type.val(),
+            // floorplansLength for choice field includes the placeholder option so
+            // need to subtract it.
+            floorplansLength = $floorplan.find("option").length - 1;
         if (value) {
             $outdoor.show();
             $geoEdit.show();
@@ -178,6 +181,19 @@ django.jQuery(function ($) {
         if (value === 'indoor') {
             $indoor.show();
             indoorForm($locationSelection.val());
+        } else if (value === "outdoor" && floorplansLength >= 1) {
+            // Confirm deletion on switching indoor to outdoor, if floorplans exist
+            msg = gettext(
+                "This location has floorplans associated to it. " +
+                    "Converting it to outdoor will remove all these floorplans, " +
+                    "affecting all devices related to this location. " +
+                    "Do you want to proceed?"
+            );
+            if (!confirm(msg)) {
+                $type.val("indoor");
+                return;
+            }
+            $indoor.hide();
         } else {
             $indoor.hide();
         }
@@ -354,7 +370,7 @@ django.jQuery(function ($) {
     });
 
     $('#content-main form').submit(function (e) {
-        var indoorPosition = $('.field-indoor .floorplan-raw input').val();
+        var indoorPosition = $(".field-indoor .floorplan-raw input").val();
         if (isNew && $type.val() === 'indoor' && !indoorPosition) {
             var message = gettext('You have set this location as indoor but have ' +
                                   'not specified indoor cordinates on a floorplan, ' +
