@@ -47,27 +47,16 @@ class AbstractLocation(TimeStampedEditableModel):
     class Meta:
         abstract = True
 
+    # overriding __init__ to store the initial type
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._initial_type = self.type
+
     def __str__(self):
         return self.name
 
     def clean(self):
-        self._validate_outdoor_floorplans()
         self._validate_geometry_if_not_mobile()
-
-    def _validate_outdoor_floorplans(self):
-        """
-        if a location type is changed from indoor to outdoor
-        but the location has still floorplan associated to it,
-        a ValidationError will be raised
-        """
-        if self.type == 'indoor' or self._state.adding:
-            return
-        if self.floorplan_set.count() > 0:
-            msg = (
-                'this location has floorplans associated to it, '
-                'please delete them before changing its type'
-            )
-            raise ValidationError({'type': msg})
 
     def _validate_geometry_if_not_mobile(self):
         """
@@ -80,6 +69,19 @@ class AbstractLocation(TimeStampedEditableModel):
     @property
     def short_type(self):
         return _(self.type.capitalize())
+
+    # save method is automatically wrapped in atomic transaction
+    def save(self, *args, **kwargs):
+        # if location type is changed to outdoor, remove all associated floorplans
+        if (
+            self.type != self._initial_type
+            and not self._state.adding
+            and self.type == 'outdoor'
+            and self.floorplan_set.exists()
+        ):
+            self.objectlocation_set.update(floorplan=None, indoor=None)
+            self.floorplan_set.all().delete()
+        return super().save(*args, **kwargs)
 
 
 class AbstractFloorPlan(TimeStampedEditableModel):
