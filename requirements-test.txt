@@ -1,5 +1,4 @@
-pytest-django~=4.9.0
-pytest-asyncio~=0.24.0
 pytest-cov~=5.0.0
 responses~=0.25.3
-openwisp-utils[qa] @ https://github.com/openwisp/openwisp-utils/tarball/1.2
+openwisp-utils[qa,selenium,channels,channels-test] @ https://github.com/openwisp/openwisp-utils/tarball/1.2
+
