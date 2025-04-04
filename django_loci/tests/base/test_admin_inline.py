@@ -769,20 +769,23 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
     def test_add_outdoor_with_floorplan(self):
         self._login_as_admin()
         p = 'floorplan_set'
-        params = {
-            'name': 'test-add-outdoor-with-floorplan',
-            'type': 'outdoor',
-            'geometry': 'SRID=4326;POINT (12.512324 41.898703)',
-            'address': 'Piazza Venezia, Roma, Italia',
-            '{0}-0-floor'.format(p): '1',
-            '{0}-0-image'.format(p): self._get_simpleuploadedfile(),
-            '{0}-0-id'.format(p): '',
-            '{0}-0-location'.format(p): '',
-            '{0}-TOTAL_FORMS'.format(p): '1',
-            '{0}-INITIAL_FORMS'.format(p): '0',
-            '{0}-MIN_NUM_FORMS'.format(p): '0',
-            '{0}-MAX_NUM_FORMS'.format(p): '1',
-        }
+        params = self.params
+        params.update(
+            {
+                'name': 'test-add-outdoor-with-floorplan',
+                'type': 'outdoor',
+                'geometry': 'SRID=4326;POINT (12.512324 41.898703)',
+                'address': 'Piazza Venezia, Roma, Italia',
+                '{0}-0-floor'.format(p): '1',
+                '{0}-0-image'.format(p): self._get_simpleuploadedfile(),
+                '{0}-0-id'.format(p): '',
+                '{0}-0-location'.format(p): '',
+                '{0}-TOTAL_FORMS'.format(p): '1',
+                '{0}-INITIAL_FORMS'.format(p): '0',
+                '{0}-MIN_NUM_FORMS'.format(p): '0',
+                '{0}-MAX_NUM_FORMS'.format(p): '1',
+            }
+        )
         location_url = '{0}_{1}_add'.format(
             self.url_prefix, self.location_model.__name__.lower()
         )
