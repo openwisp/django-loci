@@ -14,3 +14,9 @@
 p.change-image {
   margin-left: 170px;
 }
+/* Set .readonly to flex to ensure the floorplan-widget inherits the full width of 
+its parent flex container */
+.field-indoor .readonly {
+  display: flex;
+  width: 100%;
+}
