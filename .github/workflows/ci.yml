@@ -23,7 +23,6 @@ jobs:
           - "3.12"
           - "3.13"
         django-version:
-          - django~=4.1.0
           - django~=4.2.0
           - django~=5.0.0
           - django~=5.1.0
@@ -46,7 +45,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.sha }}
-    
+
     - name: Cache APT packages
       uses: actions/cache@v4
       with:
