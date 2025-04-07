@@ -90,6 +90,8 @@ jobs:
         coverage run runtests.py --parallel
         coverage combine
         coverage xml
+      env:
+        SELENIUM_HEADLESS: 1
 
     - name: Upload Coverage
       if: ${{ success() }}

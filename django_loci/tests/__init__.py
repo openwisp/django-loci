@@ -78,10 +78,16 @@ class TestAdminMixin(object):
     def object_url_prefix(self):
         return 'admin:{0}'.format(self.object_model._meta.app_label)
 
-    def _create_admin(self):
-        return self.user_model.objects.create_superuser(
-            username='admin', password='admin', email='admin@email.org'
+    def _create_admin(self, **kwargs):
+        opts = dict(
+            username='admin',
+            password='admin',
+            email='admin@email.org',
+            is_superuser=True,
+            is_staff=True,
         )
+        opts.update(kwargs)
+        return self.user_model.objects.create_user(**opts)
 
     def _login_as_admin(self):
         admin = self._create_admin()

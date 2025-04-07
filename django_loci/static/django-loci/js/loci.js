@@ -567,7 +567,7 @@ django.jQuery(function ($) {
     updateMap();
   });
 
-  $(window).on("load", function () {
+  $(document).ready(function () {
     var featureGroup = getFeatureGroup(),
       marker = getMarker();
     featureGroup.on("layeradd", function () {
