@@ -12,12 +12,18 @@ django.jQuery(function ($) {
       } else if (value === "outdoor" && $floorplans_length === 0) {
         $floorplan_set.hide();
       } else if (value === "outdoor" && $floorplans_length > 0) {
-        var msg =
-          "Please remove the associated floorplans first " +
-          'and save; then you can switch to type "indoor"';
-        alert(gettext(msg));
-        e.preventDefault();
-        $type_field.val("indoor");
+        // Confirm deletion on switching indoor to outdoor, if floorplans exist
+        var msg = gettext(
+          "This location has floorplans associated to it. " +
+            "Converting it to outdoor will remove all these floorplans, " +
+            "affecting all devices related to this location. " +
+            "Do you want to proceed?",
+        );
+        if (!confirm(msg)) {
+          $type_field.val("indoor");
+        } else {
+          $floorplan_set.hide();
+        }
       }
     };
   $type_field.change(type_change_event);

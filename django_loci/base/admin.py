@@ -144,6 +144,13 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
             )
         return JsonResponse({'choices': choices})
 
+    def get_formset_kwargs(self, request, obj, inline, prefix):
+        formset_kwargs = super().get_formset_kwargs(request, obj, inline, prefix)
+        # manually set TOTAL_FORMS to 0 if the type is outdoor to avoid floorplan form creation
+        if request.method == 'POST' and formset_kwargs['data']['type'] == 'outdoor':
+            formset_kwargs['data']['floorplan_set-TOTAL_FORMS'] = '0'
+        return formset_kwargs
+
 
 class UnvalidatedChoiceField(forms.ChoiceField):
     """
@@ -289,6 +296,10 @@ class AbstractObjectLocationForm(forms.ModelForm):
         fields = []
         if not is_mobile and type_ in ['outdoor', 'indoor']:
             fields += ['location_selection', 'name', 'address', 'geometry']
+        # sync location, clean indoor field basis type
+        if location := data.get('location'):
+            location.type = type_
+            data['indoor'] = None if type_ != 'indoor' else data.get('indoor')
         if type_ == 'indoor':
             if data.get('floorplan_selection') == 'existing':
                 fields.append('floorplan')
