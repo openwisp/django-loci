@@ -2,18 +2,10 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.db.models.fields.files import ImageFieldFile
 from django.urls import reverse
 
-from .. import TestAdminMixin, TestLociMixin
+from .. import TestAdminInlineMixin, TestLociMixin
 
 
-class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
-    @classmethod
-    def _get_prefix(cls):
-        s = '{0}-{1}-content_type-object_id'
-        return s.format(
-            cls.location_model._meta.app_label,
-            cls.object_location_model.__name__.lower(),
-        )
-
+class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
     @classmethod
     def _get_params(cls):
         _p = cls._get_prefix()
@@ -33,19 +25,6 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
     @property
     def params(self):
         return self.__class__._get_params()
-
-    def _get_url_prefix(self):
-        return '{0}_{1}'.format(
-            self.object_url_prefix, self.object_model.__name__.lower()
-        )
-
-    @property
-    def add_url(self):
-        return '{0}_add'.format(self._get_url_prefix())
-
-    @property
-    def change_url(self):
-        return '{0}_change'.format(self._get_url_prefix())
 
     def test_json_urls(self):
         self._login_as_admin()

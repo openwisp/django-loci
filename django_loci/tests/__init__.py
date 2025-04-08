@@ -97,3 +97,27 @@ class TestAdminMixin(object):
     def _load_content(self, file):
         d = os.path.dirname(os.path.abspath(__file__))
         return open(os.path.join(d, file)).read()
+
+
+# Mixin for testing admin inline views
+class TestAdminInlineMixin(TestAdminMixin):
+    @classmethod
+    def _get_prefix(cls):
+        s = '{0}-{1}-content_type-object_id'
+        return s.format(
+            cls.location_model._meta.app_label,
+            cls.object_location_model.__name__.lower(),
+        )
+
+    def _get_url_prefix(self):
+        return '{0}_{1}'.format(
+            self.object_url_prefix, self.object_model.__name__.lower()
+        )
+
+    @property
+    def add_url(self):
+        return '{0}_add'.format(self._get_url_prefix())
+
+    @property
+    def change_url(self):
+        return '{0}_change'.format(self._get_url_prefix())

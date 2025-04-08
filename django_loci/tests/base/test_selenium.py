@@ -5,27 +5,10 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from openwisp_utils.tests import SeleniumTestMixin
 
-from .. import TestAdminMixin, TestLociMixin
+from .. import TestAdminInlineMixin, TestLociMixin
 
 
-class BaseTestAdminSelenium(SeleniumTestMixin, TestAdminMixin, TestLociMixin):
-    def _get_url_prefix(self):
-        return '{0}_{1}'.format(
-            self.object_url_prefix, self.object_model.__name__.lower()
-        )
-
-    @classmethod
-    def _get_prefix(cls):
-        s = '{0}-{1}-content_type-object_id'
-        return s.format(
-            cls.location_model._meta.app_label,
-            cls.object_location_model.__name__.lower(),
-        )
-
-    @property
-    def add_url(self):
-        return '{0}_add'.format(self._get_url_prefix())
-
+class BaseTestAdminSelenium(SeleniumTestMixin, TestAdminInlineMixin, TestLociMixin):
     def test_create_new_device(self):
         self.login()
         self.open(reverse(self.add_url))
