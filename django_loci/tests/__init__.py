@@ -78,10 +78,16 @@ class TestAdminMixin(object):
     def object_url_prefix(self):
         return 'admin:{0}'.format(self.object_model._meta.app_label)
 
-    def _create_admin(self):
-        return self.user_model.objects.create_superuser(
-            username='admin', password='admin', email='admin@email.org'
+    def _create_admin(self, **kwargs):
+        opts = dict(
+            username='admin',
+            password='admin',
+            email='admin@email.org',
+            is_superuser=True,
+            is_staff=True,
         )
+        opts.update(kwargs)
+        return self.user_model.objects.create_user(**opts)
 
     def _login_as_admin(self):
         admin = self._create_admin()
@@ -91,3 +97,27 @@ class TestAdminMixin(object):
     def _load_content(self, file):
         d = os.path.dirname(os.path.abspath(__file__))
         return open(os.path.join(d, file)).read()
+
+
+# Mixin for testing admin inline views
+class TestAdminInlineMixin(TestAdminMixin):
+    @classmethod
+    def _get_prefix(cls):
+        s = '{0}-{1}-content_type-object_id'
+        return s.format(
+            cls.location_model._meta.app_label,
+            cls.object_location_model.__name__.lower(),
+        )
+
+    def _get_url_prefix(self):
+        return '{0}_{1}'.format(
+            self.object_url_prefix, self.object_model.__name__.lower()
+        )
+
+    @property
+    def add_url(self):
+        return '{0}_add'.format(self._get_url_prefix())
+
+    @property
+    def change_url(self):
+        return '{0}_change'.format(self._get_url_prefix())

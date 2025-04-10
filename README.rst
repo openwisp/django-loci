@@ -544,7 +544,9 @@ Launch development server and SMTP debugging server:
 
 You can access the admin interface at http://127.0.0.1:8000/admin/.
 
-Run tests with:
+Run tests with (make sure you have the :ref:`selenium dependencies
+<https://openwisp.io/docs/dev/utils/developer/test-utilities.html#openwisp-utils-tests-seleniumtestmixin>`
+installed locally first):
 
 .. code-block:: shell
 
