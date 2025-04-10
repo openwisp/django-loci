@@ -43,8 +43,16 @@ input[type=text]{ width: 320px }
 .leaflet-bar a {
   text-decoration: none !important;
 }
-@media (max-width: 767px){
-    .field-geometry > div{
-        flex-direction: column;
-    }
+/* hide image file input for readonly view */
+.field-image .readonly input {
+  display: none;
+}
+/* hide geometry edit tools for readonly view */
+.field-geometry .readonly .leaflet-draw.geometry {
+  display: none;
+}
+@media (max-width: 767px) {
+  .field-geometry > div {
+    flex-direction: column;
+  }
 }

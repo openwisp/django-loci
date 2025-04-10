@@ -1,4 +1,6 @@
+from django.contrib.auth.models import Permission
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.humanize.templatetags.humanize import ordinal
 from django.db.models.fields.files import ImageFieldFile
 from django.urls import reverse
 
@@ -879,3 +881,66 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
             .content_object,
             obj,
         )
+
+    # for users with view only permissions to location
+    def test_readonly_indoor_location(self):
+        user = self.user_model.objects.create_user(
+            username='admin', password='admin', email='admin@email.org', is_staff=True
+        )
+        # add view permission to client
+        view_permission = Permission.objects.filter(
+            codename__in=['view_location', 'view_floorplan']
+        )
+        user.user_permissions.add(*view_permission)
+        self.client.force_login(user)
+        loc = self._create_location(name='test-admin-location-1', type='indoor')
+        fl = self._create_floorplan(location=loc)
+        url = reverse('{0}_location_change'.format(self.url_prefix), args=[loc.pk])
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        # assert if map is being rendered or not
+        self.assertContains(r, 'geometry-div-map')
+        # assert if inline fields are visible
+        self.assertContains(r, f'{loc.name} {ordinal(fl.floor)}')
+        self.assertContains(r, fl.floor)
+        self.assertContains(r, fl.image.url)
+        self.assertContains(r, loc.name)
+        self.assertContains(r, loc.address)
+        self.assertContains(r, loc.type)
+        self.assertContains(r, loc.is_mobile)
+
+    # for users with view only permissions to objectlocation
+    def test_readonly_indoor_object_location(self):
+        user = self.user_model.objects.create_user(
+            username='admin', password='admin', email='admin@gmail.com', is_staff=True
+        )
+        # add view permission to client
+        view_permission = Permission.objects.filter(
+            codename__in=['view_device', 'view_objectlocation']
+        )
+        user.user_permissions.add(*view_permission)
+        self.client.force_login(user)
+        obj = self._create_object(name='test-admin-object-1')
+        loc = self._create_location(name='test-admin-location-1', type='indoor')
+        fl = self._create_floorplan(location=loc)
+        ol = self._create_object_location(
+            content_object=obj, location=loc, floorplan=fl
+        )
+        url = reverse('{0}_device_change'.format(self.object_url_prefix), args=[obj.pk])
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        # assert if map is being rendered or not
+        self.assertContains(r, 'geometry-div-map')
+        self.assertContains(r, 'id_indoor_map')
+        # id is required for indoor map to render
+        self.assertContains(r, 'id="id_indoor"')
+        # assert if inline fields are visible
+        self.assertContains(r, f'{loc.name} {ordinal(fl.floor)} floor')
+        self.assertContains(r, fl.floor)
+        self.assertContains(r, fl.image.url)
+        self.assertContains(r, loc.name)
+        self.assertContains(r, loc.address)
+        self.assertContains(r, loc.type)
+        self.assertContains(r, loc.is_mobile)
+        self.assertContains(r, obj.name)
+        self.assertContains(r, ol.indoor)

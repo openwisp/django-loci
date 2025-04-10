@@ -41,8 +41,13 @@
         } else {
             coordinates = undefined;
         }
+        var draggable = true;
+        // if readonly field, don't allow dragging
+        if ($indoorPosition.find(".readonly").length) {
+        draggable = false;
+        }
 
-        var marker = new L.marker(coordinates, {draggable: true});
+        var marker = new L.marker(coordinates, { draggable: draggable });
         marker.bindPopup(gettext('Drag to reposition'));
         marker.on('dragend', updateInput);
         if (coordinates) { marker.addTo(map); }
