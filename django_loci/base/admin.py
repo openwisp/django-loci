@@ -1,4 +1,5 @@
 import json
+from functools import partialmethod
 
 from django import forms
 from django.contrib import admin
@@ -18,16 +19,54 @@ from openwisp_utils.admin import TimeReadonlyAdminMixin
 from ..base.geocoding_views import geocode_view, reverse_geocode_view
 from ..fields import GeometryField
 from ..widgets import FloorPlanWidget, ImageWidget
-from .models import AbstractLocation
+from .models import AbstractFloorPlan, AbstractLocation
 
 
-class AbstractFloorPlanForm(forms.ModelForm):
+class ReadOnlyMixin:
+    """Mixin for forms to handle field widgets for view-only users."""
+
+    def set_readonly_attribute(self, user, fields):
+        """
+        This method sets the read_only attribute on widget for the fields
+        which are required to be rendered as it is to view-only users. This is
+        done as 'AdminReadonlyField' renders the widget if 'read_only' is set on
+        the field's widget. Also the required field must be present in self.fields
+        """
+        app_label = self.Meta.model._meta.app_label
+        model_name = self.Meta.model._meta.model_name
+        if (
+            user
+            and user.has_perm(f'{app_label}.view_{model_name}')
+            and not user.has_perm(f'{app_label}.change_{model_name}')
+        ):
+            for field in fields:
+                if field in self.fields:
+                    setattr(self.fields[field].widget, 'read_only', True)
+            # Return 'True' to allow any further handling for view-only users
+            return True
+        return False
+
+
+class AbstractFloorPlanForm(ReadOnlyMixin, forms.ModelForm):
+    # define the image field to add it in self.fields
+    # to render it for view-only
+    image = forms.ImageField(
+        widget=ImageWidget(),
+        help_text=AbstractFloorPlan._meta.get_field('image').help_text,
+    )
+
     class Meta:
         exclude = tuple()
-        widgets = {'image': ImageWidget()}
 
     class Media:
         css = {'all': ('django-loci/css/loci.css',)}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if getattr(self, '_user', None):
+            self.set_readonly_attribute(self._user, ['image'])
+            # user is set on Form class which gets instantiated for each request
+            del self.__class__._user
 
 
 class LocationRawIdWidget(widgets.ForeignKeyRawIdWidget):
@@ -52,13 +91,22 @@ class AbstractFloorPlanAdmin(TimeReadonlyAdminMixin, admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(AbstractFloorPlanAdmin, self).get_form(request, obj, **kwargs)
-        form.base_fields['location'].widget = LocationRawIdWidget(
-            rel=self.model._meta.get_field('location').remote_field, admin_site=site
-        )
+        permissions = self.get_model_perms(request)
+        # location field is not in base_fields if user has only view-only permission
+        if permissions['add'] and permissions['change'] and permissions['delete']:
+            form.base_fields['location'].widget = LocationRawIdWidget(
+                rel=self.model._meta.get_field('location').remote_field, admin_site=site
+            )
+        # pass user to form for handling permissions for readonly view
+        form._user = request.user
         return form
 
 
-class AbstractLocationForm(forms.ModelForm):
+class AbstractLocationForm(ReadOnlyMixin, forms.ModelForm):
+    # define the geometry field to add it in self.fields
+    # to render it for view-only
+    geometry = GeometryField(required=True)
+
     class Meta:
         exclude = tuple()
 
@@ -70,6 +118,13 @@ class AbstractLocationForm(forms.ModelForm):
             'django-loci/js/vendor/reconnecting-websocket.min.js',
         )
         css = {'all': ('django-loci/css/loci.css',)}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if getattr(self, '_user', None):
+            self.set_readonly_attribute(self._user, ['geometry'])
+            # user is set on Form class which gets instantiated for each request
+            del self.__class__._user
 
 
 class AbstractFloorPlanInline(TimeReadonlyAdminMixin, admin.StackedInline):
@@ -85,6 +140,13 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
 
     # This allows apps which extend django-loci to load this template with less hacks
     change_form_template = 'admin/django_loci/location_change_form.html'
+
+    # override get_form method to pass user to form
+    # for handling permissions for readonly view
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form._user = request.user
+        return form
 
     def get_urls(self):
         # hardcoding django_loci as the prefix for the
@@ -157,7 +219,7 @@ class UnvalidatedChoiceField(forms.ChoiceField):
 _get_field = AbstractLocation._meta.get_field
 
 
-class AbstractObjectLocationForm(forms.ModelForm):
+class AbstractObjectLocationForm(ReadOnlyMixin, forms.ModelForm):
     FORM_CHOICES = (
         ('', _('--- Please select an option ---')),
         ('new', _('New')),
@@ -217,6 +279,8 @@ class AbstractObjectLocationForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        # user is passed via partialmethod in ObjectLocationInline
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         # set initial values for custom fields
         initial = {}
@@ -246,6 +310,16 @@ class AbstractObjectLocationForm(forms.ModelForm):
             self.fields['floorplan'].choices = floorplan_choices + [
                 (floorplan.pk, floorplan)
             ]
+
+        if self.set_readonly_attribute(user, ['geometry', 'image', 'indoor']):
+            # For view only permissions, 'AdminReadonlyField' reads from instance
+            for field, value in initial.items():
+                if field != 'floorplan':
+                    setattr(self.instance, field, value)
+                else:
+                    setattr(self.instance.floorplan, 'pk', value)
+            # Added id to indoor widget to display indoor position
+            self.fields['indoor'].widget.attrs.update({'id': 'id_indoor'})
         self.initial.update(initial)
 
     def _get_initial_location(self):
@@ -399,4 +473,10 @@ class AbstractObjectLocationInline(ObjectLocationMixin, GenericStackedInline):
     Generic Inline + ObjectLocationMixin
     """
 
-    pass
+    # override get_formset method to pass user to form
+    def get_formset(self, request, obj=..., **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        formset._construct_form = partialmethod(
+            formset._construct_form, user=request.user
+        )
+        return formset
