@@ -8,7 +8,9 @@ from openwisp_utils.tests import SeleniumTestMixin
 from .. import TestAdminInlineMixin, TestLociMixin
 
 
-class BaseTestAdminSelenium(SeleniumTestMixin, TestAdminInlineMixin, TestLociMixin):
+class BaseTestDeviceAdminSelenium(
+    SeleniumTestMixin, TestAdminInlineMixin, TestLociMixin
+):
     def test_create_new_device(self):
         self.login()
         self.open(reverse(self.add_url))
