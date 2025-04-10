@@ -4,18 +4,10 @@ from django.contrib.humanize.templatetags.humanize import ordinal
 from django.db.models.fields.files import ImageFieldFile
 from django.urls import reverse
 
-from .. import TestAdminMixin, TestLociMixin
+from .. import TestAdminInlineMixin, TestLociMixin
 
 
-class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
-    @classmethod
-    def _get_prefix(cls):
-        s = '{0}-{1}-content_type-object_id'
-        return s.format(
-            cls.location_model._meta.app_label,
-            cls.object_location_model.__name__.lower(),
-        )
-
+class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
     @classmethod
     def _get_params(cls):
         _p = cls._get_prefix()
@@ -35,19 +27,6 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
     @property
     def params(self):
         return self.__class__._get_params()
-
-    def _get_url_prefix(self):
-        return '{0}_{1}'.format(
-            self.object_url_prefix, self.object_model.__name__.lower()
-        )
-
-    @property
-    def add_url(self):
-        return '{0}_add'.format(self._get_url_prefix())
-
-    @property
-    def change_url(self):
-        return '{0}_change'.format(self._get_url_prefix())
 
     def test_json_urls(self):
         self._login_as_admin()
@@ -771,20 +750,23 @@ class BaseTestAdminInline(TestAdminMixin, TestLociMixin):
     def test_add_outdoor_with_floorplan(self):
         self._login_as_admin()
         p = 'floorplan_set'
-        params = {
-            'name': 'test-add-outdoor-with-floorplan',
-            'type': 'outdoor',
-            'geometry': 'SRID=4326;POINT (12.512324 41.898703)',
-            'address': 'Piazza Venezia, Roma, Italia',
-            '{0}-0-floor'.format(p): '1',
-            '{0}-0-image'.format(p): self._get_simpleuploadedfile(),
-            '{0}-0-id'.format(p): '',
-            '{0}-0-location'.format(p): '',
-            '{0}-TOTAL_FORMS'.format(p): '1',
-            '{0}-INITIAL_FORMS'.format(p): '0',
-            '{0}-MIN_NUM_FORMS'.format(p): '0',
-            '{0}-MAX_NUM_FORMS'.format(p): '1',
-        }
+        params = self.params
+        params.update(
+            {
+                'name': 'test-add-outdoor-with-floorplan',
+                'type': 'outdoor',
+                'geometry': 'SRID=4326;POINT (12.512324 41.898703)',
+                'address': 'Piazza Venezia, Roma, Italia',
+                '{0}-0-floor'.format(p): '1',
+                '{0}-0-image'.format(p): self._get_simpleuploadedfile(),
+                '{0}-0-id'.format(p): '',
+                '{0}-0-location'.format(p): '',
+                '{0}-TOTAL_FORMS'.format(p): '1',
+                '{0}-INITIAL_FORMS'.format(p): '0',
+                '{0}-MIN_NUM_FORMS'.format(p): '0',
+                '{0}-MAX_NUM_FORMS'.format(p): '1',
+            }
+        )
         location_url = '{0}_{1}_add'.format(
             self.url_prefix, self.location_model.__name__.lower()
         )

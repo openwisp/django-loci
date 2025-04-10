@@ -1,7 +1,7 @@
 import logging
 
 from django import forms
-from leaflet.forms.widgets import LeafletWidget as BaseLeafletWidget
+from leaflet.admin import LeafletAdminWidget as BaseLeafletWidget
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,5 @@ class LeafletWidget(BaseLeafletWidget):
     geom_type = 'GEOMETRY'
     template_name = 'leaflet/admin/widget.html'
     modifiable = True
-    map_width = '100%'
-    map_height = '400px'
     display_raw = False
     settings_overrides = {}

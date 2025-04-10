@@ -22,11 +22,11 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
     asynchronously, hence, pytest is used for these tests.
     """
 
-    def _force_login(self, user, backend=None):
+    async def _force_login(self, user, backend=None):
         engine = importlib.import_module(settings.SESSION_ENGINE)
         request = HttpRequest()
         request.session = engine.SessionStore()
-        login(request, user, backend)
+        database_sync_to_async(login)(request, user, backend)
         request.session.save
         return request.session
 
@@ -42,7 +42,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         path = '/ws/loci/location/{0}/'.format(pk)
         session = None
         if user:
-            session = await database_sync_to_async(self._force_login)(user)
+            session = await self._force_login(user)
         return {'pk': pk, 'path': path, 'session': session}
 
     def _get_communicator(self, request_vars, user=None):
@@ -71,9 +71,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
     @pytest.mark.django_db(transaction=True)
     async def test_consumer_unauthenticated(self):
         request_vars = await self._get_request_dict()
-        communicator = WebsocketCommunicator(
-            LocationBroadcast.as_asgi(), request_vars['path']
-        )
+        communicator = self._get_communicator(request_vars)
         connected, _ = await communicator.connect()
         assert not connected
         await communicator.disconnect()
@@ -127,17 +125,9 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         assert not connected
         await communicator.disconnect()
         # add permission to change location and repeat
-        loc_perm = await database_sync_to_async(
-            (
-                await database_sync_to_async(Permission.objects.filter)(
-                    name='Can change location'
-                )
-            ).first
-        )()
-        await database_sync_to_async(test_user.user_permissions.add)(loc_perm)
-        test_user = await database_sync_to_async(self.user_model.objects.get)(
-            pk=test_user.pk
-        )
+        loc_perm = await Permission.objects.filter(name='Can change location').afirst()
+        await test_user.user_permissions.aadd(loc_perm)
+        test_user = await self.user_model.objects.aget(pk=test_user.pk)
         communicator = self._get_communicator(request_vars, test_user)
         connected, _ = await communicator.connect()
         assert connected
@@ -151,15 +141,15 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         communicator = self._get_communicator(request_vars, test_user)
         connected, _ = await communicator.connect()
         assert connected
-        await database_sync_to_async(self._save_location)(request_vars['pk'])
+        await self._save_location(request_vars['pk'])
         response = await communicator.receive_json_from()
         assert response == {'type': 'Point', 'coordinates': [12.513124, 41.897903]}
         await communicator.disconnect()
 
-    def _save_location(self, pk):
-        loc = self.location_model.objects.get(pk=pk)
+    async def _save_location(self, pk):
+        loc = await self.location_model.objects.aget(pk=pk)
         loc.geometry = 'POINT (12.513124 41.897903)'
-        loc.save()
+        await loc.asave()
 
     def test_routing(self):
         from django_loci.channels.asgi import channel_routing

@@ -587,7 +587,7 @@ django.jQuery(function ($) {
     updateMap();
   });
 
-  $(window).on("load", function () {
+  function geometryListeners() {
     var featureGroup = getFeatureGroup(),
       marker = getMarker();
     featureGroup.on("layeradd", function () {
@@ -603,7 +603,16 @@ django.jQuery(function ($) {
       updateLatLng(marker.getLatLng());
       updateAddressOnMapChange();
     }
-  });
+  }
+  // some browsers fires load event before attaching listener
+  // so we need to check if the document is ready
+  if (document.readyState === "complete") {
+    geometryListeners();
+  } else {
+    $(window).on("load", function () {
+      geometryListeners();
+    });
+  }
 
   // show existing location
   var pk;
