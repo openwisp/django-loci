@@ -11,10 +11,13 @@ from .. import TestAdminInlineMixin, TestLociMixin
 class BaseTestDeviceAdminSelenium(
     SeleniumTestMixin, TestAdminInlineMixin, TestLociMixin
 ):
+    def _create_device(self):
+        self.find_element(by=By.NAME, value='name').send_keys('11:22:33:44:55:66')
+
     def test_create_new_device(self):
         self.login()
         self.open(reverse(self.add_url))
-        self.find_element(by=By.NAME, value='name').send_keys('11:22:33:44:55:66')
+        self._create_device()
         select = Select(
             self.find_element(
                 by=By.NAME, value=f'{self._get_prefix()}-0-location_selection'
@@ -53,7 +56,9 @@ class BaseTestDeviceAdminSelenium(
 
         self.find_element(by=By.NAME, value='_save').click()
         self.wait_for_presence(By.CSS_SELECTOR, '.messagelist .success')
+        # device model verbose name is dynamic
+        object_verbose_name = self.object_model._meta.verbose_name
         self.assertEqual(
             self.find_elements(by=By.CLASS_NAME, value='success')[0].text,
-            'The device “11:22:33:44:55:66” was added successfully.',
+            f'The {object_verbose_name} “11:22:33:44:55:66” was added successfully.',
         )
