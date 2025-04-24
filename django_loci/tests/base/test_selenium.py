@@ -11,13 +11,10 @@ from .. import TestAdminInlineMixin, TestLociMixin
 class BaseTestDeviceAdminSelenium(
     SeleniumTestMixin, TestAdminInlineMixin, TestLociMixin
 ):
-    def _fill_device_form(self):
-        self.find_element(by=By.NAME, value='name').send_keys('11:22:33:44:55:66')
-
     def test_create_new_device(self):
         self.login()
         self.open(reverse(self.add_url))
-        self._fill_device_form()
+        self.find_element(by=By.NAME, value='name').send_keys('11:22:33:44:55:66')
         select = Select(
             self.find_element(
                 by=By.NAME, value=f'{self._get_prefix()}-0-location_selection'
