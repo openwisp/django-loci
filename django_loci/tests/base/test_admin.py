@@ -1,6 +1,7 @@
 import json
 
 import responses
+from django.contrib.auth.models import Permission
 from django.contrib.humanize.templatetags.humanize import ordinal
 from django.urls import reverse
 
@@ -10,6 +11,7 @@ from .. import TestAdminMixin, TestLociMixin
 class BaseTestAdmin(TestAdminMixin, TestLociMixin):
     app_label = 'django_loci'
     geocode_url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
+    permission_model = Permission
 
     def test_location_list(self):
         self._login_as_admin()

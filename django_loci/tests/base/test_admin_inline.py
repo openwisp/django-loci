@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Permission
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.humanize.templatetags.humanize import ordinal
 from django.db.models.fields.files import ImageFieldFile
@@ -7,6 +8,8 @@ from .. import TestAdminInlineMixin, TestLociMixin
 
 
 class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
+    permission_model = Permission
+
     @classmethod
     def _get_params(cls):
         _p = cls._get_prefix()

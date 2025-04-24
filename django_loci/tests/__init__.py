@@ -96,9 +96,6 @@ class TestAdminMixin(object):
 
     def _create_readonly_admin(self, **kwargs):
         """Creates a read-only admin user with view permissions for the specified models."""
-        # during test discovery 'auth' app is not ready so import here
-        from django.contrib.auth.models import Permission
-
         models = kwargs.pop('models', [])
         user = self._create_admin(is_superuser=False, **kwargs)
         if models:
@@ -106,7 +103,7 @@ class TestAdminMixin(object):
             for model in models:
                 permission_codenames.append(f'view_{model.__name__.lower()}')
             # assign view permissions to user
-            view_permission = Permission.objects.filter(
+            view_permission = self.permission_model.objects.filter(
                 codename__in=permission_codenames
             )
             user.user_permissions.add(*view_permission)
