@@ -8,6 +8,8 @@ from .. import TestAdminInlineMixin, TestLociMixin
 
 
 class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
+    permission_model = Permission
+
     @classmethod
     def _get_params(cls):
         _p = cls._get_prefix()
@@ -863,14 +865,9 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
 
     # for users with view only permissions to location
     def test_readonly_indoor_location(self):
-        user = self.user_model.objects.create_user(
-            username='admin', password='admin', email='admin@email.org', is_staff=True
+        user = self._create_readonly_admin(
+            models=[self.location_model, self.floorplan_model]
         )
-        # add view permission to client
-        view_permission = Permission.objects.filter(
-            codename__in=['view_location', 'view_floorplan']
-        )
-        user.user_permissions.add(*view_permission)
         self.client.force_login(user)
         loc = self._create_location(name='test-admin-location-1', type='indoor')
         fl = self._create_floorplan(location=loc)
@@ -890,14 +887,9 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
 
     # for users with view only permissions to objectlocation
     def test_readonly_indoor_object_location(self):
-        user = self.user_model.objects.create_user(
-            username='admin', password='admin', email='admin@gmail.com', is_staff=True
+        user = self._create_readonly_admin(
+            models=[self.object_model, self.object_location_model]
         )
-        # add view permission to client
-        view_permission = Permission.objects.filter(
-            codename__in=['view_device', 'view_objectlocation']
-        )
-        user.user_permissions.add(*view_permission)
         self.client.force_login(user)
         obj = self._create_object(name='test-admin-object-1')
         loc = self._create_location(name='test-admin-location-1', type='indoor')
@@ -905,8 +897,7 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
         ol = self._create_object_location(
             content_object=obj, location=loc, floorplan=fl
         )
-        url = reverse('{0}_device_change'.format(self.object_url_prefix), args=[obj.pk])
-        r = self.client.get(url)
+        r = self.client.get(reverse(self.change_url, args=[obj.pk]))
         self.assertEqual(r.status_code, 200)
         # assert if map is being rendered or not
         self.assertContains(r, 'geometry-div-map')

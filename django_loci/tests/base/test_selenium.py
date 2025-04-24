@@ -53,7 +53,9 @@ class BaseTestDeviceAdminSelenium(
 
         self.find_element(by=By.NAME, value='_save').click()
         self.wait_for_presence(By.CSS_SELECTOR, '.messagelist .success')
+        # device model verbose name is dynamic
+        object_verbose_name = self.object_model._meta.verbose_name
         self.assertEqual(
             self.find_elements(by=By.CLASS_NAME, value='success')[0].text,
-            'The device “11:22:33:44:55:66” was added successfully.',
+            f'The {object_verbose_name} “11:22:33:44:55:66” was added successfully.',
         )

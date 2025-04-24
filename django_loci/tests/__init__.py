@@ -94,6 +94,21 @@ class TestAdminMixin(object):
         self.client.force_login(admin)
         return admin
 
+    def _create_readonly_admin(self, **kwargs):
+        """Creates a read-only admin user with view permissions for the specified models."""
+        models = kwargs.pop('models', [])
+        user = self._create_admin(is_superuser=False, **kwargs)
+        if models:
+            permission_codenames = []
+            for model in models:
+                permission_codenames.append(f'view_{model.__name__.lower()}')
+            # assign view permissions to user
+            view_permission = self.permission_model.objects.filter(
+                codename__in=permission_codenames
+            )
+            user.user_permissions.add(*view_permission)
+        return user
+
     def _load_content(self, file):
         d = os.path.dirname(os.path.abspath(__file__))
         return open(os.path.join(d, file)).read()
