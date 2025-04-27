@@ -11,6 +11,10 @@ def update_mobile_location(sender, instance, **kwargs):
         group_name = "loci.mobile-location.{0}".format(str(instance.pk))
         channel_layer = channels.layers.get_channel_layer()
         message = json.loads(instance.geometry.geojson)
+        message = {
+            'geometry': json.loads(instance.geometry.geojson),
+            'address': instance.address,
+        }
         async_to_sync(channel_layer.group_send)(
             group_name, {"type": "send_message", "message": message}
         )
