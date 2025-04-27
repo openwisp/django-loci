@@ -11,6 +11,7 @@ from .. import TestAdminMixin, TestLociMixin
 class BaseTestAdmin(TestAdminMixin, TestLociMixin):
     app_label = 'django_loci'
     geocode_url = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/'
+    permission_model = Permission
 
     def test_location_list(self):
         self._login_as_admin()
@@ -233,12 +234,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
 
     # for users with view only permissions to floorplans
     def test_readonly_floorplans(self):
-        user = self.user_model.objects.create_user(
-            username='admin', password='admin', email='admin@email.org', is_staff=True
-        )
-        # add view permission to client
-        view_permission = Permission.objects.filter(codename__in=['view_floorplan'])
-        user.user_permissions.add(*view_permission)
+        user = self._create_readonly_admin(models=[self.floorplan_model])
         self.client.force_login(user)
         loc = self._create_location(name='test-admin-location-1', type='indoor')
         fl = self._create_floorplan(location=loc)

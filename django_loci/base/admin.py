@@ -474,12 +474,6 @@ class ObjectLocationMixin(TimeReadonlyAdminMixin):
         ),
     )
 
-
-class AbstractObjectLocationInline(ObjectLocationMixin, GenericStackedInline):
-    """
-    Generic Inline + ObjectLocationMixin
-    """
-
     # override get_formset method to pass user to form
     def get_formset(self, request, obj=..., **kwargs):
         formset = super().get_formset(request, obj, **kwargs)
@@ -487,3 +481,9 @@ class AbstractObjectLocationInline(ObjectLocationMixin, GenericStackedInline):
             formset._construct_form, user=request.user
         )
         return formset
+
+
+class AbstractObjectLocationInline(ObjectLocationMixin, GenericStackedInline):
+    """
+    Generic Inline + ObjectLocationMixin
+    """
