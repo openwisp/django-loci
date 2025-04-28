@@ -143,7 +143,6 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         assert connected
         await self._save_location(request_vars["pk"])
         response = await communicator.receive_json_from()
-        print(response)
         assert response == {
             "geometry": {"type": "Point", "coordinates": [12.513124, 41.897903]},
             "address": "Via del Corso, Roma, Italia",
