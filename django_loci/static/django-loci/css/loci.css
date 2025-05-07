@@ -7,7 +7,8 @@
   display: block;
 }
 /* hide redundant heading in objectlocationinline */
-.loci.coords > h2 {
+.loci.coords > h2,
+.loci.coords > h4 {
   display: none;
 }
 /* improve raw_id_field look */
