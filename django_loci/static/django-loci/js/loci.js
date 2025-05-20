@@ -448,9 +448,11 @@ django.jQuery(function ($) {
         protocol + "://" + host + "/ws/loci/location/" + pk + "/",
       );
     ws.onmessage = function (e) {
+      const data = JSON.parse(e.data);
       $geometryRow.show();
       $noLocationDiv.hide();
-      $geometryTextarea.val(e.data);
+      $geometryTextarea.val(JSON.stringify(data.geometry));
+      $address.val(data.address);
       getMap().remove();
       window[loadMapName]();
     };
