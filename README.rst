@@ -130,7 +130,7 @@ following order:
         "django_loci",
         "django.contrib.admin",
         "leaflet",
-        "channels"
+        "channels",
         # ...
     ]
 
@@ -320,12 +320,8 @@ This example provides an example of how to extend the base models of
 
 
     class ObjectLocation(OrganizationMixin, AbstractObjectLocation):
-        location = models.ForeignKey(
-            Location, models.PROTECT, blank=True, null=True
-        )
-        floorplan = models.ForeignKey(
-            FloorPlan, models.PROTECT, blank=True, null=True
-        )
+        location = models.ForeignKey(Location, models.PROTECT, blank=True, null=True)
+        floorplan = models.ForeignKey(FloorPlan, models.PROTECT, blank=True, null=True)
 
         class Meta(AbstractObjectLocation.Meta):
             abstract = False
@@ -359,7 +355,7 @@ following:
         "django.forms",  # <-- add this
         #      ↑
         "leaflet",
-        "channels"
+        "channels",
         # ...
     ]
 

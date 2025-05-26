@@ -2,7 +2,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.exceptions import ValidationError
 
-location_broadcast_path = 'ws/loci/location/<uuid:pk>/'
+location_broadcast_path = "ws/loci/location/<uuid:pk>/"
 
 
 def _get_object_or_none(model, **kwargs):
@@ -21,8 +21,8 @@ class BaseLocationBroadcast(JsonWebsocketConsumer):
     def connect(self):
         self.pk = None
         try:
-            user = self.scope['user']
-            self.pk = self.scope['url_route']['kwargs']['pk']
+            user = self.scope["user"]
+            self.pk = self.scope["url_route"]["kwargs"]["pk"]
         except KeyError:
             # Will fall here when the scope does not have
             # one of the variables, most commonly, user
@@ -35,21 +35,21 @@ class BaseLocationBroadcast(JsonWebsocketConsumer):
                 return
             self.accept()
             # Create group name once
-            self.group_name = 'loci.mobile-location.{}'.format(self.pk)
+            self.group_name = "loci.mobile-location.{}".format(self.pk)
             async_to_sync(self.channel_layer.group_add)(
                 self.group_name, self.channel_name
             )
 
     def is_authorized(self, user, location):
-        perm = '{0}.change_location'.format(self.model._meta.app_label)
+        perm = "{0}.change_location".format(self.model._meta.app_label)
         # allow users with view permission
-        readperm = '{0}.view_location'.format(self.model._meta.app_label)
+        readperm = "{0}.view_location".format(self.model._meta.app_label)
         authenticated = user.is_authenticated
         is_permitted = user.has_perm(perm) or user.has_perm(readperm)
         return authenticated and (user.is_superuser or (user.is_staff and is_permitted))
 
     def send_message(self, event):
-        self.send_json(event['message'])
+        self.send_json(event["message"])
 
     def disconnect(self, close_code):
         """
@@ -57,7 +57,7 @@ class BaseLocationBroadcast(JsonWebsocketConsumer):
         """
         # The group_name is set only when the connection is accepted.
         # Remove the user from the group, if it exists.
-        if hasattr(self, 'group_name'):
+        if hasattr(self, "group_name"):
             async_to_sync(self.channel_layer.group_discard)(
                 self.group_name, self.channel_name
             )

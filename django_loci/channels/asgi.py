@@ -9,19 +9,19 @@ from django_loci.channels.consumers import LocationBroadcast
 
 channel_routing = ProtocolTypeRouter(
     {
-        'websocket': AllowedHostsOriginValidator(
+        "websocket": AllowedHostsOriginValidator(
             AuthMiddlewareStack(
                 URLRouter(
                     [
                         path(
                             location_broadcast_path,
                             LocationBroadcast.as_asgi(),
-                            name='LocationChannel',
+                            name="LocationChannel",
                         )
                     ]
                 )
             )
         ),
-        'http': get_asgi_application(),
+        "http": get_asgi_application(),
     }
 )

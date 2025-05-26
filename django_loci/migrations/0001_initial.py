@@ -14,14 +14,14 @@ import django_loci.storage
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = [('contenttypes', '0002_remove_content_type_name')]
+    dependencies = [("contenttypes", "0002_remove_content_type_name")]
 
     operations = [
         migrations.CreateModel(
-            name='FloorPlan',
+            name="FloorPlan",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -30,38 +30,38 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'created',
+                    "created",
                     model_utils.fields.AutoCreatedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='created',
+                        verbose_name="created",
                     ),
                 ),
                 (
-                    'modified',
+                    "modified",
                     model_utils.fields.AutoLastModifiedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='modified',
+                        verbose_name="modified",
                     ),
                 ),
-                ('floor', models.SmallIntegerField(verbose_name='floor')),
+                ("floor", models.SmallIntegerField(verbose_name="floor")),
                 (
-                    'image',
+                    "image",
                     models.ImageField(
-                        help_text='floor plan image',
+                        help_text="floor plan image",
                         storage=django_loci.storage.OverwriteStorage(),
                         upload_to=django_loci.storage.OverwriteStorage.upload_to,
-                        verbose_name='image',
+                        verbose_name="image",
                     ),
                 ),
             ],
         ),
         migrations.CreateModel(
-            name='Location',
+            name="Location",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -70,79 +70,79 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'created',
+                    "created",
                     model_utils.fields.AutoCreatedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='created',
+                        verbose_name="created",
                     ),
                 ),
                 (
-                    'modified',
+                    "modified",
                     model_utils.fields.AutoLastModifiedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='modified',
+                        verbose_name="modified",
                     ),
                 ),
                 (
-                    'name',
+                    "name",
                     models.CharField(
-                        help_text='A descriptive name of the location (building name, company name, etc.)',
+                        help_text="A descriptive name of the location (building name, company name, etc.)",
                         max_length=75,
-                        verbose_name='name',
+                        verbose_name="name",
                     ),
                 ),
                 (
-                    'type',
+                    "type",
                     models.CharField(
                         choices=[
                             (
-                                'outdoor',
-                                'Outdoor environment (eg: street, square, garden, land)',
+                                "outdoor",
+                                "Outdoor environment (eg: street, square, garden, land)",
                             ),
                             (
-                                'indoor',
-                                'Indoor environment (eg: building, roofs, subway, large vehicles)',
+                                "indoor",
+                                "Indoor environment (eg: building, roofs, subway, large vehicles)",
                             ),
                         ],
                         db_index=True,
-                        help_text='indoor locations can have floorplans associated to them',
+                        help_text="indoor locations can have floorplans associated to them",
                         max_length=8,
                     ),
                 ),
                 (
-                    'is_mobile',
+                    "is_mobile",
                     models.BooleanField(
                         db_index=True,
                         default=False,
-                        help_text='is this location a moving object?',
-                        verbose_name='is mobile?',
+                        help_text="is this location a moving object?",
+                        verbose_name="is mobile?",
                     ),
                 ),
                 (
-                    'address',
+                    "address",
                     models.CharField(
                         blank=True,
                         db_index=True,
                         max_length=256,
-                        verbose_name='address',
+                        verbose_name="address",
                     ),
                 ),
                 (
-                    'geometry',
+                    "geometry",
                     django.contrib.gis.db.models.fields.GeometryField(
-                        blank=True, null=True, srid=4326, verbose_name='geometry'
+                        blank=True, null=True, srid=4326, verbose_name="geometry"
                     ),
                 ),
             ],
-            options={'abstract': False},
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='ObjectLocation',
+            name="ObjectLocation",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -151,69 +151,69 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'created',
+                    "created",
                     model_utils.fields.AutoCreatedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='created',
+                        verbose_name="created",
                     ),
                 ),
                 (
-                    'modified',
+                    "modified",
                     model_utils.fields.AutoLastModifiedField(
                         default=django.utils.timezone.now,
                         editable=False,
-                        verbose_name='modified',
+                        verbose_name="modified",
                     ),
                 ),
-                ('object_id', models.CharField(db_index=True, max_length=36)),
+                ("object_id", models.CharField(db_index=True, max_length=36)),
                 (
-                    'indoor',
+                    "indoor",
                     models.CharField(
                         blank=True,
                         max_length=64,
                         null=True,
-                        verbose_name='indoor position',
+                        verbose_name="indoor position",
                     ),
                 ),
                 (
-                    'content_type',
+                    "content_type",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='contenttypes.ContentType',
+                        to="contenttypes.ContentType",
                     ),
                 ),
                 (
-                    'floorplan',
+                    "floorplan",
                     models.ForeignKey(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.PROTECT,
-                        to='django_loci.FloorPlan',
+                        to="django_loci.FloorPlan",
                     ),
                 ),
                 (
-                    'location',
+                    "location",
                     models.ForeignKey(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.PROTECT,
-                        to='django_loci.Location',
+                        to="django_loci.Location",
                     ),
                 ),
             ],
         ),
         migrations.AddField(
-            model_name='floorplan',
-            name='location',
+            model_name="floorplan",
+            name="location",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to='django_loci.Location'
+                on_delete=django.db.models.deletion.CASCADE, to="django_loci.Location"
             ),
         ),
         migrations.AlterUniqueTogether(
-            name='objectlocation', unique_together=set([('content_type', 'object_id')])
+            name="objectlocation", unique_together=set([("content_type", "object_id")])
         ),
         migrations.AlterUniqueTogether(
-            name='floorplan', unique_together=set([('location', 'floor')])
+            name="floorplan", unique_together=set([("location", "floor")])
         ),
     ]

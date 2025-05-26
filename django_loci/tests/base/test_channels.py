@@ -39,22 +39,22 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
                 location=location
             )
             pk = location.pk
-        path = '/ws/loci/location/{0}/'.format(pk)
+        path = "/ws/loci/location/{0}/".format(pk)
         session = None
         if user:
             session = await self._force_login(user)
-        return {'pk': pk, 'path': path, 'session': session}
+        return {"pk": pk, "path": path, "session": session}
 
     def _get_communicator(self, request_vars, user=None):
         communicator = WebsocketCommunicator(
-            LocationBroadcast.as_asgi(), request_vars['path']
+            LocationBroadcast.as_asgi(), request_vars["path"]
         )
         if user:
             communicator.scope.update(
                 {
                     "user": user,
-                    "session": request_vars['session'],
-                    "url_route": {"kwargs": {"pk": request_vars['pk']}},
+                    "session": request_vars["session"],
+                    "url_route": {"kwargs": {"pk": request_vars["pk"]}},
                 }
             )
         return communicator
@@ -90,7 +90,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
     @pytest.mark.django_db(transaction=True)
     async def test_consumer_not_staff(self):
         test_user = await database_sync_to_async(self.user_model.objects.create_user)(
-            username='user', password='password', email='test@test.org'
+            username="user", password="password", email="test@test.org"
         )
         request_vars = await self._get_request_dict(user=test_user)
         communicator = self._get_communicator(request_vars, test_user)
@@ -112,7 +112,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
     @pytest.mark.django_db(transaction=True)
     async def test_consumer_staff_but_no_change_permission(self):
         test_user = await database_sync_to_async(self.user_model.objects.create_user)(
-            username='user', password='password', email='test@test.org', is_staff=True
+            username="user", password="password", email="test@test.org", is_staff=True
         )
         location = await database_sync_to_async(self._create_location)(is_mobile=True)
         ol = await database_sync_to_async(self._create_object_location)(
@@ -125,7 +125,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         assert not connected
         await communicator.disconnect()
         # add permission to change location and repeat
-        loc_perm = await Permission.objects.filter(name='Can change location').afirst()
+        loc_perm = await Permission.objects.filter(name="Can change location").afirst()
         await test_user.user_permissions.aadd(loc_perm)
         test_user = await self.user_model.objects.aget(pk=test_user.pk)
         communicator = self._get_communicator(request_vars, test_user)
@@ -141,14 +141,14 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
         communicator = self._get_communicator(request_vars, test_user)
         connected, _ = await communicator.connect()
         assert connected
-        await self._save_location(request_vars['pk'])
+        await self._save_location(request_vars["pk"])
         response = await communicator.receive_json_from()
-        assert response == {'type': 'Point', 'coordinates': [12.513124, 41.897903]}
+        assert response == {"type": "Point", "coordinates": [12.513124, 41.897903]}
         await communicator.disconnect()
 
     async def _save_location(self, pk):
         loc = await self.location_model.objects.aget(pk=pk)
-        loc.geometry = 'POINT (12.513124 41.897903)'
+        loc.geometry = "POINT (12.513124 41.897903)"
         await loc.asave()
 
     def test_routing(self):
