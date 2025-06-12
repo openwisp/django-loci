@@ -65,6 +65,10 @@ input[type="text"] {
 .field-geometry .readonly .leaflet-draw.geometry {
   display: none;
 }
+/* avoid underlining leaflet controls */
+.leaflet-bar a {
+  text-decoration: none !important;
+}
 @media (max-width: 767px) {
   .field-geometry > div {
     flex-direction: column;
