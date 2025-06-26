@@ -1,2 +1,2 @@
-Please refer to the `Contribution Guidelines
-<https://github.com/openwisp/django-loci#contributing>`_.
+Please refer to the `OpenWISP Contribution Guidelines
+<https://openwisp.io/docs/stable/developer/contributing.html>`_.

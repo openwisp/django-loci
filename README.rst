@@ -552,18 +552,14 @@ installed locally first):
 Contributing
 ------------
 
-1. Announce your intentions in the `OpenWISP Mailing List
-   <https://groups.google.com/d/forum/openwisp>`_
-2. Fork this repo and install it
-3. Follow `PEP8, Style Guide for Python Code`_
-4. Write code
-5. Write tests for your code
-6. Ensure all tests pass
-7. Ensure test coverage does not decrease
-8. Document your changes
-9. Send pull request
+Please refer to the `OpenWISP Contribution Guidelines
+<https://openwisp.io/docs/stable/developer/contributing.html>`_.
 
-.. _pep8, style guide for python code: http://www.python.org/dev/peps/pep-0008/
+Questions
+---------
+
+See `Github Discussions
+<https://github.com/openwisp/django-loci/discussions>`_.
 
 Changelog
 ---------
