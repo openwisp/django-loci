@@ -1,4 +1,4 @@
-pytest-cov~=6.1.1
+pytest-cov~=6.2.1
 responses~=0.25.7
 openwisp-utils[qa,selenium,channels,channels-test] @ https://github.com/openwisp/openwisp-utils/tarball/1.2
 
