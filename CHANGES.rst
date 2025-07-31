@@ -4,11 +4,17 @@ Changelog
 Version 1.1.2 [2025-01-27]
 --------------------------
 
+Bugfixes
+~~~~~~~~
+
 - Refactored code to move logic to helper methods in
   AbstractObjectLocationForm
 
 Version 1.1.1 [2024-11-20]
 --------------------------
+
+Bugfixes
+~~~~~~~~
 
 - [deps] Updated django-leaflet to ~=0.31.0.
 
