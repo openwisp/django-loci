@@ -6,6 +6,27 @@ Version 1.2.0 [Unreleased]
 
 Work in progress.
 
+Version 1.1.3 [2025-07-31]
+--------------------------
+
+Bugfixes
+~~~~~~~~
+
+- Fixed `loading of map in ObjectLocation admin
+  <https://github.com/openwisp/django-loci/issues/95>`_ when the user only
+  has view permissions.
+- `Fixed error when changing a location from indoor to outdoor
+  <https://github.com/openwisp/django-loci/issues/156>`_. Changing the
+  location type from indoor to outdoor will delete related floorplans.
+  Added confirmation dialog to prevent accidental deletion of floorplans.
+- Avoided underlining Leaflet controls in the admin interface.
+- Fixed import of ``FileSystemStorage`` for compatibility with different
+  Django versions.
+- Fixed `JavaScript SyntaxError: redeclaration of const withForms
+  <https://github.com/makinacorpus/django-leaflet/issues/389>`_ by
+  overriding ``leaflet.draw.i18n.js`` in django-loci and wrapping the
+  ``withForms`` declaration in a block scope.
+
 Version 1.1.2 [2025-01-27]
 --------------------------
 
