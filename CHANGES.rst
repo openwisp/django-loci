@@ -6,6 +6,18 @@ Version 1.2.0 [Unreleased]
 
 Work in progress.
 
+Version 1.1.4 [2025-08-01]
+--------------------------
+
+Bugfixes
+~~~~~~~~
+
+- Fixed ``test_add_outdoor_with_floorplan`` which was causing test
+  failures in downstream projects.
+- Refactored formset handling for outdoor locations in the admin
+  interface: moved the logic rejecting floorplans for outdoor locations to
+  ``AbstractLocationAdmin`` to improve reusability and extendability.
+
 Version 1.1.3 [2025-07-31]
 --------------------------
 
