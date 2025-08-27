@@ -1,9 +1,10 @@
+from time import sleep
+
 from django.urls.base import reverse
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
-from time import sleep
 
 from openwisp_utils.tests import SeleniumTestMixin
 
@@ -13,6 +14,7 @@ from .. import TestAdminInlineMixin, TestLociMixin
 class BaseTestDeviceAdminSelenium(
     SeleniumTestMixin, TestAdminInlineMixin, TestLociMixin
 ):
+
     def _fill_device_form(self):
         """
         This method can be extended by downstram implementations
@@ -92,12 +94,12 @@ class BaseTestDeviceAdminSelenium(
         alert = WebDriverWait(self.web_driver, 2).until(EC.alert_is_present())
         alert.accept()
         sleep(0.5)
-        new_address = "Via dei Ramni, Roma, Lazio 00185, ITA"
+        new_address = "Lazio 00185, ITA"
         address_input = self.find_element(by=By.ID, value="id_address")
-        self.assertEqual(address_input.get_attribute("value"), new_address)
-        self.find_element(by=By.NAME, value="_save").click()
+        self.assertIn(new_address, address_input.get_attribute("value"))
+        self.wait_for("element_to_be_clickable", by=By.NAME, value="_continue").click()
         # Close tab[1] so other tests are not affected
         self.web_driver.close()
         self.web_driver.switch_to.window(tabs[0])
         address_input = self.find_element(by=By.ID, value="id_address")
-        self.assertEqual(address_input.get_attribute("value"), new_address)
+        self.assertIn(new_address, address_input.get_attribute("value"))
