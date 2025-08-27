@@ -87,7 +87,8 @@ jobs:
     - name: Tests
       if: ${{ !cancelled() && steps.deps.conclusion == 'success' }}
       run: |
-        coverage run runtests.py --parallel
+        coverage run runtests.py --parallel --exclude-tag=selenium_tests
+        coverage run runtests.py --tag=selenium_tests
         coverage combine
         coverage xml
       env:
