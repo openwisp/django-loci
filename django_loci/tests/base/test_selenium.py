@@ -3,6 +3,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
+from time import sleep
 
 from openwisp_utils.tests import SeleniumTestMixin
 
@@ -90,6 +91,7 @@ class BaseTestDeviceAdminSelenium(
         ).click().perform()
         alert = WebDriverWait(self.web_driver, 2).until(EC.alert_is_present())
         alert.accept()
+        sleep(0.5)
         new_address = "Via dei Ramni, Roma, Lazio 00185, ITA"
         address_input = self.find_element(by=By.ID, value="id_address")
         self.assertEqual(address_input.get_attribute("value"), new_address)
