@@ -12,6 +12,9 @@ DATABASES = {
     "default": {
         "ENGINE": "openwisp_utils.db.backends.spatialite",
         "NAME": "django-loci.db",
+        "TEST": {
+            "NAME": "openwisp_utils_test.db",
+        },
     }
 }
 
