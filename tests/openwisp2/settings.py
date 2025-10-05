@@ -12,11 +12,12 @@ DATABASES = {
     "default": {
         "ENGINE": "openwisp_utils.db.backends.spatialite",
         "NAME": "django-loci.db",
-        "TEST": {
-            "NAME": "openwisp_utils_test.db",
-        },
     }
 }
+if TESTING and "--exclude-tag=selenium_tests" not in sys.argv:
+    DATABASES["default"]["TEST"] = {
+        "NAME": os.path.join(BASE_DIR, "django-loci.db.db"),
+    }
 
 SPATIALITE_LIBRARY_PATH = "mod_spatialite.so"
 

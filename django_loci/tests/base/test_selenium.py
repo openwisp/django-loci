@@ -71,7 +71,7 @@ class BaseTestDeviceAdminSelenium(
             f"The {object_verbose_name} “11:22:33:44:55:66” was added successfully.",
         )
 
-    def test_address_field_real_time_update(self):
+    def test_real_time_update_address_field(self):
         location = self._create_location()
         self.login()
         url = reverse("admin:django_loci_location_change", args=[location.id])
