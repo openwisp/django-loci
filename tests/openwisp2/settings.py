@@ -16,7 +16,7 @@ DATABASES = {
 }
 if TESTING and "--exclude-tag=selenium_tests" not in sys.argv:
     DATABASES["default"]["TEST"] = {
-        "NAME": os.path.join(BASE_DIR, "django-loci.db.db"),
+        "NAME": os.path.join(BASE_DIR, "django-loci-test.db"),
     }
 
 SPATIALITE_LIBRARY_PATH = "mod_spatialite.so"
