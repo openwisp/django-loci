@@ -3,8 +3,7 @@ name: Question
 about: Please use the Discussion Forum to ask questions
 title: "[question] "
 labels: question
-assignees: ''
-
+assignees: ""
 ---
 
 Please use the [Discussion Forum](https://github.com/openwisp/django-loci/discussions) to ask questions.

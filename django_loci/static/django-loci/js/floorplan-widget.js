@@ -4,9 +4,7 @@
     var $input = django.jQuery("#id_" + widgetName),
       $parent = $input.parents("fieldset").eq(0),
       url = imageUrl || $parent.find("a.floorplan-image").attr("href"),
-      $dim = $parent.find(
-        "#id_" + widgetName.replace("indoor", "image") + "-dim",
-      ),
+      $dim = $parent.find("#id_" + widgetName.replace("indoor", "image") + "-dim"),
       $indoorPosition = $parent.find(".field-indoor"),
       mapId = "id_" + widgetName + "_map",
       w = imageW || $dim.data("width"),

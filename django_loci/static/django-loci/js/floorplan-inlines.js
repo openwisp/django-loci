@@ -2,9 +2,7 @@ django.jQuery(function ($) {
   "use strict";
   var $type_field = $("#id_type"),
     $floorplan_set = $("#floorplan_set-group"),
-    $floorplans_length = $floorplan_set.find(
-      ".inline-related.has_original",
-    ).length,
+    $floorplans_length = $floorplan_set.find(".inline-related.has_original").length,
     type_change_event = function (e) {
       var value = $type_field.val();
       // if value is undefined, check for readonly field

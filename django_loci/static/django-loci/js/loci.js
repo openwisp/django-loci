@@ -34,14 +34,12 @@ django.jQuery(function ($) {
     $location = $locationRow.find("select, input"),
     $locationLabel = $(".field-location .item-label"),
     $name = $(".field-name input", ".loci.coords"),
-    $address = $(
-      ".coords .field-address input, #location_form .field-address input",
-    ),
+    $address = $(".coords .field-address input, #location_form .field-address input"),
     $geometryTextarea = $(".field-geometry textarea"),
     baseLocationJsonUrl = $("#loci-location-json-url").attr("data-url"),
-    baseLocationFloorplansJsonUrl = $(
-      "#loci-location-floorplans-json-url",
-    ).attr("data-url"),
+    baseLocationFloorplansJsonUrl = $("#loci-location-floorplans-json-url").attr(
+      "data-url",
+    ),
     $geometryRow = $geometryTextarea.parents(".form-row"),
     msg = gettext("Location data not received yet"),
     $noLocationDiv = $(".no-location", ".loci.coords"),
@@ -67,10 +65,7 @@ django.jQuery(function ($) {
   }
 
   function getLocationJsonUrl(pk) {
-    return baseLocationJsonUrl.replace(
-      "00000000-0000-0000-0000-000000000000",
-      pk,
-    );
+    return baseLocationJsonUrl.replace("00000000-0000-0000-0000-000000000000", pk);
   }
 
   function getLocationFloorplansJsonUrl(pk) {
@@ -129,11 +124,9 @@ django.jQuery(function ($) {
     // fallbacks for view only users
     var type = $type.val() || $typeRow.find(".readonly").text(),
       floorplanValue =
-        $floorplanSelection.val() ||
-        $floorplanSelectionRow.find(".readonly").text(),
+        $floorplanSelection.val() || $floorplanSelectionRow.find(".readonly").text(),
       locationSelectionValue =
-        $locationSelection.val() ||
-        $locationSelectionRow.find(".readonly").text();
+        $locationSelection.val() || $locationSelectionRow.find(".readonly").text();
     if (type !== "indoor") {
       return;
     }
@@ -160,8 +153,7 @@ django.jQuery(function ($) {
   function locationSelectionChange(e, initial) {
     // get value from 'readonly' in case of view only permissions
     var value =
-      $locationSelection.val() ||
-      $locationSelectionRow.find(".readonly").text();
+      $locationSelection.val() || $locationSelectionRow.find(".readonly").text();
     $allSections.hide();
     if (!initial) {
       resetDeviceLocationForm();
@@ -238,8 +230,7 @@ django.jQuery(function ($) {
   function floorplanSelectionChange(e, initial) {
     // fallbacks for view only users
     var value =
-        $floorplanSelection.val() ||
-        $floorplanSelectionRow.find(".readonly").text(),
+        $floorplanSelection.val() || $floorplanSelectionRow.find(".readonly").text(),
       optionsLength =
         $floorplan.find("option").length ||
         $floorplanSelectionRow.find(".readonly").length;
@@ -322,9 +313,7 @@ django.jQuery(function ($) {
         $type.val(data.type);
         $isMobile.prop("checked", data.is_mobile);
         $address.val(data.address);
-        $geometryTextarea.val(
-          data.geometry ? JSON.stringify(data.geometry) : "",
-        );
+        $geometryTextarea.val(data.geometry ? JSON.stringify(data.geometry) : "");
         var map = getMap();
         if (map) {
           map.remove();
@@ -488,11 +477,7 @@ django.jQuery(function ($) {
   // update map view
   function updateMapView(data) {
     var geojson =
-      '{ "type": "Point", "coordinates": [ ' +
-      data.lng +
-      ", " +
-      data.lat +
-      "] }";
+      '{ "type": "Point", "coordinates": [ ' + data.lng + ", " + data.lat + "] }";
     $mapGeojsonTextarea.val(geojson);
     getMap().setView([data.lat, data.lng], 15);
   }
@@ -543,10 +528,7 @@ django.jQuery(function ($) {
       return;
     }
     latlng = marker.getLatLng();
-    if (
-      latlng.lat.toString() === $oldLat &&
-      latlng.lng.toString() === $oldLng
-    ) {
+    if (latlng.lat.toString() === $oldLat && latlng.lng.toString() === $oldLng) {
       return;
     }
     updateLatLng(latlng);
@@ -566,9 +548,7 @@ django.jQuery(function ($) {
         }
       })
       .fail(function () {
-        message = gettext(
-          "Could not find any address related to this location.",
-        );
+        message = gettext("Could not find any address related to this location.");
         alert(message);
       });
   }
@@ -641,9 +621,7 @@ django.jQuery(function ($) {
     // if no location data yet
     if (!$geometryTextarea.val()) {
       $geometryRow.hide();
-      $geometryRow
-        .parent()
-        .append('<div class="no-location">' + msg + "</div>");
+      $geometryRow.parent().append('<div class="no-location">' + msg + "</div>");
       $noLocationDiv = $(".no-location", ".loci.coords");
     }
     // this is triggered in the location form page
@@ -656,10 +634,7 @@ django.jQuery(function ($) {
   // fallbacks for view only users
   if ($floorplan.val() || $floorplanSelectionRow.find(".readonly").text()) {
     $indoor.show();
-    if (
-      $floorplanSelection.val() ||
-      $floorplanSelectionRow.find(".readonly").text()
-    ) {
+    if ($floorplanSelection.val() || $floorplanSelectionRow.find(".readonly").text()) {
       $indoorRows.show();
       $floorplanSelectionRow.hide();
     }
@@ -668,8 +643,7 @@ django.jQuery(function ($) {
     $indoor.show();
     $indoorRows.show();
     indoorForm(
-      $locationSelection.val() ||
-        $locationSelectionRow.find(".readonly").text(),
+      $locationSelection.val() || $locationSelectionRow.find(".readonly").text(),
     );
   }
 });
