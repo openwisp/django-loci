@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+coverage run runtests.py --parallel --exclude-tag=selenium_tests
+coverage run runtests.py --tag=selenium_tests --exclude-pytest
+coverage combine
+coverage xml

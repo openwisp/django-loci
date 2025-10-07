@@ -546,8 +546,7 @@ installed locally first):
 
 .. code-block:: shell
 
-    # pytests is used to test django-channels
-    ./runtests.py && pytest
+    ./runtests
 
 Contributing
 ------------

@@ -86,10 +86,7 @@ jobs:
 
     - name: Tests
       if: ${{ !cancelled() && steps.deps.conclusion == 'success' }}
-      run: |
-        coverage run runtests.py --parallel
-        coverage combine
-        coverage xml
+      run: ./runtests
       env:
         SELENIUM_HEADLESS: 1
         GECKO_LOG: 1
@@ -104,7 +101,7 @@ jobs:
       with:
         parallel: true
         format: cobertura
-        flag-name: python-${{ matrix.env.env }}
+        flag-name: python-${{ matrix.python-version }}-${{ matrix.django-version }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
   coveralls:
