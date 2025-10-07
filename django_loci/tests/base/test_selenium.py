@@ -79,7 +79,8 @@ class BaseTestDeviceAdminSelenium(
         # Changing the address in tab 1 should update it in tab 0 in real time without a page reload
         self.web_driver.switch_to.new_window("tab")
         tabs = self.web_driver.window_handles
-        self.web_driver.switch_to.window(tabs[1])
+        # Swtich to last tab
+        self.web_driver.switch_to.window(tabs[-1])
         self.open(url)
         address_input = self.find_element(by=By.ID, value="id_address")
         self.assertEqual(address_input.get_attribute("value"), location.address)
@@ -93,13 +94,16 @@ class BaseTestDeviceAdminSelenium(
         ).click().perform()
         alert = WebDriverWait(self.web_driver, 2).until(EC.alert_is_present())
         alert.accept()
-        sleep(0.5)
+        sleep(0.05)
         new_address = "Lazio 00185, ITA"
         address_input = self.find_element(by=By.ID, value="id_address")
         self.assertIn(new_address, address_input.get_attribute("value"))
         self.wait_for("element_to_be_clickable", by=By.NAME, value="_continue").click()
         # Close tab[1] so other tests are not affected
         self.web_driver.close()
-        self.web_driver.switch_to.window(tabs[0])
+        # on some systems the zero tab may be an empty tab
+        # hence we open the tab before the last one
+        initial_tab = tabs.index(tabs[-1]) - 1
+        self.web_driver.switch_to.window(tabs[initial_tab])
         address_input = self.find_element(by=By.ID, value="id_address")
         self.assertIn(new_address, address_input.get_attribute("value"))
