@@ -14,10 +14,11 @@ from .. import TestAdminInlineMixin, TestLociMixin
 class BaseTestDeviceAdminSelenium(
     SeleniumTestMixin, TestAdminInlineMixin, TestLociMixin
 ):
+    app_label = "django_loci"
 
     def _fill_device_form(self):
         """
-        This method can be extended by downstram implementations
+        This method can be extended by downstream implementations
         needing more complex logic to fill the device form
         """
         self.find_element(by=By.NAME, value="name").send_keys("11:22:33:44:55:66")
@@ -74,7 +75,7 @@ class BaseTestDeviceAdminSelenium(
     def test_real_time_update_address_field(self):
         location = self._create_location()
         self.login()
-        url = reverse("admin:django_loci_location_change", args=[location.id])
+        url = reverse(f"admin:{self.app_label}_location_change", args=[location.id])
         self.open(url)
         # Changing the address in tab 1 should update it in tab 0 in real time without a page reload
         self.web_driver.switch_to.new_window("tab")
