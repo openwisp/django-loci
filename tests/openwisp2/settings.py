@@ -91,6 +91,8 @@ TEMPLATES = [
     }
 ]
 
+LEAFLET_CONFIG = {"RESET_VIEW": False}
+
 # local settings must be imported before test runner otherwise they'll be ignored
 try:
     from .local_settings import *
