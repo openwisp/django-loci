@@ -1,10 +1,28 @@
 Changelog
 =========
 
-Version 1.2.0 [Unreleased]
+Version 1.2.0 [2025-10-23]
 --------------------------
 
-Work in progress.
+Changes
+~~~~~~~
+
+Dependencies
+++++++++++++
+
+- Bumped ``django-leaflet~=0.32.0``.
+- Bumped ``openwisp-utils~=1.2.0``.
+- Bumped ``Pillow~=11.3.0``.
+- Added support for Django ``5.x``.
+- Added support for Python ``3.11``, ``3.12``, and ``3.13``.
+- Dropped support for Django ``3.2`` and ``4.1``.
+- Dropped support for Python ``3.8``.
+
+Bugfixes
+~~~~~~~~
+
+- Added address field to real-time location updates `#169
+  <https://github.com/openwisp/django-loci/issues/169>`_.
 
 Version 1.1.4 [2025-08-01]
 --------------------------
