@@ -3,6 +3,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.exceptions import ValidationError
 
 location_broadcast_path = "ws/loci/location/<uuid:pk>/"
+all_location_boradcast_path = "ws/loci/location/all/"
 
 
 def _get_object_or_none(model, **kwargs):
@@ -59,5 +60,25 @@ class BaseLocationBroadcast(JsonWebsocketConsumer):
         # Remove the user from the group, if it exists.
         if hasattr(self, "group_name"):
             async_to_sync(self.channel_layer.group_discard)(
+                self.group_name, self.channel_name
+            )
+
+class BaseAllLocationBroadcast(BaseLocationBroadcast):
+
+    def connect(self):
+        """
+        Modified connect to handle all locations subscription without location pk
+        """
+        try:
+            user = self.scope["user"]
+        except KeyError:
+            self.close()
+        else:
+            if not self.is_authorized(user, None):
+                self.close()
+                return
+            self.accept()
+            self.group_name = "loci.mobile-location.all"
+            async_to_sync(self.channel_layer.group_add)(
                 self.group_name, self.channel_name
             )

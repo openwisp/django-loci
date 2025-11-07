@@ -4,8 +4,8 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 from django.urls import path
 
-from django_loci.channels.base import location_broadcast_path
-from django_loci.channels.consumers import LocationBroadcast
+from django_loci.channels.base import location_broadcast_path, all_location_boradcast_path
+from django_loci.channels.consumers import LocationBroadcast, AllLocationBroadcast
 
 channel_routing = ProtocolTypeRouter(
     {
@@ -17,6 +17,11 @@ channel_routing = ProtocolTypeRouter(
                             location_broadcast_path,
                             LocationBroadcast.as_asgi(),
                             name="LocationChannel",
+                        ),
+                        path(
+                            all_location_boradcast_path,
+                            AllLocationBroadcast.as_asgi(),
+                            name="AllLocationChannel",
                         )
                     ]
                 )

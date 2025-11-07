@@ -63,6 +63,19 @@ django.jQuery(function ($) {
       return text;
     };
   }
+  // Todo: Remove this before merging only added for testing
+  function listenForAllLocationUpdates() {
+    var host = window.location.host,
+      protocol = window.location.protocol === "http:" ? "ws" : "wss",
+      ws = new ReconnectingWebSocket(
+        protocol + "://" + host + "/ws/loci/location/all/",
+      );
+    ws.onmessage = function (e) {
+      const data = JSON.parse(e.data);
+      console.log("From /ws/loci/location/all/",data)
+    };
+  }
+  listenForAllLocationUpdates()
 
   function getLocationJsonUrl(pk) {
     return baseLocationJsonUrl.replace("00000000-0000-0000-0000-000000000000", pk);
