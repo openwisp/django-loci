@@ -18,6 +18,7 @@ def update_mobile_location(sender, instance, **kwargs):
             group_name, {"type": "send_message", "message": message}
         )
 
+
 def update_mobile_all_locations(sender, instance, **kwargs):
     if not kwargs.get("created") and instance.geometry:
         channel_layer = channels.layers.get_channel_layer()
@@ -28,7 +29,7 @@ def update_mobile_all_locations(sender, instance, **kwargs):
             "address": instance.address,
             "name": instance.name,
             "type": instance.type,
-            "is_mobile": instance.is_mobile
+            "is_mobile": instance.is_mobile,
         }
         async_to_sync(channel_layer.group_send)(
             group_name, {"type": "send_message", "message": message}
@@ -46,5 +47,5 @@ def load_location_receivers(sender):
         update_mobile_location
     )
     receiver(post_save, sender=sender, dispatch_uid="ws_update_mobile_location_all")(
-        update_mobile_all_locations    
+        update_mobile_all_locations
     )
