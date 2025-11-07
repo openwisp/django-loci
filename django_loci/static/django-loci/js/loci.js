@@ -72,10 +72,10 @@ django.jQuery(function ($) {
       );
     ws.onmessage = function (e) {
       const data = JSON.parse(e.data);
-      console.log("From /ws/loci/location/all/",data)
+      console.log("From /ws/loci/location/all/", data);
     };
   }
-  listenForAllLocationUpdates()
+  listenForAllLocationUpdates();
 
   function getLocationJsonUrl(pk) {
     return baseLocationJsonUrl.replace("00000000-0000-0000-0000-000000000000", pk);

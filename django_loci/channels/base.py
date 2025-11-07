@@ -63,6 +63,7 @@ class BaseLocationBroadcast(JsonWebsocketConsumer):
                 self.group_name, self.channel_name
             )
 
+
 class BaseAllLocationBroadcast(BaseLocationBroadcast):
 
     def connect(self):
