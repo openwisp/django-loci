@@ -3,7 +3,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.exceptions import ValidationError
 
 location_broadcast_path = "ws/loci/location/<uuid:pk>/"
-all_location_boradcast_path = "ws/loci/location/all/"
+all_location_broadcast_path = "ws/loci/location/all/"
 
 
 def _get_object_or_none(model, **kwargs):

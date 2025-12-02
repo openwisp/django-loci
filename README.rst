@@ -482,6 +482,17 @@ Extend the channel consumer of django-loci in this way:
     class LocationBroadcast(BaseLocationBroadcast):
         model = Location
 
+Extend the broadcast consumer for all locations:
+
+.. code-block:: python
+
+    from django_loci.channels.base import BaseAllLocationBroadcast
+    from ..models import Location  # your own location model
+
+
+    class AllLocationBroadcast(BaseAllLocationBroadcast):
+        model = Location
+
 Extending AppConfig
 ~~~~~~~~~~~~~~~~~~~
 
