@@ -1,10 +1,10 @@
 from ..models import Location
-from .base import BaseAllLocationBroadcast, BaseLocationBroadcast
+from .base import BaseCommonLocationBroadcast, BaseLocationBroadcast
 
 
 class LocationBroadcast(BaseLocationBroadcast):
     model = Location
 
 
-class AllLocationBroadcast(BaseAllLocationBroadcast):
+class CommonLocationBroadcast(BaseCommonLocationBroadcast):
     model = Location
