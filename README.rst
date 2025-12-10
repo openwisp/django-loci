@@ -486,11 +486,11 @@ Extend the broadcast consumer for all locations:
 
 .. code-block:: python
 
-    from django_loci.channels.base import BaseAllLocationBroadcast
+    from django_loci.channels.base import BaseCommonLocationBroadcast
     from ..models import Location  # your own location model
 
 
-    class AllLocationBroadcast(BaseAllLocationBroadcast):
+    class CommonLocationBroadcast(BaseCommonLocationBroadcast):
         model = Location
 
 Extending AppConfig

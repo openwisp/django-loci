@@ -5,10 +5,10 @@ from django.core.asgi import get_asgi_application
 from django.urls import path
 
 from django_loci.channels.base import (
-    all_location_broadcast_path,
+    common_location_broadcast_path,
     location_broadcast_path,
 )
-from django_loci.channels.consumers import AllLocationBroadcast, LocationBroadcast
+from django_loci.channels.consumers import CommonLocationBroadcast, LocationBroadcast
 
 channel_routing = ProtocolTypeRouter(
     {
@@ -22,8 +22,8 @@ channel_routing = ProtocolTypeRouter(
                             name="LocationChannel",
                         ),
                         path(
-                            all_location_broadcast_path,
-                            AllLocationBroadcast.as_asgi(),
+                            common_location_broadcast_path,
+                            CommonLocationBroadcast.as_asgi(),
                             name="AllLocationChannel",
                         ),
                     ]
