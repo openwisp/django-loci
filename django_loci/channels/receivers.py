@@ -9,33 +9,38 @@ from django.dispatch import receiver
 def update_mobile_location(sender, instance, **kwargs):
     """
     Sends WebSocket updates when a location record is updated.
-    - Sends a message with the specific location update.
-    - Sends a message with the common (all locations) update.
+    - Sends a message to the location specific group.
+    - Sends a message to a common group for tracking all mobile location updates.
     """
     if not kwargs.get("created") and instance.geometry:
         channel_layer = channels.layers.get_channel_layer()
-        specific_location_group_name = f"loci.mobile-location.{instance.pk}"
-        specific_location_message = {
-            "geometry": json.loads(instance.geometry.geojson),
-            "address": instance.address,
-        }
+
+        # Send update to location specific group
         async_to_sync(channel_layer.group_send)(
-            specific_location_group_name,
-            {"type": "send_message", "message": specific_location_message},
+            f"loci.mobile-location.{instance.pk}",
+            {
+                "type": "send_message",
+                "message": {
+                    "geometry": json.loads(instance.geometry.geojson),
+                    "address": instance.address,
+                },
+            },
         )
-        # Broadcast update to track updates across all locations
-        common_location_group_name = "loci.mobile-location.common"
-        common_location_message = {
-            "id": str(instance.pk),
-            "geometry": json.loads(instance.geometry.geojson),
-            "address": instance.address,
-            "name": instance.name,
-            "type": instance.type,
-            "is_mobile": instance.is_mobile,
-        }
+
+        # Send update to common mobile location group
         async_to_sync(channel_layer.group_send)(
-            common_location_group_name,
-            {"type": "send_message", "message": common_location_message},
+            "loci.mobile-location.common",
+            {
+                "type": "send_message",
+                "message": {
+                    "id": str(instance.pk),
+                    "geometry": json.loads(instance.geometry.geojson),
+                    "address": instance.address,
+                    "name": instance.name,
+                    "type": instance.type,
+                    "is_mobile": instance.is_mobile,
+                },
+            },
         )
 
 
