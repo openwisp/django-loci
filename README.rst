@@ -482,6 +482,17 @@ Extend the channel consumer of django-loci in this way:
     class LocationBroadcast(BaseLocationBroadcast):
         model = Location
 
+Extend the broadcast consumer for all locations:
+
+.. code-block:: python
+
+    from django_loci.channels.base import BaseCommonLocationBroadcast
+    from ..models import Location  # your own location model
+
+
+    class CommonLocationBroadcast(BaseCommonLocationBroadcast):
+        model = Location
+
 Extending AppConfig
 ~~~~~~~~~~~~~~~~~~~
 
@@ -523,6 +534,12 @@ Install test requirements:
 .. code-block:: shell
 
     pip install -r requirements-test.txt
+
+Launch Redis:
+
+.. code-block:: shell
+
+    docker compose up -d redis
 
 Create database:
 
