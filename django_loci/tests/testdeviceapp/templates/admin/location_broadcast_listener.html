@@ -1,8 +1,10 @@
 {% extends "admin/base_site.html" %}
 
 {% load static %}
+{% load i18n %}
 
 {% block content %}
+<p class="hidden" id="ws-connected">{% trans "WebSocket connection established. Location updates will appear below." %}</p>
 <ul id="location-updates"></ul>
 {% endblock content %}
 
@@ -22,6 +24,13 @@
         pre.textContent = JSON.stringify(data, null, 2);
         li.appendChild(pre);
         locationUpdates.appendChild(li);
+    };
+
+    ws.onopen = function() {
+        const statusMessage = document.querySelector('#ws-connected');
+        if (statusMessage) {
+            statusMessage.classList.remove('hidden');
+        }
     };
 </script>
 {% endblock footer %}

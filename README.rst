@@ -535,6 +535,12 @@ Install test requirements:
 
     pip install -r requirements-test.txt
 
+Launch Redis:
+
+.. code-block:: shell
+
+    docker compose up -d redis
+
 Create database:
 
 .. code-block:: shell
