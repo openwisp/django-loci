@@ -434,7 +434,7 @@ django.jQuery(function ($) {
     var host = window.location.host,
       protocol = window.location.protocol === "http:" ? "ws" : "wss",
       ws = new ReconnectingWebSocket(
-        protocol + "://" + host + "/ws/loci/locations/" + pk + "/",
+        protocol + "://" + host + "/ws/loci/location/" + pk + "/",
       );
     ws.onmessage = function (e) {
       const data = JSON.parse(e.data);
