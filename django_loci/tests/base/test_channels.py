@@ -39,7 +39,7 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin):
                 location=location
             )
             pk = location.pk
-        path = "/ws/loci/locations/{0}/".format(pk)
+        path = "/ws/loci/location/{0}/".format(pk)
         session = None
         if user:
             session = await self._force_login(user)

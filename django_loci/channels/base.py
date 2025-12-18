@@ -2,7 +2,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.exceptions import ValidationError
 
-location_broadcast_path = "ws/loci/locations/<uuid:pk>/"
+location_broadcast_path = "ws/loci/location/<uuid:pk>/"
 common_location_broadcast_path = "ws/loci/locations/"
 
 
