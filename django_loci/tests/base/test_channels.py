@@ -1,85 +1,23 @@
 # use pytest
-import importlib
-
 import pytest
 from channels.db import database_sync_to_async
 from channels.routing import ProtocolTypeRouter
-from channels.testing import WebsocketCommunicator
-from django.conf import settings
-from django.contrib.auth import login
 from django.contrib.auth.models import Permission
-from django.http.request import HttpRequest
 
 from django_loci.channels.consumers import CommonLocationBroadcast, LocationBroadcast
 
 from ...channels.base import _get_object_or_none
-from .. import TestAdminMixin, TestLociMixin
+from .. import TestAdminMixin, TestChannelsMixin, TestLociMixin
 
 
-class BaseTestChannels(TestAdminMixin, TestLociMixin):
+class BaseTestChannels(TestAdminMixin, TestLociMixin, TestChannelsMixin):
     """
     In channels 2.x, Websockets can only be tested
     asynchronously, hence, pytest is used for these tests.
     """
 
-    async def _force_login(self, user, backend=None):
-        engine = importlib.import_module(settings.SESSION_ENGINE)
-        request = HttpRequest()
-        request.session = engine.SessionStore()
-        database_sync_to_async(login)(request, user, backend)
-        request.session.save
-        return request.session
-
-    async def _get_specific_location_request_dict(self, pk=None, user=None):
-        if not pk:
-            location = await database_sync_to_async(self._create_location)(
-                is_mobile=True
-            )
-            await database_sync_to_async(self._create_object_location)(
-                location=location
-            )
-            pk = location.pk
-        path = "/ws/loci/location/{0}/".format(pk)
-        session = None
-        if user:
-            session = await self._force_login(user)
-        return {"pk": pk, "path": path, "session": session}
-
-    async def _get_common_location_request_dict(self, user=None):
-        location = await database_sync_to_async(self._create_location)(is_mobile=True)
-        await database_sync_to_async(self._create_object_location)(location=location)
-        pk = location.pk
-        path = "/ws/loci/locations/"
-        session = None
-        if user:
-            session = await self._force_login(user)
-        return {"pk": pk, "path": path, "session": session}
-
-    def _get_location_communicator(
-        self, consumer_cls, request_vars, user=None, include_pk=False
-    ):
-        communicator = WebsocketCommunicator(
-            consumer_cls.as_asgi(), request_vars["path"]
-        )
-        if user:
-            scope = {
-                "user": user,
-                "session": request_vars["session"],
-            }
-            if include_pk:
-                scope["url_route"] = {"kwargs": {"pk": request_vars["pk"]}}
-            communicator.scope.update(scope)
-        return communicator
-
-    def _get_specific_location_communicator(self, request_vars, user=None):
-        return self._get_location_communicator(
-            LocationBroadcast, request_vars, user=user, include_pk=True
-        )
-
-    def _get_common_location_communicator(self, request_vars, user=None):
-        return self._get_location_communicator(
-            CommonLocationBroadcast, request_vars, user=user, include_pk=False
-        )
+    location_consumer = LocationBroadcast
+    common_location_consumer = CommonLocationBroadcast
 
     @pytest.mark.django_db(transaction=True)
     def test_object_or_none(self):
