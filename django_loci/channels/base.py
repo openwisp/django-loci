@@ -79,7 +79,14 @@ class BaseCommonLocationBroadcast(BaseLocationBroadcast):
                 self.close()
                 return
             self.accept()
-            self.group_name = "loci.mobile-location.common"
-            async_to_sync(self.channel_layer.group_add)(
-                self.group_name, self.channel_name
-            )
+            self.join_groups(user)
+
+    def join_groups(self, user):
+        self.group_names = ["loci.mobile-location.common"]
+        async_to_sync(self.channel_layer.group_add)(
+            self.group_names[0], self.channel_name
+        )
+
+    def disconnect(self, close_code):
+        for group in getattr(self, "group_names", []):
+            async_to_sync(self.channel_layer.group_discard)(group, self.channel_name)
