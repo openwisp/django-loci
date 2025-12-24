@@ -189,11 +189,6 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin, TestChannelsMixin):
         }
         await communicator.disconnect()
 
-    async def _save_location(self, pk):
-        loc = await self.location_model.objects.aget(pk=pk)
-        loc.geometry = "POINT (12.513124 41.897903)"
-        await loc.asave()
-
     def test_routing(self):
         from django_loci.channels.asgi import channel_routing
 

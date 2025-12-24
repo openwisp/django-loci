@@ -213,3 +213,8 @@ class TestChannelsMixin(object):
             user=user,
             include_pk=False,
         )
+
+    async def _save_location(self, pk):
+        loc = await self.location_model.objects.aget(pk=pk)
+        loc.geometry = "POINT (12.513124 41.897903)"
+        await loc.asave()
