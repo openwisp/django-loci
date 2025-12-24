@@ -7,15 +7,40 @@ from django.dispatch import receiver
 
 
 def update_mobile_location(sender, instance, **kwargs):
+    """
+    Sends WebSocket updates when a location record is updated.
+    - Sends a message to the location specific group.
+    - Sends a message to a common group for tracking all mobile location updates.
+    """
     if not kwargs.get("created") and instance.geometry:
-        group_name = "loci.mobile-location.{0}".format(str(instance.pk))
         channel_layer = channels.layers.get_channel_layer()
-        message = {
-            "geometry": json.loads(instance.geometry.geojson),
-            "address": instance.address,
-        }
+
+        # Send update to location specific group
         async_to_sync(channel_layer.group_send)(
-            group_name, {"type": "send_message", "message": message}
+            f"loci.mobile-location.{instance.pk}",
+            {
+                "type": "send_message",
+                "message": {
+                    "geometry": json.loads(instance.geometry.geojson),
+                    "address": instance.address,
+                },
+            },
+        )
+
+        # Send update to common mobile location group
+        async_to_sync(channel_layer.group_send)(
+            "loci.mobile-location.common",
+            {
+                "type": "send_message",
+                "message": {
+                    "id": str(instance.pk),
+                    "geometry": json.loads(instance.geometry.geojson),
+                    "address": instance.address,
+                    "name": instance.name,
+                    "type": instance.type,
+                    "is_mobile": instance.is_mobile,
+                },
+            },
         )
 
 
