@@ -173,18 +173,34 @@ class BaseTestChannels(TestAdminMixin, TestLociMixin, TestChannelsMixin):
     @pytest.mark.django_db(transaction=True)
     async def test_common_location_update(self):
         test_user = await database_sync_to_async(self._create_admin)()
-        request_vars = await self._get_common_location_request_dict(user=test_user)
+        location1 = await database_sync_to_async(self._create_location)(is_mobile=True)
+        await database_sync_to_async(self._create_object_location)(location=location1)
+        location2 = await database_sync_to_async(self._create_location)(is_mobile=True)
+        await database_sync_to_async(self._create_object_location)(location=location2)
+        request_vars = await self._get_common_location_request_dict(
+            pk=location1.pk, user=test_user
+        )
         communicator = self._get_common_location_communicator(request_vars, test_user)
         connected, _ = await communicator.connect()
         assert connected
         await self._save_location(request_vars["pk"])
         response = await communicator.receive_json_from()
         assert response == {
-            "id": str(request_vars["pk"]),
+            "id": str(location1.pk),
             "geometry": {"type": "Point", "coordinates": [12.513124, 41.897903]},
             "address": "Via del Corso, Roma, Italia",
-            "name": "test-location",
-            "type": "outdoor",
+            "name": location1.name,
+            "type": location1.type,
+            "is_mobile": True,
+        }
+        await self._save_location(location2.pk)
+        response = await communicator.receive_json_from()
+        assert response == {
+            "id": str(location2.pk),
+            "geometry": {"type": "Point", "coordinates": [12.513124, 41.897903]},
+            "address": "Via del Corso, Roma, Italia",
+            "name": location2.name,
+            "type": location2.type,
             "is_mobile": True,
         }
         await communicator.disconnect()
