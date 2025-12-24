@@ -21,7 +21,8 @@ class TestCommonLocationWebsocket(
 
     def test_common_location_broadcast_ws(self):
         self.login()
-        mobile_location = self._create_location(is_mobile=True)
+        location1 = self._create_location(is_mobile=True, name="Location 1")
+        location2 = self._create_location(is_mobile=True, name="Location 2")
         self.open(reverse("admin:location-broadcast-listener"))
         WebDriverWait(self.web_driver, 3).until(
             EC.visibility_of_element_located(
@@ -29,16 +30,28 @@ class TestCommonLocationWebsocket(
             )
         )
         # Update location to trigger websocket message
-        mobile_location.geometry = (
+        location1.geometry = (
             '{ "type": "Point", "coordinates": [ 77.218791, 28.6324252 ] }'
         )
-        mobile_location.address = "Delhi, India"
-        mobile_location.full_clean()
-        mobile_location.save()
+        location1.address = "Delhi, India"
+        location1.full_clean()
+        location1.save()
         # Wait for websocket message to be received
         WebDriverWait(self.web_driver, 3).until(
             EC.text_to_be_present_in_element(
                 (By.CSS_SELECTOR, "#location-updates li"),
                 "77.218791",
+            )
+        )
+        location2.geometry = (
+            '{ "type": "Point", "coordinates": [72.877656, 19.075984] }'
+        )
+        location2.address = "Mumbai, India"
+        location2.full_clean()
+        location2.save()
+        WebDriverWait(self.web_driver, 3).until(
+            EC.text_to_be_present_in_element(
+                (By.CSS_SELECTOR, "#location-updates"),
+                "72.877656",
             )
         )
