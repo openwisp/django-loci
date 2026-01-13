@@ -13,7 +13,7 @@
 <script src="{% static 'django-loci/js/vendor/reconnecting-websocket.min.js' %}"></script>
 <script>
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/loci/locations/`;
+    const wsUrl = `${protocol}//${window.location.host}/ws/loci/location/`;
     const ws = new ReconnectingWebSocket(wsUrl);
     const locationUpdates = document.getElementById('location-updates');
 

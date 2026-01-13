@@ -178,7 +178,7 @@ class TestChannelsMixin(object):
                 location=location
             )
             pk = location.pk
-        path = "/ws/loci/locations/"
+        path = "/ws/loci/location/"
         session = None
         if user:
             session = await self._force_login(user)
