@@ -877,6 +877,10 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
         url = reverse("{0}_location_change".format(self.url_prefix), args=[loc.pk])
         r = self.client.get(url)
         self.assertEqual(r.status_code, 200)
+        # In Django 6.0+, readonly fields no longer render widgets,
+        # so geometry is displayed as plain text instead of a map
+        # assert that geometry value is visible
+        self.assertContains(r, "SRID=4326;POINT")
         # assert if inline fields are visible
         self.assertContains(r, f"{loc.name} {ordinal(fl.floor)}")
         self.assertContains(r, fl.floor)
@@ -900,8 +904,10 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
         )
         r = self.client.get(reverse(self.change_url, args=[obj.pk]))
         self.assertEqual(r.status_code, 200)
-        # assert if map is being rendered or not
-        # id is required for indoor map to render
+        # In Django 6.0+, readonly fields no longer render widgets,
+        # so geometry is displayed as plain text instead of a map
+        # assert that geometry value is visible
+        self.assertContains(r, "SRID=4326;POINT")
         # assert if inline fields are visible
         self.assertContains(r, f"{loc.name} {ordinal(fl.floor)} floor")
         self.assertContains(r, fl.floor)
