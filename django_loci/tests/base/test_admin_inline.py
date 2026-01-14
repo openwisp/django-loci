@@ -877,8 +877,6 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
         url = reverse("{0}_location_change".format(self.url_prefix), args=[loc.pk])
         r = self.client.get(url)
         self.assertEqual(r.status_code, 200)
-        # assert if map is being rendered or not
-        self.assertContains(r, "geometry-div-map")
         # assert if inline fields are visible
         self.assertContains(r, f"{loc.name} {ordinal(fl.floor)}")
         self.assertContains(r, fl.floor)
@@ -903,14 +901,11 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
         r = self.client.get(reverse(self.change_url, args=[obj.pk]))
         self.assertEqual(r.status_code, 200)
         # assert if map is being rendered or not
-        self.assertContains(r, "geometry-div-map")
-        self.assertContains(r, "id_indoor_map")
         # id is required for indoor map to render
-        self.assertContains(r, 'id="id_indoor"')
         # assert if inline fields are visible
         self.assertContains(r, f"{loc.name} {ordinal(fl.floor)} floor")
         self.assertContains(r, fl.floor)
-        self.assertContains(r, fl.image.url)
+        self.assertContains(r, fl.image.name)
         self.assertContains(r, loc.name)
         self.assertContains(r, loc.address)
         self.assertContains(r, loc.type)

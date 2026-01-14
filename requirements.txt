@@ -1,4 +1,4 @@
-django>=4.2.0,<5.3.0
+django>=4.2.0,<6.1.0
 django-leaflet~=0.33.0
 Pillow~=12.0.0
 geopy~=2.4.1
