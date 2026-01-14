@@ -154,7 +154,7 @@ class TestChannelsMixin(object):
         await database_sync_to_async(request.session.save)()
         return request.session
 
-    async def _get_specific_location_request_dict(self, pk=None, user=None):
+    async def _get_location_request_dict(self, path, pk=None, user=None):
         if not pk:
             location = await database_sync_to_async(self._create_location)(
                 is_mobile=True
@@ -163,26 +163,22 @@ class TestChannelsMixin(object):
                 location=location
             )
             pk = location.pk
-        path = "/ws/loci/location/{0}/".format(pk)
         session = None
         if user:
             session = await self._force_login(user)
         return {"pk": pk, "path": path, "session": session}
 
+    async def _get_specific_location_request_dict(self, pk=None, user=None):
+        result = await self._get_location_request_dict(
+            path="/ws/loci/location/{0}/", pk=pk, user=user
+        )
+        result["path"] = result["path"].format(result["pk"])
+        return result
+
     async def _get_common_location_request_dict(self, pk=None, user=None):
-        if not pk:
-            location = await database_sync_to_async(self._create_location)(
-                is_mobile=True
-            )
-            await database_sync_to_async(self._create_object_location)(
-                location=location
-            )
-            pk = location.pk
-        path = "/ws/loci/location/"
-        session = None
-        if user:
-            session = await self._force_login(user)
-        return {"pk": pk, "path": path, "session": session}
+        return await self._get_location_request_dict(
+            path="/ws/loci/location/", pk=pk, user=user
+        )
 
     def _get_location_communicator(
         self, consumer, request_vars, user=None, include_pk=False
