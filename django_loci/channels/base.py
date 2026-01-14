@@ -15,11 +15,15 @@ def _get_object_or_none(model, **kwargs):
 
 class BaseLocationBroadcast(JsonWebsocketConsumer):
     """
-    Notifies that the coordinates of a location have changed
-    to authorized users (superusers or organization operators)
+    Base WebSocket consumer for broadcasting location coordinate changes
+    to authorized users (superusers or organization operators).
     """
 
     def connect(self):
+        """
+        Handle WebSocket connection: authenticate user, validate location,
+        and join the location-specific broadcast group.
+        """
         self.pk = None
         try:
             user = self.scope["user"]
@@ -42,6 +46,10 @@ class BaseLocationBroadcast(JsonWebsocketConsumer):
             )
 
     def is_authorized(self, user, location):
+        """
+        Check if the user has permission to receive location broadcasts.
+        Requires authentication and change or view permissions on the location.
+        """
         perm = "{0}.change_location".format(self.model._meta.app_label)
         # allow users with view permission
         readperm = "{0}.view_location".format(self.model._meta.app_label)
@@ -50,11 +58,14 @@ class BaseLocationBroadcast(JsonWebsocketConsumer):
         return authenticated and (user.is_superuser or (user.is_staff and is_permitted))
 
     def send_message(self, event):
+        """
+        Send JSON event data to the connected WebSocket client.
+        """
         self.send_json(event["message"])
 
     def disconnect(self, close_code):
         """
-        Perform things on connection close
+        Handle cleanup on WebSocket disconnection.
         """
         # The group_name is set only when the connection is accepted.
         # Remove the user from the group, if it exists.
@@ -68,7 +79,8 @@ class BaseCommonLocationBroadcast(BaseLocationBroadcast):
 
     def connect(self):
         """
-        Modified connect to handle all locations subscription without location pk
+        Override connect to handle subscription to all locations
+        without requiring a specific location PK.
         """
         try:
             user = self.scope["user"]
@@ -83,8 +95,8 @@ class BaseCommonLocationBroadcast(BaseLocationBroadcast):
 
     def join_groups(self, user):
         """
-        Subscribe to location broadcast group(s).
-        Subclasses can override to add organization-specific groups based on user.
+        Subscribe to broadcast groups.
+        Subclasses can override to add user-specific groups (using the ``user`` argument).
         """
         self.group_name = "loci.mobile-location.common"
         async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
