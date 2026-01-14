@@ -2,10 +2,15 @@
 Reusable test helpers
 """
 
+import importlib
 import os
 
+from channels.db import database_sync_to_async
+from channels.testing import WebsocketCommunicator
 from django.conf import settings
+from django.contrib.auth import login
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.http.request import HttpRequest
 
 
 class TestLociMixin(object):
@@ -137,3 +142,75 @@ class TestAdminInlineMixin(TestAdminMixin):
     @property
     def change_url(self):
         return "{0}_change".format(self._get_url_prefix())
+
+
+class TestChannelsMixin(object):
+
+    async def _force_login(self, user, backend=None):
+        engine = importlib.import_module(settings.SESSION_ENGINE)
+        request = HttpRequest()
+        request.session = engine.SessionStore()
+        await database_sync_to_async(login)(request, user, backend)
+        await database_sync_to_async(request.session.save)()
+        return request.session
+
+    async def _get_location_request_dict(self, path, pk=None, user=None):
+        if not pk:
+            location = await database_sync_to_async(self._create_location)(
+                is_mobile=True
+            )
+            await database_sync_to_async(self._create_object_location)(
+                location=location
+            )
+            pk = location.pk
+        session = None
+        if user:
+            session = await self._force_login(user)
+        return {"pk": pk, "path": path, "session": session}
+
+    async def _get_specific_location_request_dict(self, pk=None, user=None):
+        result = await self._get_location_request_dict(
+            path="/ws/loci/location/{0}/", pk=pk, user=user
+        )
+        result["path"] = result["path"].format(result["pk"])
+        return result
+
+    async def _get_common_location_request_dict(self, pk=None, user=None):
+        return await self._get_location_request_dict(
+            path="/ws/loci/location/", pk=pk, user=user
+        )
+
+    def _get_location_communicator(
+        self, consumer, request_vars, user=None, include_pk=False
+    ):
+        communicator = WebsocketCommunicator(consumer.as_asgi(), request_vars["path"])
+        if user:
+            scope = {
+                "user": user,
+                "session": request_vars["session"],
+            }
+            if include_pk:
+                scope["url_route"] = {"kwargs": {"pk": request_vars["pk"]}}
+            communicator.scope.update(scope)
+        return communicator
+
+    def _get_specific_location_communicator(self, request_vars, user=None):
+        return self._get_location_communicator(
+            consumer=self.location_consumer,
+            request_vars=request_vars,
+            user=user,
+            include_pk=True,
+        )
+
+    def _get_common_location_communicator(self, request_vars, user=None):
+        return self._get_location_communicator(
+            consumer=self.common_location_consumer,
+            request_vars=request_vars,
+            user=user,
+            include_pk=False,
+        )
+
+    async def _save_location(self, pk):
+        loc = await self.location_model.objects.aget(pk=pk)
+        loc.geometry = "POINT (12.513124 41.897903)"
+        await loc.asave()

@@ -62,7 +62,14 @@ MIDDLEWARE = [
 ROOT_URLCONF = "openwisp2.urls"
 
 ASGI_APPLICATION = "django_loci.channels.asgi.channel_routing"
-CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 TIME_ZONE = "Europe/Rome"
 LANGUAGE_CODE = "en-gb"

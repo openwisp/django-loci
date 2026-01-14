@@ -53,7 +53,7 @@ Reusable django-app for storing GIS and indoor coordinates of objects.
 Dependencies
 ------------
 
-- Python >= 3.8
+- Python >= 3.10
 - GeoDjango (`see GeoDjango Install Instructions
   <https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#requirements>`_)
 - One of the databases supported by GeoDjango
@@ -67,7 +67,7 @@ django-loci Python version
 0.3 - 0.4   >=3.6
 1.0         >=3.7
 1.1         >=3.8
-dev         >=3.8
+dev         >=3.10
 =========== ==============
 
 Install stable version from pypi
@@ -142,7 +142,10 @@ configuration can be:
     ASGI_APPLICATION = "django_loci.channels.asgi.channel_routing"
     CHANNEL_LAYERS = {
         "default": {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("127.0.0.1", 6379)],
+            },
         },
     }
 
@@ -482,6 +485,17 @@ Extend the channel consumer of django-loci in this way:
     class LocationBroadcast(BaseLocationBroadcast):
         model = Location
 
+Extend the broadcast consumer for all locations:
+
+.. code-block:: python
+
+    from django_loci.channels.base import BaseCommonLocationBroadcast
+    from ..models import Location  # your own location model
+
+
+    class CommonLocationBroadcast(BaseCommonLocationBroadcast):
+        model = Location
+
 Extending AppConfig
 ~~~~~~~~~~~~~~~~~~~
 
@@ -523,6 +537,12 @@ Install test requirements:
 .. code-block:: shell
 
     pip install -r requirements-test.txt
+
+Launch Redis:
+
+.. code-block:: shell
+
+    docker compose up -d redis
 
 Create database:
 
