@@ -54,6 +54,11 @@ input[type="text"] {
 .form-row.field-geometry .flex-container {
   display: block;
 }
+/* adjust label width for geometry field */
+.field-geometry label {
+  min-width: auto;
+  width: auto;
+}
 #floorplan_set-group {
   display: none;
 }
