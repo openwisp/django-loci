@@ -54,8 +54,18 @@ input[type="text"] {
 .form-row.field-geometry .flex-container {
   display: block;
 }
+/* Ensures Layer Control labels in Leaflet are not stretched horizontally */
+.form-row .leaflet-control-layers.leaflet-control label {
+  min-width: 0;
+  width: auto;
+  display: inline-block;
+}
+.form-row .leaflet-control-layers.leaflet-control input[type="radio"] {
+  margin-top: -4px;
+}
 /* adjust label width for geometry field */
-.field-geometry label {
+.form-row.field-geometry label,
+.field-geometry.form-row label {
   min-width: auto;
   width: auto;
 }
