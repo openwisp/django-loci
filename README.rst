@@ -63,11 +63,18 @@ Compatibility Table
 
 =========== ==============
 django-loci Python version
-0.2         2.7 or >=3.4
-0.3 - 0.4   >=3.6
 1.0         >=3.7
 1.1         >=3.8
+1.1         >=3.9
 dev         >=3.10
+=========== ==============
+
+=========== ==============
+django-loci Django version
+1.0         up to 3.2
+1.1         >=4.0
+1.2         >=4.0
+dev         >=5.2
 =========== ==============
 
 Install stable version from pypi
