@@ -23,14 +23,23 @@ from .models import AbstractFloorPlan, AbstractLocation
 
 
 class ReadOnlyMixin:
-    """Mixin for forms to handle field widgets for view-only users."""
+    """Mixin for forms to handle field widgets for view-only users.
+    
+    For Django 6.0+ compatibility, this mixin disables fields instead of marking
+    them as readonly. This allows readonly users to see interactive widgets
+    (like maps) while preventing editing. The `read_only` attribute on widgets
+    is also set for backwards compatibility with custom widget templates.
+    """
 
     def set_readonly_attribute(self, user, fields):
         """
-        This method sets the read_only attribute on widget for the fields
-        which are required to be rendered as it is to view-only users. This is
-        done as 'AdminReadonlyField' renders the widget if 'read_only' is set on
-        the field's widget. Also the required field must be present in self.fields
+        This method disables fields for view-only users while keeping widgets
+        visible and interactive (read-only in terms of input, but visually rich).
+        
+        For Django 6.0+, we disable the field instead of using readonly on the
+        widget, which allows the widget to render fully (e.g., Leaflet map).
+        The `read_only` attribute is still set on widgets for custom templates
+        that may check for it.
         """
         app_label = self.Meta.model._meta.app_label
         model_name = self.Meta.model._meta.model_name
@@ -41,6 +50,9 @@ class ReadOnlyMixin:
         ):
             for field in fields:
                 if field in self.fields:
+                    # Disable the field to prevent editing
+                    self.fields[field].disabled = True
+                    # Also set read_only for custom widget templates compatibility
                     setattr(self.fields[field].widget, "read_only", True)
             # Return 'True' to allow any further handling for view-only users
             return True

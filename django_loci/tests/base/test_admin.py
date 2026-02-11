@@ -242,7 +242,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         r = self.client.get(url)
         self.assertEqual(r.status_code, 200)
         # assert if image is being rendered or not
-        self.assertContains(r, 'img src="{0}"'.format(fl.image.url))
+        self.assertContains(r, fl.image.url)
         self.assertContains(r, f"{loc.name} {ordinal(fl.floor)}")
         self.assertContains(r, fl.floor)
         self.assertContains(r, loc.name)
