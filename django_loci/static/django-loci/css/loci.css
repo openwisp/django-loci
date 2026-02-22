@@ -41,8 +41,8 @@ input[type="text"] {
   width: 320px;
 }
 /* simulate required fields */
-.coords.loci label {
-  font-weight: bold;
+.coords.loci .flex-container > label {
+  font-weight: bold !important;
   color: #333;
 }
 .no-location {
@@ -53,6 +53,27 @@ input[type="text"] {
 }
 .form-row.field-geometry .flex-container {
   display: block;
+}
+/* Ensures Layer Control labels in Leaflet are not stretched horizontally */
+.form-row .leaflet-control label {
+  min-width: 0;
+  width: auto;
+  display: inline-block;
+}
+.form-row .leaflet-control label:last-child {
+  padding-right: 0;
+}
+.form-row .leaflet-control input[type="radio"] {
+  margin-top: -6px;
+}
+.form-row .leaflet-control-layers-expanded {
+  padding: 6px 12px;
+}
+/* adjust label width for geometry field */
+.form-row.field-geometry label,
+.field-geometry.form-row label {
+  min-width: auto;
+  width: auto;
 }
 #floorplan_set-group {
   display: none;
