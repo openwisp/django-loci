@@ -570,6 +570,9 @@ django.jQuery(function ($) {
   });
 
   function geometryListeners() {
+    if (!getMap()) {
+      return;
+    }
     var featureGroup = getFeatureGroup(),
       marker = getMarker();
     featureGroup.on("layeradd", function () {
