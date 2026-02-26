@@ -101,6 +101,7 @@ jobs:
           format: cobertura
           flag-name: python-${{ matrix.python-version }}-${{ matrix.django-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          fail-on-error: false
 
   coveralls:
     needs: build
@@ -110,3 +111,4 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
+          fail-on-error: false
