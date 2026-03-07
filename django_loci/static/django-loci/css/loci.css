@@ -69,12 +69,6 @@ input[type="text"] {
 .form-row .leaflet-control-layers-expanded {
   padding: 6px 12px;
 }
-/* adjust label width for geometry field */
-.form-row.field-geometry label,
-.field-geometry.form-row label {
-  min-width: auto;
-  width: auto;
-}
 #floorplan_set-group {
   display: none;
 }
