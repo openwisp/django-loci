@@ -105,7 +105,7 @@ class AbstractFloorPlanAdmin(TimeReadonlyAdminMixin, admin.ModelAdmin):
 class AbstractLocationForm(ReadOnlyMixin, forms.ModelForm):
     # define the geometry field to add it in self.fields
     # to render it for view-only
-    geometry = GeometryField(required=True)
+    geometry = GeometryField(required=False)
 
     class Meta:
         exclude = tuple()

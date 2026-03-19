@@ -232,6 +232,36 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), expected)
 
+    def _get_location_add_params(self, **kwargs):
+        params = {
+            "name": "test location",
+            "type": "outdoor",
+            "is_mobile": "",
+            "address": "",
+            "geometry": "",
+            "floorplan_set-TOTAL_FORMS": "0",
+            "floorplan_set-INITIAL_FORMS": "0",
+            "floorplan_set-MIN_NUM_FORMS": "0",
+            "floorplan_set-MAX_NUM_FORMS": "1000",
+            "_save": "Save",
+        }
+        params.update(kwargs)
+        return params
+
+    def test_add_mobile_location(self):
+        self._login_as_admin()
+        url = reverse("{0}_location_add".format(self.url_prefix))
+        params = self._get_location_add_params(is_mobile="on")
+        self.client.post(url, params)
+        self.assertEqual(self.location_model.objects.filter(is_mobile=True).count(), 1)
+
+    def test_add_non_mobile_location_without_geometry(self):
+        self._login_as_admin()
+        url = reverse("{0}_location_add".format(self.url_prefix))
+        params = self._get_location_add_params()
+        r = self.client.post(url, params)
+        self.assertContains(r, "No geometry value provided.")
+
     # for users with view only permissions to floorplans
     def test_readonly_floorplans(self):
         user = self._create_readonly_admin(models=[self.floorplan_model])

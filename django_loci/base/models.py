@@ -64,7 +64,7 @@ class AbstractLocation(TimeStampedEditableModel):
         otherwise raise a ValidationError
         """
         if not self.is_mobile and not self.geometry:
-            raise ValidationError(_("geometry cannot be null"))
+            raise ValidationError({"geometry": _("No geometry value provided.")})
 
     @property
     def short_type(self):
