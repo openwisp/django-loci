@@ -263,6 +263,7 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No geometry value provided.")
+        self.assertEqual(self.location_model.objects.count(), 0)
 
     # for users with view only permissions to floorplans
     def test_readonly_floorplans(self):
