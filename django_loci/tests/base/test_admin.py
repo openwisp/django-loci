@@ -252,15 +252,17 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         self._login_as_admin()
         url = reverse("{0}_location_add".format(self.url_prefix))
         params = self._get_location_add_params(is_mobile="on")
-        self.client.post(url, params)
+        response = self.client.post(url, params, follow=True)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(self.location_model.objects.filter(is_mobile=True).count(), 1)
 
     def test_add_non_mobile_location_without_geometry(self):
         self._login_as_admin()
         url = reverse("{0}_location_add".format(self.url_prefix))
         params = self._get_location_add_params()
-        r = self.client.post(url, params)
-        self.assertContains(r, "No geometry value provided.")
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No geometry value provided.")
 
     # for users with view only permissions to floorplans
     def test_readonly_floorplans(self):
