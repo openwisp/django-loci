@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.admin import widgets
 from django.contrib.admin.sites import site
 from django.contrib.contenttypes.admin import GenericStackedInline
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import path
@@ -178,6 +178,8 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
 
     def json_view(self, request, pk):
         instance = get_object_or_404(self.model, pk=pk)
+        if not self.has_view_or_change_permission(request, obj=instance):
+            raise PermissionDenied
         return JsonResponse(
             {
                 "name": instance.name,
@@ -192,6 +194,8 @@ class AbstractLocationAdmin(TimeReadonlyAdminMixin, LeafletGeoAdmin):
 
     def floorplans_json_view(self, request, pk):
         instance = get_object_or_404(self.model, pk=pk)
+        if not self.has_view_or_change_permission(request, obj=instance):
+            raise PermissionDenied
         choices = []
         for floorplan in instance.floorplan_set.all():
             choices.append(
