@@ -75,7 +75,7 @@ class BaseTestModels(TestLociMixin):
             self._create_location(geometry=None)
         except ValidationError as e:
             err_str = str(e)
-            self.assertIn("geometry cannot be null", err_str)
+            self.assertIn("No geometry value provided.", err_str)
         else:
             self.fail("ValidationError not raised")
 
