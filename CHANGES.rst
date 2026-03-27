@@ -6,6 +6,21 @@ Version 1.3.0 [unreleased]
 
 Work in progress.
 
+Version 1.2.1 [2026-03-27]
+--------------------------
+
+Bugfixes
+~~~~~~~~
+
+- Fixed the width of Leaflet control labels in the map UI `#200
+  <https://github.com/openwisp/django-loci/issues/200>`_.
+- Fixed an issue preventing creation of mobile locations via the Django
+  admin `#207 <https://github.com/openwisp/django-loci/issues/207>`_.
+- Prevented JavaScript errors on pages where the map is not available or
+  the user does not have permission to view it.
+- Restored the default Django admin form-row label width to avoid layout
+  issues.
+
 Version 1.2.0 [2025-10-23]
 --------------------------
 
