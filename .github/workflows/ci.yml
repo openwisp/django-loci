@@ -80,6 +80,7 @@ jobs:
                gdal-bin
           pip install -U -r requirements-test.txt
           sudo npm install -g prettier
+          pip install -U "setuptools<82"  # for Python 3.9
           pip install -U -e .
           pip install -U ${{ matrix.django-version }}
 
