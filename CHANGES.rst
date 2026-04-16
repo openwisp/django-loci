@@ -6,6 +6,15 @@ Version 1.3.0 [unreleased]
 
 Work in progress.
 
+Version 1.2.2 [2026-04-16]
+--------------------------
+
+Bugfixes
+~~~~~~~~
+
+- Updated higher bound of pillow range due to CVE `#215
+  <https://github.com/openwisp/django-loci/issues/215>`_
+
 Version 1.2.1 [2026-03-27]
 --------------------------
 
