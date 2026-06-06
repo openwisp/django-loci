@@ -42,7 +42,10 @@ class LociConfig(AppConfig):
     def ready(self):
         import leaflet
 
+        from .base.admin import restore_readonly_widget_rendering
+
         leaflet.app_settings["NO_GLOBALS"] = False
+        restore_readonly_widget_rendering()
         self.__setmodels__()
         self._load_receivers()
 
