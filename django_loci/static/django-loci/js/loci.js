@@ -57,12 +57,23 @@ django.jQuery(function ($) {
     $coordsUrl = $("#loci-geocode-url").attr("data-url"),
     $addrUrl = $("#loci-reverse-geocode-url").attr("data-url");
 
+  function isLociInlineRow($row) {
+    return $row.find(".loci.coords, .indoor.coords, .field-location_selection").length;
+  }
+
+  function getLociInlineRows() {
+    return $(".inline-group .inline-related")
+      .not(".empty-form")
+      .filter(function () {
+        return isLociInlineRow($(this));
+      });
+  }
+
   function refreshScope() {
-    var $scope = $(".inline-group .inline-related")
-        .not(".empty-form")
-        .add($("#location_form")),
+    var $scope = getLociInlineRows().add($("#location_form")),
       $geometryLabel = $scope.find(".field-geometry label").first();
 
+    isNew = true;
     $outdoor = $scope.find(".loci.coords");
     $indoor = $scope.find(".indoor.coords");
     $allSections = $scope.find(".coords");
@@ -102,6 +113,9 @@ django.jQuery(function ($) {
     $floorplanMap = $scope.find(".indoor.coords .floorplan-widget");
     $addressInput = $scope.find(".field-address input");
     $mapGeojsonTextarea = $scope.find(".django-leaflet-raw-textarea");
+    if ($location.val()) {
+      isNew = false;
+    }
     return $scope;
   }
 
@@ -649,14 +663,19 @@ django.jQuery(function ($) {
 
   // triggers update of the address when the location on the map is changed
   function updateAddressOnMapChange() {
-    var marker = getMarker();
+    var map = getMap(),
+      marker = getMarker();
     if (!marker) {
       return;
     }
-    getMap().on("draw:edited", function (e) {
+    if (map._djangoLociDrawEditedHandler) {
+      map.off("draw:edited", map._djangoLociDrawEditedHandler);
+    }
+    map._djangoLociDrawEditedHandler = function () {
       updateAdress();
       updateMapView(marker.getLatLng());
-    });
+    };
+    map.on("draw:edited", map._djangoLociDrawEditedHandler);
   }
 
   function geometryListeners() {
@@ -665,7 +684,10 @@ django.jQuery(function ($) {
     }
     var featureGroup = getFeatureGroup(),
       marker = getMarker();
-    featureGroup.on("layeradd", function () {
+    if (featureGroup._djangoLociLayerAddHandler) {
+      featureGroup.off("layeradd", featureGroup._djangoLociLayerAddHandler);
+    }
+    featureGroup._djangoLociLayerAddHandler = function () {
       updateAdress();
       updateAddressOnMapChange();
       marker = getMarker();
@@ -673,7 +695,8 @@ django.jQuery(function ($) {
         return;
       }
       updateMapView(marker.getLatLng());
-    });
+    };
+    featureGroup.on("layeradd", featureGroup._djangoLociLayerAddHandler);
     if (marker !== undefined) {
       updateLatLng(marker.getLatLng());
       updateAddressOnMapChange();
@@ -747,14 +770,18 @@ django.jQuery(function ($) {
         rowId = $addedRow.attr("id") || "",
         rowIndexMatch = rowId.match(/-(\d+)$/),
         rowIndex = rowIndexMatch ? rowIndexMatch[1] : null;
-      if ($addedRow.length) {
+      if (isLociInlineRow($addedRow)) {
         resetLeafletWidget($addedRow);
         rerunLeafletWidgetScripts($addedRow, rowIndex);
         geometryListeners();
+        initializeLociState();
       }
-      initializeLociState();
     })
-    .on("formset:removed.loci", function () {
-      initializeLociState();
+    .on("formset:removed.loci", function (event) {
+      var $removedRow = $(event.target);
+      if (isLociInlineRow($removedRow)) {
+        resetLeafletWidget($removedRow);
+        initializeLociState();
+      }
     });
 });
