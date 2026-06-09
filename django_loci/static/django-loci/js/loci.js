@@ -52,13 +52,17 @@ django.jQuery(function ($) {
     isNew = true,
     $addressInput = $(".field-address input"),
     $mapGeojsonTextarea = $(".django-leaflet-raw-textarea"),
+    formsetPrefix = null,
     $oldLat,
     $oldLng,
     $coordsUrl = $("#loci-geocode-url").attr("data-url"),
     $addrUrl = $("#loci-reverse-geocode-url").attr("data-url");
 
   function isLociInlineRow($row) {
-    return $row.find(".loci.coords, .indoor.coords, .field-location_selection").length;
+    return (
+      $row.hasClass("inline-related") &&
+      $row.find(".loci.coords, .indoor.coords, .field-location_selection").length
+    );
   }
 
   function getLociInlineRows() {
@@ -73,6 +77,9 @@ django.jQuery(function ($) {
     var $scope = getLociInlineRows().add($("#location_form")),
       $geometryLabel = $scope.find(".field-geometry label").first();
 
+    if (!$scope.length) {
+      return $scope;
+    }
     isNew = true;
     $outdoor = $scope.find(".loci.coords");
     $indoor = $scope.find(".indoor.coords");
@@ -94,14 +101,18 @@ django.jQuery(function ($) {
     loadMapName = "loadmap" + geometryId + "-map";
     $typeRow = $scope.find(".field-type");
     $type = $typeRow.find("select");
-    $isMobile = $scope.find(".coords .field-is_mobile input");
+    $isMobile = $scope
+      .find(".coords .field-is_mobile input")
+      .add($("#location_form .field-is_mobile input"));
     $locationSelectionRow = $scope.find(".field-location_selection");
     $locationSelection = $locationSelectionRow.find("select");
     $locationRow = $scope.find(".loci.coords .field-location");
     $location = $locationRow.find("select, input");
     $locationLabel = $scope.find(".field-location .item-label");
     $name = $scope.find(".loci.coords .field-name input");
-    $address = $scope.find(".coords .field-address input");
+    $address = $scope
+      .find(".coords .field-address input")
+      .add($("#location_form .field-address input"));
     $geometryTextarea = $scope.find(".field-geometry textarea");
     $geometryRow = $geometryTextarea.parents(".form-row");
     $noLocationDiv = $scope.find(".loci.coords .no-location");
@@ -113,6 +124,10 @@ django.jQuery(function ($) {
     $floorplanMap = $scope.find(".indoor.coords .floorplan-widget");
     $addressInput = $scope.find(".field-address input");
     $mapGeojsonTextarea = $scope.find(".django-leaflet-raw-textarea");
+    formsetPrefix = ($locationSelection.attr("name") || "").replace(
+      /-\d+-location_selection$/,
+      "",
+    );
     if ($location.val()) {
       isNew = false;
     }
@@ -526,6 +541,9 @@ django.jQuery(function ($) {
         replacement = document.createElement("script"),
         scriptText = original.textContent || original.innerText || "";
 
+      if (scriptText.indexOf("loadmap") === -1) {
+        return;
+      }
       if (typeof inlineIndex !== "undefined" && inlineIndex !== null) {
         scriptText = scriptText.replace(/__prefix__/g, inlineIndex);
       }
@@ -773,14 +791,13 @@ django.jQuery(function ($) {
       if (isLociInlineRow($addedRow)) {
         resetLeafletWidget($addedRow);
         rerunLeafletWidgetScripts($addedRow, rowIndex);
-        geometryListeners();
         initializeLociState();
+        geometryListeners();
       }
     })
     .on("formset:removed.loci", function (event) {
-      var $removedRow = $(event.target);
-      if (isLociInlineRow($removedRow)) {
-        resetLeafletWidget($removedRow);
+      var formsetName = event.detail && event.detail.formsetName;
+      if (formsetName && formsetName === formsetPrefix) {
         initializeLociState();
       }
     });
