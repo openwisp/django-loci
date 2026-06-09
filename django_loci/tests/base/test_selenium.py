@@ -72,6 +72,70 @@ class BaseTestDeviceAdminSelenium(
             f"The {object_verbose_name} “11:22:33:44:55:66” was added successfully.",
         )
 
+    def test_recreate_location_inline_after_removal(self):
+        self.login()
+        self.open(reverse(self.add_url))
+        self._fill_device_form()
+        prefix = self._get_prefix()
+
+        self.wait_for(
+            "element_to_be_clickable",
+            by=By.CSS_SELECTOR,
+            value=".inline-group .inline-deletelink",
+        ).click()
+        self.wait_for(
+            "element_to_be_clickable",
+            by=By.CSS_SELECTOR,
+            value=".inline-group .add-row a",
+        ).click()
+
+        select = Select(
+            self.find_element(by=By.NAME, value=f"{prefix}-0-location_selection")
+        )
+        select.select_by_value("existing")
+        WebDriverWait(self.web_driver, 5).until(
+            lambda driver: driver.find_element(
+                by=By.CSS_SELECTOR,
+                value=".inline-group .inline-related:not(.empty-form) .field-location",
+            ).is_displayed()
+        )
+
+        select = Select(
+            self.find_element(by=By.NAME, value=f"{prefix}-0-location_selection")
+        )
+        select.select_by_value("new")
+        WebDriverWait(self.web_driver, 5).until(
+            lambda driver: driver.find_element(
+                by=By.NAME, value=f"{prefix}-0-type"
+            ).is_displayed()
+        )
+
+        Select(self.find_element(by=By.NAME, value=f"{prefix}-0-type")).select_by_value(
+            "outdoor"
+        )
+        WebDriverWait(self.web_driver, 5).until(
+            lambda driver: driver.find_element(
+                by=By.NAME, value=f"{prefix}-0-name"
+            ).is_displayed()
+        )
+
+        scale_line = self.find_element(
+            by=By.CSS_SELECTOR,
+            value=f"#id_{prefix}-0-geometry-map .leaflet-control-scale-line",
+        )
+        initial_scale = scale_line.text
+        self.find_element(
+            by=By.CSS_SELECTOR,
+            value=f"#id_{prefix}-0-geometry-map .leaflet-control-zoom-in",
+        ).click()
+        WebDriverWait(self.web_driver, 5).until(
+            lambda driver: driver.find_element(
+                by=By.CSS_SELECTOR,
+                value=f"#id_{prefix}-0-geometry-map .leaflet-control-scale-line",
+            ).text
+            != initial_scale
+        )
+
     def test_real_time_update_address_field(self):
         location = self._create_location()
         self.login()
