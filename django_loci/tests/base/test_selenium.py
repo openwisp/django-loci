@@ -23,54 +23,49 @@ class BaseTestDeviceAdminSelenium(
         """
         self.find_element(by=By.NAME, value="name").send_keys("11:22:33:44:55:66")
 
-    def test_create_new_device(self):
-        self.login()
-        self.open(reverse(self.add_url))
-        self._fill_device_form()
-        select = Select(
-            self.find_element(
-                by=By.NAME, value=f"{self._get_prefix()}-0-location_selection"
-            )
-        )
-        select.select_by_value("new")
-
-        select = Select(
-            self.find_element(by=By.NAME, value=f"{self._get_prefix()}-0-type")
-        )
-        select.select_by_value("outdoor")
-
-        self.find_element(by=By.NAME, value=f"{self._get_prefix()}-0-name").send_keys(
-            "Test Location"
-        )
-        # use the marker button to select location on map
+    def _mark_location_on_map(self, prefix):
         self.find_element(
             by=By.XPATH, value='//a[@class="leaflet-draw-draw-marker"]'
         ).click()
         action = ActionChains(self.web_driver)
-        # place the marker on the map at a random location
-        elem = self.find_element(
-            by=By.ID, value=f"id_{self._get_prefix()}-0-geometry-map"
-        )
-        # (15, 5) is a random offset from the top left corner of the map
+        elem = self.find_element(by=By.ID, value=f"id_{prefix}-0-geometry-map")
         action.move_to_element(elem).move_by_offset(15, 5).click().perform()
-        # Wait until address field gets populated with the location marked above
         WebDriverWait(self.web_driver, 5).until(
             lambda x: x.find_element(
-                by=By.XPATH, value=f'//input[@name="{self._get_prefix()}-0-address"]'
+                by=By.XPATH, value=f'//input[@name="{prefix}-0-address"]'
             )
             .get_attribute("value")
             .strip()
             not in ("", None)
         )
 
+    def _assert_device_added(self):
         self.find_element(by=By.NAME, value="_save").click()
         self.wait_for_presence(By.CSS_SELECTOR, ".messagelist .success")
-        # device model verbose name is dynamic
         object_verbose_name = self.object_model._meta.verbose_name
         self.assertEqual(
             self.find_elements(by=By.CLASS_NAME, value="success")[0].text,
             f"The {object_verbose_name} “11:22:33:44:55:66” was added successfully.",
         )
+
+    def test_create_new_device(self):
+        self.login()
+        self.open(reverse(self.add_url))
+        self._fill_device_form()
+        prefix = self._get_prefix()
+        select = Select(
+            self.find_element(by=By.NAME, value=f"{prefix}-0-location_selection")
+        )
+        select.select_by_value("new")
+
+        select = Select(self.find_element(by=By.NAME, value=f"{prefix}-0-type"))
+        select.select_by_value("outdoor")
+
+        self.find_element(by=By.NAME, value=f"{prefix}-0-name").send_keys(
+            "Test Location"
+        )
+        self._mark_location_on_map(prefix)
+        self._assert_device_added()
 
     def test_recreate_location_inline_after_removal(self):
         self.login()
@@ -135,6 +130,11 @@ class BaseTestDeviceAdminSelenium(
             ).text
             != initial_scale
         )
+        self.find_element(by=By.NAME, value=f"{prefix}-0-name").send_keys(
+            "Test Location"
+        )
+        self._mark_location_on_map(prefix)
+        self._assert_device_added()
 
     def test_real_time_update_address_field(self):
         location = self._create_location()
