@@ -124,6 +124,7 @@ django.jQuery(function ($) {
     $floorplanMap = $scope.find(".indoor.coords .floorplan-widget");
     $addressInput = $scope.find(".field-address input");
     $mapGeojsonTextarea = $scope.find(".django-leaflet-raw-textarea");
+    // Strip the Django inline field suffix to recover the formset prefix.
     formsetPrefix = ($locationSelection.attr("name") || "").replace(
       /-\d+-location_selection$/,
       "",
@@ -550,6 +551,7 @@ django.jQuery(function ($) {
       if (original.nonce) {
         replacement.nonce = original.nonce;
       }
+      // Replacing cloned scripts forces the Leaflet widget initializer to run again.
       replacement.text = scriptText;
       original.parentNode.replaceChild(replacement, original);
     });
@@ -786,6 +788,7 @@ django.jQuery(function ($) {
     .on("formset:added.loci", function (event) {
       var $addedRow = $(event.target),
         rowId = $addedRow.attr("id") || "",
+        // Django inline row IDs end with "-<index>"; reuse that index for __prefix__.
         rowIndexMatch = rowId.match(/-(\d+)$/),
         rowIndex = rowIndexMatch ? rowIndexMatch[1] : null;
       if (isLociInlineRow($addedRow)) {

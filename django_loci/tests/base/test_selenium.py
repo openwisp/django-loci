@@ -24,11 +24,14 @@ class BaseTestDeviceAdminSelenium(
         self.find_element(by=By.NAME, value="name").send_keys("11:22:33:44:55:66")
 
     def _mark_location_on_map(self, prefix):
+        map_selector = f"#id_{prefix}-0-geometry-map"
         self.find_element(
-            by=By.XPATH, value='//a[@class="leaflet-draw-draw-marker"]'
+            by=By.CSS_SELECTOR,
+            value=f"{map_selector} .leaflet-draw-draw-marker",
         ).click()
         action = ActionChains(self.web_driver)
-        elem = self.find_element(by=By.ID, value=f"id_{prefix}-0-geometry-map")
+        elem = self.find_element(by=By.CSS_SELECTOR, value=map_selector)
+        # Click slightly inside the map to avoid Leaflet controls on the edge.
         action.move_to_element(elem).move_by_offset(15, 5).click().perform()
         WebDriverWait(self.web_driver, 5).until(
             lambda x: x.find_element(
@@ -114,21 +117,20 @@ class BaseTestDeviceAdminSelenium(
             ).is_displayed()
         )
 
-        scale_line = self.find_element(
-            by=By.CSS_SELECTOR,
-            value=f"#id_{prefix}-0-geometry-map .leaflet-control-scale-line",
+        map_name = f"leafletmapid_{prefix}-0-geometry-map"
+        initial_zoom = self.web_driver.execute_script(
+            "return window[arguments[0]].getZoom();", map_name
         )
-        initial_scale = scale_line.text
         self.find_element(
             by=By.CSS_SELECTOR,
             value=f"#id_{prefix}-0-geometry-map .leaflet-control-zoom-in",
         ).click()
+        # Read Leaflet state directly to avoid waiting on tile/scale rendering in CI.
         WebDriverWait(self.web_driver, 5).until(
-            lambda driver: driver.find_element(
-                by=By.CSS_SELECTOR,
-                value=f"#id_{prefix}-0-geometry-map .leaflet-control-scale-line",
-            ).text
-            != initial_scale
+            lambda driver: driver.execute_script(
+                "return window[arguments[0]].getZoom();", map_name
+            )
+            > initial_zoom
         )
         self.find_element(by=By.NAME, value=f"{prefix}-0-name").send_keys(
             "Test Location"
