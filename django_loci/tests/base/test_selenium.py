@@ -66,7 +66,7 @@ class BaseTestDeviceAdminSelenium(
             });
             arguments[0].dispatchEvent(new Event("change", { bubbles: true }));
             """,
-            self.find_element(by=By.NAME, value=f"{prefix}-0-geometry"),
+            self.web_driver.find_element(by=By.NAME, value=f"{prefix}-0-geometry"),
         )
 
     def test_create_new_device(self):
