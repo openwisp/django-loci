@@ -51,6 +51,24 @@ class BaseTestDeviceAdminSelenium(
             f"The {object_verbose_name} “11:22:33:44:55:66” was added successfully.",
         )
 
+    def _fill_location_fields(self, prefix):
+        self.find_element(by=By.NAME, value=f"{prefix}-0-name").send_keys(
+            "Test Location"
+        )
+        self.find_element(by=By.NAME, value=f"{prefix}-0-address").send_keys(
+            "Piazza Venezia, Roma, Italia"
+        )
+        self.web_driver.execute_script(
+            """
+            arguments[0].value = JSON.stringify({
+                type: "Point",
+                coordinates: [12.512124, 41.898903]
+            });
+            arguments[0].dispatchEvent(new Event("change", { bubbles: true }));
+            """,
+            self.find_element(by=By.NAME, value=f"{prefix}-0-geometry"),
+        )
+
     def test_create_new_device(self):
         self.login()
         self.open(reverse(self.add_url))
@@ -132,10 +150,8 @@ class BaseTestDeviceAdminSelenium(
             )
             > initial_zoom
         )
-        self.find_element(by=By.NAME, value=f"{prefix}-0-name").send_keys(
-            "Test Location"
-        )
-        self._mark_location_on_map(prefix)
+        # Normal marker/geocoding behavior is covered by test_create_new_device.
+        self._fill_location_fields(prefix)
         self._assert_device_added()
 
     def test_real_time_update_address_field(self):
