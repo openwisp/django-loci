@@ -1,9 +1,6 @@
-from time import sleep
-
 from django.urls.base import reverse
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from openwisp_utils.tests import SeleniumTestMixin
@@ -85,18 +82,31 @@ class BaseTestDeviceAdminSelenium(
         self.open(url)
         address_input = self.find_element(by=By.ID, value="id_address")
         self.assertEqual(address_input.get_attribute("value"), location.address)
+        # Headless Firefox does not reliably expose this async confirm to Selenium.
+        self.web_driver.execute_script("""
+            window._lociConfirmMessage = null;
+            window.confirm = function (message) {
+                window._lociConfirmMessage = message;
+                return true;
+            };
+            """)
         self.find_element(
-            by=By.XPATH, value='//a[@class="leaflet-draw-draw-marker"]'
+            by=By.XPATH, value='//a[contains(@class, "leaflet-draw-edit-edit")]'
         ).click()
-        elem = self.find_element(by=By.ID, value="id_geometry-map")
+        marker = self.find_element(by=By.CLASS_NAME, value="leaflet-marker-icon")
         # Updating the marker to a random new location
-        ActionChains(self.web_driver).move_to_element(elem).move_by_offset(
-            30, 15
-        ).click().perform()
-        alert = WebDriverWait(self.web_driver, 2).until(EC.alert_is_present())
-        alert.accept()
-        sleep(0.05)
+        ActionChains(self.web_driver).drag_and_drop_by_offset(marker, 30, 15).perform()
+        self.find_element(by=By.XPATH, value='//a[@title="Save changes"]').click()
         new_address = "Lazio 00185, ITA"
+        WebDriverWait(self.web_driver, 5).until(
+            lambda x: new_address
+            in x.find_element(by=By.ID, value="id_address").get_attribute("value")
+        )
+        confirm_message = self.web_driver.execute_script(
+            "return window._lociConfirmMessage;"
+        )
+        self.assertIsNotNone(confirm_message)
+        self.assertIn(new_address, confirm_message)
         address_input = self.find_element(by=By.ID, value="id_address")
         self.assertIn(new_address, address_input.get_attribute("value"))
         self.wait_for("element_to_be_clickable", by=By.NAME, value="_continue").click()
