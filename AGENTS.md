@@ -53,6 +53,8 @@ If instructions conflict, repository config and CI workflows win first, docs nex
 
 ## Django Notes
 
+- Build internal URLs with named URL patterns and `reverse()` or `reverse_lazy()`, including in tests. Use the appropriate namespace and URL arguments.
+- In the main behavior test for non-trivial, frequently called views, include `assertNumQueries()` with representative data to enforce an intentional query budget and catch N+1 queries. Use `AssertNumQueriesSubTestMixin` from `openwisp_utils.tests` where available: it records the query-count check as a subtest, so subsequent assertions in the method still run. Change the expected count only when the extra queries are necessary and understood.
 - Be careful with map/floor plan storage, geographic coordinates, file cleanup, channels updates, admin behavior, serializers, and migrations.
 - When changing APIs or serializers, include tests for validation, permissions when applicable, and edge cases in geometry data.
 
