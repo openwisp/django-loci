@@ -60,6 +60,7 @@ If instructions conflict, repository config and CI workflows win first, docs nex
 - Before defining a new class, view, URL, REST endpoint, or test layout, inspect analogous implementations in related OpenWISP modules. Match their established names, URL names, API shape, and test organization unless the behavior requires a difference.
 - Be careful with map/floor plan storage, geographic coordinates, file cleanup, channels updates, admin behavior, serializers, and migrations.
 - When changing APIs or serializers, include tests for validation, permissions when applicable, and edge cases in geometry data.
+- Treat email addresses as case-insensitive when identifying, deduplicating, importing, migrating, or searching users by email. Use `email__iexact` for direct and `Q()` ORM lookups. Keep username matching case-sensitive unless explicitly required. Normalize email records this module owns to lowercase, and cover casing-only inputs, including legacy mixed-case records when relevant.
 
 ## Security Rules
 
