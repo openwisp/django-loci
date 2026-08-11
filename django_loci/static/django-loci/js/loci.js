@@ -52,10 +52,88 @@ django.jQuery(function ($) {
     isNew = true,
     $addressInput = $(".field-address input"),
     $mapGeojsonTextarea = $(".django-leaflet-raw-textarea"),
+    formsetPrefix = null,
     $oldLat,
     $oldLng,
     $coordsUrl = $("#loci-geocode-url").attr("data-url"),
     $addrUrl = $("#loci-reverse-geocode-url").attr("data-url");
+
+  function isLociInlineRow($row) {
+    return (
+      $row.hasClass("inline-related") &&
+      $row.find(".loci.coords, .indoor.coords, .field-location_selection").length
+    );
+  }
+
+  function getLociInlineRows() {
+    return $(".inline-group .inline-related")
+      .not(".empty-form")
+      .filter(function () {
+        return isLociInlineRow($(this));
+      });
+  }
+
+  function refreshScope() {
+    var $scope = getLociInlineRows().add($("#location_form")),
+      $geometryLabel = $scope.find(".field-geometry label").first();
+
+    if (!$scope.length) {
+      return $scope;
+    }
+    isNew = true;
+    $outdoor = $scope.find(".loci.coords");
+    $indoor = $scope.find(".indoor.coords");
+    $allSections = $scope.find(".coords");
+    $geoEdit = $scope.find(
+      ".loci.coords .field-name, " +
+        ".loci.coords .field-type, " +
+        ".loci.coords .field-is_mobile, " +
+        ".loci.coords .field-address, " +
+        ".loci.coords .field-geometry",
+    );
+    $indoorRows = $scope.find(".indoor.coords .form-row:not(.field-indoor)");
+    $indoorEdit = $scope.find(
+      ".indoor.coords .form-row:not(.field-floorplan_selection)",
+    );
+    $indoorPositionRow = $scope.find(".indoor.coords .field-indoor");
+    geometryId = $geometryLabel.attr("for") || "geometry"; // fallback for readonly
+    mapName = "leafletmap" + geometryId + "-map";
+    loadMapName = "loadmap" + geometryId + "-map";
+    $typeRow = $scope.find(".field-type");
+    $type = $typeRow.find("select");
+    $isMobile = $scope
+      .find(".coords .field-is_mobile input")
+      .add($("#location_form .field-is_mobile input"));
+    $locationSelectionRow = $scope.find(".field-location_selection");
+    $locationSelection = $locationSelectionRow.find("select");
+    $locationRow = $scope.find(".loci.coords .field-location");
+    $location = $locationRow.find("select, input");
+    $locationLabel = $scope.find(".field-location .item-label");
+    $name = $scope.find(".loci.coords .field-name input");
+    $address = $scope
+      .find(".coords .field-address input")
+      .add($("#location_form .field-address input"));
+    $geometryTextarea = $scope.find(".field-geometry textarea");
+    $geometryRow = $geometryTextarea.parents(".form-row");
+    $noLocationDiv = $scope.find(".loci.coords .no-location");
+    $floorplanSelectionRow = $scope.find(".indoor.coords .field-floorplan_selection");
+    $floorplanSelection = $floorplanSelectionRow.find("select");
+    $floorplanRow = $scope.find(".indoor .field-floorplan");
+    $floorplan = $floorplanRow.find("select").eq(0);
+    $floorplanImage = $scope.find(".indoor.coords .field-image input");
+    $floorplanMap = $scope.find(".indoor.coords .floorplan-widget");
+    $addressInput = $scope.find(".field-address input");
+    $mapGeojsonTextarea = $scope.find(".django-leaflet-raw-textarea");
+    // Strip the Django inline field suffix to recover the formset prefix.
+    formsetPrefix = ($locationSelection.attr("name") || "").replace(
+      /-\d+-location_selection$/,
+      "",
+    );
+    if ($location.val()) {
+      isNew = false;
+    }
+    return $scope;
+  }
 
   // define dummy gettext if django i18n is not enabled
   if (!gettext) {
@@ -85,6 +163,13 @@ django.jQuery(function ($) {
       map.invalidateSize();
     }
     return map;
+  }
+
+  function ensureMapInitialized() {
+    if (!getMap() && typeof window[loadMapName] === "function") {
+      window[loadMapName]();
+    }
+    return invalidateMapSize();
   }
 
   function resetOutdoorForm(keepLocationSelection) {
@@ -199,7 +284,7 @@ django.jQuery(function ($) {
     if (value) {
       $outdoor.show();
       $geoEdit.show();
-      invalidateMapSize();
+      ensureMapInitialized();
       isMobileChange();
     } else {
       $geoEdit.hide();
@@ -268,12 +353,6 @@ django.jQuery(function ($) {
     triggerChangeOnField(win, chosenId);
   };
 
-  $type.change(typeChange);
-  typeChange(null, true);
-
-  $locationSelection.change(locationSelectionChange);
-  locationSelectionChange(null, true);
-
   function locationChange(e, initial) {
     function loadIndoor() {
       indoorForm();
@@ -317,9 +396,10 @@ django.jQuery(function ($) {
         var map = getMap();
         if (map) {
           map.remove();
+          delete window[mapName];
         }
         $geoEdit.show();
-        window[loadMapName]();
+        ensureMapInitialized();
         isMobileChange();
         loadIndoor();
       });
@@ -331,16 +411,7 @@ django.jQuery(function ($) {
   // listen to change events
   // although these events are being artificially triggered
   // see the override of dismissRelatedLookupPopup above
-  $location.change(locationChange);
-  // initial set up
-  locationChange(null, true);
-
-  $isMobile.change(isMobileChange);
-
-  $floorplanSelection.change(floorplanSelectionChange);
-  floorplanSelectionChange(null, true);
-
-  $floorplan.change(function () {
+  function floorplanChange() {
     // reset floorplan data if no floorplan is chosen
     if (!$floorplan.val()) {
       resetIndoorForm(true);
@@ -374,9 +445,9 @@ django.jQuery(function ($) {
       option.data("image_width"),
       option.data("image_height"),
     );
-  });
+  }
 
-  $floorplanImage.change(function () {
+  function floorplanImageChange() {
     var input = this,
       reader = new FileReader(),
       image = new Image(),
@@ -407,9 +478,9 @@ django.jQuery(function ($) {
       };
     };
     reader.readAsDataURL(input.files[0]);
-  });
+  }
 
-  $("#content-main form").submit(function (e) {
+  function handleFormSubmit(e) {
     var indoorPosition = $(".field-indoor .floorplan-raw input").val(),
       typeSelect = $type.find("option").length
         ? $type
@@ -427,7 +498,64 @@ django.jQuery(function ($) {
         indoorForm();
       }
     }
-  });
+  }
+
+  function initializeLociState() {
+    var $scope = refreshScope();
+    if (!$scope.length) {
+      return;
+    }
+
+    $type.off("change.loci").on("change.loci", typeChange);
+    $locationSelection.off("change.loci").on("change.loci", locationSelectionChange);
+    $location.off("change.loci").on("change.loci", locationChange);
+    $isMobile.off("change.loci").on("change.loci", isMobileChange);
+    $floorplanSelection.off("change.loci").on("change.loci", floorplanSelectionChange);
+    $floorplan.off("change.loci").on("change.loci", floorplanChange);
+    $floorplanImage.off("change.loci").on("change.loci", floorplanImageChange);
+    $("#content-main form").off("submit.loci").on("submit.loci", handleFormSubmit);
+    $addressInput.off("change.loci").on("change.loci", updateMap);
+
+    typeChange(null, true);
+    locationSelectionChange(null, true);
+    locationChange(null, true);
+    floorplanSelectionChange(null, true);
+  }
+
+  function resetLeafletWidget($scope) {
+    $scope.find(".field-geometry [id$='-geometry-map']").each(function () {
+      var container = this,
+        containerId = container.id,
+        map = window["leafletmap" + containerId];
+
+      if (map && typeof map.remove === "function") {
+        map.remove();
+      }
+      delete window["leafletmap" + containerId];
+      $(container).removeAttr("style").empty();
+    });
+  }
+
+  function rerunLeafletWidgetScripts($scope, inlineIndex) {
+    $scope.find(".field-geometry script").each(function () {
+      var original = this,
+        replacement = document.createElement("script"),
+        scriptText = original.textContent || original.innerText || "";
+
+      if (scriptText.indexOf("loadmap") === -1) {
+        return;
+      }
+      if (typeof inlineIndex !== "undefined" && inlineIndex !== null) {
+        scriptText = scriptText.replace(/__prefix__/g, inlineIndex);
+      }
+      if (original.nonce) {
+        replacement.nonce = original.nonce;
+      }
+      // Replacing cloned scripts forces the Leaflet widget initializer to run again.
+      replacement.text = scriptText;
+      original.parentNode.replaceChild(replacement, original);
+    });
+  }
 
   // websocket for mobile coords
   function listenForLocationUpdates(pk) {
@@ -555,19 +683,20 @@ django.jQuery(function ($) {
 
   // triggers update of the address when the location on the map is changed
   function updateAddressOnMapChange() {
-    var marker = getMarker();
+    var map = getMap(),
+      marker = getMarker();
     if (!marker) {
       return;
     }
-    getMap().on("draw:edited", function (e) {
+    if (map._djangoLociDrawEditedHandler) {
+      map.off("draw:edited", map._djangoLociDrawEditedHandler);
+    }
+    map._djangoLociDrawEditedHandler = function () {
       updateAdress();
       updateMapView(marker.getLatLng());
-    });
+    };
+    map.on("draw:edited", map._djangoLociDrawEditedHandler);
   }
-
-  $addressInput.change(function () {
-    updateMap();
-  });
 
   function geometryListeners() {
     if (!getMap()) {
@@ -575,7 +704,10 @@ django.jQuery(function ($) {
     }
     var featureGroup = getFeatureGroup(),
       marker = getMarker();
-    featureGroup.on("layeradd", function () {
+    if (featureGroup._djangoLociLayerAddHandler) {
+      featureGroup.off("layeradd", featureGroup._djangoLociLayerAddHandler);
+    }
+    featureGroup._djangoLociLayerAddHandler = function () {
       updateAdress();
       updateAddressOnMapChange();
       marker = getMarker();
@@ -583,7 +715,8 @@ django.jQuery(function ($) {
         return;
       }
       updateMapView(marker.getLatLng());
-    });
+    };
+    featureGroup.on("layeradd", featureGroup._djangoLociLayerAddHandler);
     if (marker !== undefined) {
       updateLatLng(marker.getLatLng());
       updateAddressOnMapChange();
@@ -649,4 +782,26 @@ django.jQuery(function ($) {
       $locationSelection.val() || $locationSelectionRow.find(".readonly").text(),
     );
   }
+
+  initializeLociState();
+  $(document)
+    .on("formset:added.loci", function (event) {
+      var $addedRow = $(event.target),
+        rowId = $addedRow.attr("id") || "",
+        // Django inline row IDs end with "-<index>"; reuse that index for __prefix__.
+        rowIndexMatch = rowId.match(/-(\d+)$/),
+        rowIndex = rowIndexMatch ? rowIndexMatch[1] : null;
+      if (isLociInlineRow($addedRow)) {
+        resetLeafletWidget($addedRow);
+        rerunLeafletWidgetScripts($addedRow, rowIndex);
+        initializeLociState();
+        geometryListeners();
+      }
+    })
+    .on("formset:removed.loci", function (event) {
+      var formsetName = event.detail && event.detail.formsetName;
+      if (formsetName && formsetName === formsetPrefix) {
+        initializeLociState();
+      }
+    });
 });
