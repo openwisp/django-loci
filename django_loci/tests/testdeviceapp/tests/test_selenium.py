@@ -4,7 +4,6 @@ from django.test import tag
 from django.urls import reverse
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 from django_loci.models import Location, ObjectLocation
 from django_loci.tests import TestAdminMixin, TestLociMixin
@@ -24,10 +23,11 @@ class TestCommonLocationWebsocket(
         location1 = self._create_location(is_mobile=True, name="Location 1")
         location2 = self._create_location(is_mobile=True, name="Location 2")
         self.open(reverse("admin:location-broadcast-listener"))
-        WebDriverWait(self.web_driver, 3).until(
+        self.wait_until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, "#ws-connected"),
-            )
+            ),
+            timeout=5,
         )
         # Update location to trigger websocket message
         location1.geometry = (
@@ -37,11 +37,12 @@ class TestCommonLocationWebsocket(
         location1.full_clean()
         location1.save()
         # Wait for websocket message to be received
-        WebDriverWait(self.web_driver, 3).until(
+        self.wait_until(
             EC.text_to_be_present_in_element(
                 (By.CSS_SELECTOR, "#location-updates li"),
                 "77.218791",
-            )
+            ),
+            timeout=5,
         )
         location2.geometry = (
             '{ "type": "Point", "coordinates": [72.877656, 19.075984] }'
@@ -49,9 +50,10 @@ class TestCommonLocationWebsocket(
         location2.address = "Mumbai, India"
         location2.full_clean()
         location2.save()
-        WebDriverWait(self.web_driver, 3).until(
+        self.wait_until(
             EC.text_to_be_present_in_element(
                 (By.CSS_SELECTOR, "#location-updates"),
                 "72.877656",
-            )
+            ),
+            timeout=5,
         )

@@ -1,7 +1,7 @@
 from django.urls.base import reverse
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support.ui import Select
 
 from openwisp_utils.tests import SeleniumTestMixin
 
@@ -51,17 +51,18 @@ class BaseTestDeviceAdminSelenium(
         # (15, 5) is a random offset from the top left corner of the map
         action.move_to_element(elem).move_by_offset(15, 5).click().perform()
         # Wait until address field gets populated with the location marked above
-        WebDriverWait(self.web_driver, 5).until(
+        self.wait_until(
             lambda x: x.find_element(
                 by=By.XPATH, value=f'//input[@name="{self._get_prefix()}-0-address"]'
             )
             .get_attribute("value")
             .strip()
-            not in ("", None)
+            not in ("", None),
+            timeout=5,
         )
 
         self.find_element(by=By.NAME, value="_save").click()
-        self.wait_for_presence(By.CSS_SELECTOR, ".messagelist .success")
+        self.wait_for_admin_success_message()
         # device model verbose name is dynamic
         object_verbose_name = self.object_model._meta.verbose_name
         self.assertEqual(
@@ -98,9 +99,10 @@ class BaseTestDeviceAdminSelenium(
         ActionChains(self.web_driver).drag_and_drop_by_offset(marker, 30, 15).perform()
         self.find_element(by=By.XPATH, value='//a[@title="Save changes"]').click()
         new_address = "Lazio 00185, ITA"
-        WebDriverWait(self.web_driver, 5).until(
+        self.wait_until(
             lambda x: new_address
-            in x.find_element(by=By.ID, value="id_address").get_attribute("value")
+            in x.find_element(by=By.ID, value="id_address").get_attribute("value"),
+            timeout=5,
         )
         confirm_message = self.web_driver.execute_script(
             "return window._lociConfirmMessage;"
