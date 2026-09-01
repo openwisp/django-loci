@@ -1,10 +1,31 @@
 Changelog
 =========
 
-Version 1.3.0 [unreleased]
+Version 1.3.0 [2026-09-01]
 --------------------------
 
-Work in progress.
+Features
+~~~~~~~~
+
+- Added a `WebSocket endpoint for receiving updates for all locations in a
+  single feed <https://github.com/openwisp/django-loci/issues/191>`_ at
+  ``/ws/loci/location/all/``.
+
+Changes
+~~~~~~~
+
+Dependencies
+++++++++++++
+
+- Bumped django-leaflet from `~=0.32.0 to ~=0.33.0
+  <https://github.com/makinacorpus/django-leaflet/blob/master/CHANGES>`_.
+- Bumped geopy from `~=2.4.1 to ~=2.5.0
+  <https://geopy.readthedocs.io/en/stable/changelog_2xx.html>`_.
+- Bumped openwisp-utils from `~=1.2.0 to ~=1.3.0
+  <https://github.com/openwisp/openwisp-utils/blob/1.3.0/CHANGES.rst>`_.
+- Bumped Pillow from `>=11.3.0,<12.3.0 to >=12.3.0,<12.4.0
+  <https://pillow.readthedocs.io/en/stable/releasenotes/12.3.0.html>`_.
+- Dropped support for Python 3.9.
 
 Version 1.2.2 [2026-04-16]
 --------------------------
