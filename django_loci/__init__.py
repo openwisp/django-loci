@@ -1,18 +1,20 @@
-VERSION = (1, 3, 0, "final")
+VERSION = (1, 3, 0, "post1")
 __version__ = VERSION  # alias
 
 
 def get_version():
-    version = "%s.%s" % (VERSION[0], VERSION[1])
-    if VERSION[2]:
-        version = "%s.%s" % (version, VERSION[2])
+    version = f"{VERSION[0]}.{VERSION[1]}"
+    if VERSION[2] or "post" in VERSION[3]:
+        version = f"{version}.{VERSION[2]}"
     if VERSION[3:] == ("alpha", 0):
-        version = "%s pre-alpha" % version
+        version = f"{version} pre-alpha"
+    if "post" in VERSION[3]:
+        version = f"{version}.{VERSION[3]}"
     else:
         if VERSION[3] != "final":
             try:
                 rev = VERSION[4]
             except IndexError:
                 rev = 0
-            version = "%s%s%s" % (version, VERSION[3][0:1], rev)
+            version = f"{version}{VERSION[3][0:1]}{rev}"
     return version
