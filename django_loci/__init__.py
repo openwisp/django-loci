@@ -1,4 +1,4 @@
-VERSION = (1, 3, 0, "post1")
+VERSION = (1, 4, 0, "alpha")
 __version__ = VERSION  # alias
 
 
