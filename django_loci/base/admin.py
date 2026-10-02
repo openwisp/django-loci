@@ -4,9 +4,11 @@ from functools import partialmethod
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import widgets
+from django.contrib.admin.helpers import AdminReadonlyField
 from django.contrib.admin.sites import site
+from django.contrib.admin.utils import lookup_field
 from django.contrib.contenttypes.admin import GenericStackedInline
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import path
@@ -20,6 +22,38 @@ from ..base.geocoding_views import geocode_view, reverse_geocode_view
 from ..fields import GeometryField
 from ..widgets import FloorPlanWidget, ImageWidget
 from .models import AbstractFloorPlan, AbstractLocation
+
+
+def restore_readonly_widget_rendering():
+    """
+    Renders read-only widgets (map, floorplan, image) for view-only users.
+
+    Django 6.0 dropped the ``AdminReadonlyField.contents()`` code path that
+    rendered a widget when its ``read_only`` attribute was set, breaking the
+    read-only admin (see issue #95). This restores it only for widgets that
+    opt-in via ``read_only = True``, so other admins are unaffected.
+    """
+    if getattr(AdminReadonlyField, "_loci_readonly_patched", False):
+        return
+    original_contents = AdminReadonlyField.contents
+
+    def contents(self):
+        field = self.field["field"]
+        if field in self.form.fields:
+            widget = self.form[field].field.widget
+            if getattr(widget, "read_only", False):
+                try:
+                    _, _, value = lookup_field(
+                        field, self.form.instance, self.model_admin
+                    )
+                except (AttributeError, ValueError, ObjectDoesNotExist):
+                    pass
+                else:
+                    return widget.render(field, value)
+        return original_contents(self)
+
+    AdminReadonlyField.contents = contents
+    AdminReadonlyField._loci_readonly_patched = True
 
 
 class ReadOnlyMixin:
