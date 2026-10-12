@@ -61,6 +61,24 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
         }
         self.assertDictEqual(r.json(), expected)
 
+    def test_location_json_view_denied_without_location_permission(self):
+        loc = self._create_location()
+        readonly = self._create_readonly_admin(models=[self.floorplan_model])
+        self.client.force_login(readonly)
+
+        r = self.client.get(reverse("admin:django_loci_location_json", args=[loc.pk]))
+        self.assertEqual(r.status_code, 403)
+
+    def test_location_floorplan_json_view_denied_without_location_permission(self):
+        fl = self._create_floorplan()
+        readonly = self._create_readonly_admin(models=[self.floorplan_model])
+        self.client.force_login(readonly)
+
+        r = self.client.get(
+            reverse("admin:django_loci_location_floorplans_json", args=[fl.location.pk])
+        )
+        self.assertEqual(r.status_code, 403)
+
     def test_location_change_image_removed(self):
         self._login_as_admin()
         loc = self._create_location(name="test-admin-location-1", type="indoor")
