@@ -32,6 +32,14 @@ def restore_readonly_widget_rendering():
     rendered a widget when its ``read_only`` attribute was set, breaking the
     read-only admin (see issue #95). This restores it only for widgets that
     opt-in via ``read_only = True``, so other admins are unaffected.
+
+    TODO: Django is adding an official hook, ``get_readonly_widget()``
+    (https://code.djangoproject.com/ticket/30577,
+    https://github.com/django/django/pull/21686). Once it is released:
+    implement it in the admins that set ``read_only``, use admin display
+    methods for the ObjectLocation form fields which are not model fields
+    (``geometry``, ``image``), since the hook only covers model fields,
+    and apply this patch only on Django versions without the hook.
     """
     if getattr(AdminReadonlyField, "_loci_readonly_patched", False):
         return
