@@ -9,6 +9,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.humanize.templatetags.humanize import ordinal
 from django.urls import reverse
 
+from ...base.admin import restore_readonly_widget_rendering
 from .. import TestAdminMixin, TestLociMixin
 
 
@@ -299,7 +300,32 @@ class BaseTestAdmin(TestAdminMixin, TestLociMixin):
 
         loc = self._create_location(name="test-admin-location-1")
         admin = ModelAdmin(self.location_model, site)
-        form = forms.modelform_factory(
-            self.location_model, fields=["name"], widgets={"name": ReadOnlyWidget}
-        )(instance=loc)
-        self.assertEqual(contents("name", form, admin), f"read-only {loc.name}")
+
+        with self.subTest("Widget with read_only is rendered"):
+            form = forms.modelform_factory(
+                self.location_model, fields=["name"], widgets={"name": ReadOnlyWidget}
+            )(instance=loc)
+            self.assertEqual(contents("name", form, admin), f"read-only {loc.name}")
+
+        with self.subTest("Widget without read_only uses default rendering"):
+            form = forms.modelform_factory(self.location_model, fields=["name"])(
+                instance=loc
+            )
+            self.assertEqual(contents("name", form, admin), loc.name)
+
+        with self.subTest("Value lookup failure uses default rendering"):
+            floorplan_admin = ModelAdmin(self.floorplan_model, site)
+            form = forms.modelform_factory(
+                self.floorplan_model,
+                fields=["location"],
+                widgets={"location": ReadOnlyWidget},
+            )(instance=self.floorplan_model())
+            self.assertEqual(
+                contents("location", form, floorplan_admin),
+                floorplan_admin.get_empty_value_display(),
+            )
+
+        with self.subTest("Patch is applied only once"):
+            patched_contents = AdminReadonlyField.contents
+            restore_readonly_widget_rendering()
+            self.assertIs(AdminReadonlyField.contents, patched_contents)
