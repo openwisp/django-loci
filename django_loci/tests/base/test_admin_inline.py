@@ -30,6 +30,15 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
     def params(self):
         return self.__class__._get_params()
 
+    def _assert_field_errors(self, response, *fields):
+        formset = next(
+            inline.formset
+            for inline in response.context["inline_admin_formsets"]
+            if inline.formset.prefix == self._get_prefix()
+        )
+        for field in fields:
+            self.assertIn(field, formset.errors[0], f"No error for {field!r}")
+
     def test_json_urls(self):
         self._login_as_admin()
         r = self.client.get(reverse(self.add_url))
@@ -397,7 +406,7 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
         r = self.client.post(
             reverse(self.change_url, args=[obj.pk]), params, follow=True
         )
-        self.assertContains(r, "errors field-indoor")
+        self._assert_field_errors(r, "indoor")
 
     def test_add_outdoor_invalid(self):
         self._login_as_admin()
@@ -415,9 +424,7 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
             }
         )
         r = self.client.post(reverse(self.add_url), params, follow=True)
-        self.assertContains(r, "errors field-name")
-        self.assertContains(r, "errors field-address")
-        self.assertContains(r, "errors field-geometry")
+        self._assert_field_errors(r, "name", "address", "geometry")
 
     def test_add_outdoor_invalid_geometry(self):
         self._login_as_admin()
@@ -433,7 +440,7 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
             }
         )
         r = self.client.post(reverse(self.add_url), params, follow=True)
-        self.assertContains(r, "errors field-geometry")
+        self._assert_field_errors(r, "geometry")
 
     def test_add_mobile(self):
         self._login_as_admin()
@@ -556,7 +563,7 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
         r = self.client.post(
             reverse(self.change_url, args=[obj.pk]), params, follow=True
         )
-        self.assertContains(r, "errors field-floorplan")
+        self._assert_field_errors(r, "floorplan")
         self.assertContains(r, "No floorplan selected")
 
     def test_change_indoor_floorplan_doesnotexist(self):
@@ -592,7 +599,7 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
         r = self.client.post(
             reverse(self.change_url, args=[obj.pk]), params, follow=True
         )
-        self.assertContains(r, "errors field-floorplan")
+        self._assert_field_errors(r, "floorplan")
         self.assertContains(r, "Selected floorplan does not exist")
 
     def test_change_indoor_floorplan_different_location(self):
@@ -627,7 +634,7 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
         r = self.client.post(
             reverse(self.change_url, args=[obj.pk]), params, follow=True
         )
-        self.assertContains(r, "errors field-floorplan")
+        self._assert_field_errors(r, "floorplan")
         self.assertContains(r, "This floorplan is associated to a different location")
 
     def test_missing_type_error(self):
@@ -649,7 +656,7 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
             }
         )
         r = self.client.post(reverse(self.add_url), params, follow=True)
-        self.assertContains(r, "errors field-type")
+        self._assert_field_errors(r, "type")
 
     def test_add_indoor_location_without_indoor_coords(self):
         self._login_as_admin()
@@ -701,7 +708,7 @@ class BaseTestAdminInline(TestAdminInlineMixin, TestLociMixin):
             }
         )
         r = self.client.post(reverse(self.add_url), params, follow=True)
-        self.assertContains(r, "errors field-floor")
+        self._assert_field_errors(r, "floor")
         loc = self.location_model.objects.filter(name=params["{0}-0-name".format(p)])
         self.assertEqual(loc.count(), 0)
 
