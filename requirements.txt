@@ -1,5 +1,5 @@
 django>=5.2.0,<6.2.0
 django-leaflet~=0.34.0
-Pillow>=12.3.0,<12.4.0
+Pillow>=13.0.0,<13.1.0
 geopy~=2.5.0
 openwisp-utils[channels] @ https://github.com/openwisp/openwisp-utils/archive/refs/heads/1.4.tar.gz
