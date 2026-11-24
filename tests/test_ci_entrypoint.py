@@ -108,3 +108,39 @@ class CiEntrypointTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("unsupported", result.stderr.lower())
         self.assertNotIn("unexpected", result.stdout)
+
+    def test_focused_django_labels_are_forwarded(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copy2(ROOT / "runtests", root / "runtests")
+            (root / "tests").mkdir()
+            (root / "django" / "core").mkdir(parents=True)
+            (root / "django_loci" / "tests").mkdir(parents=True)
+            for package in (
+                root / "django",
+                root / "django" / "core",
+                root / "django_loci",
+                root / "django_loci" / "tests",
+            ):
+                (package / "__init__.py").touch()
+            (root / "django" / "__init__.py").write_text("def setup(): pass\n")
+            (root / "django" / "core" / "management.py").write_text(
+                'def execute_from_command_line(args): print("|".join(args[1:]))\n'
+            )
+            (root / "django_loci" / "tests" / "test_probe.py").write_text(
+                "import unittest\nclass TestProbe(unittest.TestCase):\n    def test_ok(self): pass\n"
+            )
+            for label in (
+                "django_loci.tests.test_probe",
+                "django_loci.tests.test_probe.TestProbe",
+                "django_loci.tests.test_probe.TestProbe.test_ok",
+            ):
+                with self.subTest(label=label):
+                    result = subprocess.run(
+                        [str(root / "runtests"), label, "--noinput"],
+                        cwd=root,
+                        capture_output=True,
+                        text=True,
+                    )
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(result.stdout.strip(), f"test|{label}|--noinput")
