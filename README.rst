@@ -569,6 +569,10 @@ installed locally first):
 
     ./runtests
 
+Pass a Django test label or ``django_loci/tests/pytest_channels.py`` for a
+focused run. Supported flags are ``--failfast`` and ``--noinput`` for
+Django, and ``-q`` and ``-v`` for pytest. Test code remains untrusted.
+
 Contributing
 ------------
 
