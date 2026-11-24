@@ -54,8 +54,17 @@ class CiInstallerTests(unittest.TestCase):
     def test_default_installs_both_phases(self):
         result, calls = self.run_installer()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(calls[0], "sudo apt update")
-        self.assertEqual(calls[-1], "python -m pip install -U django~=6.0.0")
+        self.assertEqual(
+            calls,
+            [
+                "sudo apt update",
+                "sudo apt-get -qq -y install sqlite3 libsqlite3-dev libsqlite3-mod-spatialite gdal-bin",
+                "sudo npm install -g prettier",
+                "python -m pip install -U -r requirements-test.txt",
+                "python -m pip install -U -e .",
+                "python -m pip install -U django~=6.0.0",
+            ],
+        )
 
     def test_failure_stops_installation(self):
         command = "sudo npm install -g prettier"
