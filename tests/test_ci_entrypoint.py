@@ -144,3 +144,23 @@ class CiEntrypointTests(unittest.TestCase):
                     )
                     self.assertEqual(result.returncode, 0, result.stderr)
                     self.assertEqual(result.stdout.strip(), f"test|{label}|--noinput")
+
+    def test_rejects_callable_in_place_of_test_module(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copy2(ROOT / "runtests", root / "runtests")
+            (root / "tests").mkdir()
+            (root / "django.py").write_text("def setup(): pass\n")
+            (root / "django_loci" / "tests").mkdir(parents=True)
+            (root / "django_loci" / "__init__.py").touch()
+            (root / "django_loci" / "tests" / "__init__.py").write_text(
+                'def test_action(): print("unexpected execution")\n'
+            )
+            result = subprocess.run(
+                [str(root / "runtests"), "django_loci.tests.test_action"],
+                cwd=root,
+                capture_output=True,
+                text=True,
+            )
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertNotIn("unexpected execution", result.stdout)
