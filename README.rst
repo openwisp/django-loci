@@ -567,7 +567,11 @@ installed locally first):
 
 .. code-block:: shell
 
+    cd ..
     ./runtests
+
+Pass a Django test label or ``django_loci/tests/pytest_channels.py`` for a
+focused run.
 
 Contributing
 ------------
