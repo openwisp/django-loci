@@ -1,9 +1,86 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env python
+"""Run the CI suite or selected Django and Channels tests."""
 
-coverage erase
+import os
+import subprocess
+import sys
 
-coverage run runtests.py --parallel --exclude-tag=selenium_tests
-coverage run runtests.py --tag=selenium_tests --exclude-pytest
-coverage combine
-coverage xml
+from openwisp_utils.test.runner import (
+    InvalidTestArgument,
+    compile_test_label_pattern,
+    parse_test_arguments,
+    validate_test_labels,
+)
+
+
+def main():
+    if len(sys.argv) == 1:
+        for arguments in (
+            ["coverage", "erase"],
+            [
+                "coverage",
+                "run",
+                "runtests.py",
+                "--parallel",
+                "--exclude-tag=selenium_tests",
+            ],
+            [
+                "coverage",
+                "run",
+                "runtests.py",
+                "--tag=selenium_tests",
+                "--exclude-pytest",
+            ],
+            ["coverage", "combine"],
+            ["coverage", "xml"],
+        ):
+            result = subprocess.run(arguments)
+            if result.returncode:
+                return result.returncode
+        return 0
+
+    if sys.argv[1] == "django_loci/tests/pytest_channels.py":
+        if any(argument not in ("-q", "-v") for argument in sys.argv[2:]):
+            print("Unsupported test argument", file=sys.stderr)
+            return 2
+        sys.path.insert(0, "tests")
+        os.environ["DJANGO_SETTINGS_MODULE"] = "openwisp2.settings"
+        import django
+        import pytest
+
+        django.setup()
+        # The project's addopts include the entire test directory.
+        return pytest.main(
+            ["-o", "addopts=--create-db --reuse-db --nomigrations", *sys.argv[1:]]
+        )
+
+    pattern = compile_test_label_pattern(
+        module_roots=("django_loci.tests", "django_loci.tests.testdeviceapp.tests")
+    )
+    try:
+        labels, flags = parse_test_arguments(
+            sys.argv[1:], pattern, ("--failfast", "--noinput"), require_label=True
+        )
+    except InvalidTestArgument as error:
+        print(error, file=sys.stderr)
+        return 2
+    sys.path.insert(0, "tests")
+    os.environ["DJANGO_SETTINGS_MODULE"] = "openwisp2.settings"
+    import django
+
+    django.setup()
+    try:
+        validate_test_labels(labels)
+    except InvalidTestArgument as error:
+        print(error, file=sys.stderr)
+        return 2
+    from django.core.management import execute_from_command_line
+
+    execute_from_command_line(
+        [sys.argv[0], "test", *[m.group(0) for m in labels], *flags]
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
